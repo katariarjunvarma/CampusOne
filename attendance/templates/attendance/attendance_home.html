@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Smart LPU - Attendance{% endblock %}
+
+{% block content %}
+  <div class="glass-strong p-4 p-md-5 mb-4">
+    <div class="row align-items-center g-3">
+      <div class="col-12 col-lg-8">
+        <h1 class="display-6 mb-2">Attendance</h1>
+        <p class="smart-muted mb-0">Create sessions, view recent sessions, and mark attendance.</p>
+      </div>
+      <div class="col-12 col-lg-4 text-lg-end">
+        <a class="btn btn-success text-white fw-semibold" href="{% url 'create_session' %}">Create Session</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-strong p-3 p-md-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span class="fw-semibold">Recent Sessions</span>
+      <span class="smart-muted small">Latest 20</span>
+    </div>
+    {% if sessions %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 table-clean">
+          <thead>
+            <tr>
+              <th>Course Code</th>
+              <th>Course Name</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in sessions %}
+              <tr>
+                <td class="fw-semibold">{{ s.course.code }}</td>
+                <td>{{ s.course.name }}</td>
+                <td>{{ s.session_date }}</td>
+                <td class="smart-muted">{{ s.time_slot|default:"-" }}</td>
+                <td class="text-end">
+                  <div class="d-inline-flex gap-2">
+                    <a class="btn btn-outline-smart btn-sm" href="{% url 'session_detail' session_id=s.id %}">View</a>
+                    <a class="btn btn-outline-smart btn-sm" href="{% url 'edit_session' session_id=s.id %}">Edit</a>
+                    <a class="btn btn-outline-danger btn-sm" href="{% url 'delete_session' session_id=s.id %}">Delete</a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="smart-muted mb-0">No sessions yet. Create your first session to start marking attendance.</p>
+    {% endif %}
+  </div>
+{% endblock %}
