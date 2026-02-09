@@ -42,6 +42,7 @@
               <td class="smart-muted">{{ s.email }}</td>
               <td class="smart-muted">{{ s.parent_phone }}</td>
               <td class="text-end">
+                <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_student_edit' student_id=s.id %}">Edit</a>
                 <a class="btn btn-outline-danger btn-sm" href="{% url 'manage_student_delete' student_id=s.id %}">Delete</a>
               </td>
             </tr>

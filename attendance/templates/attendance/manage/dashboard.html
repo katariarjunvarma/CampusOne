@@ -10,55 +10,69 @@
     </div>
   </div>
 
-  <div class="kpi">
-    <div class="kpi-card glass-strong p-3 p-md-4">
-      <div class="smart-muted small">Students</div>
-      <div class="display-6 mb-2">{{ stats.students }}</div>
-      <div class="d-flex gap-2 flex-wrap">
-        <a class="btn btn-smart text-white btn-sm" href="{% url 'manage_student_create' %}">Add Student</a>
-        <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_students' %}">View Students</a>
+  <div class="row g-3">
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="glass-strong p-4 h-100">
+        <div class="fw-semibold mb-1">Students</div>
+        <div class="smart-muted small mb-3">Add and manage student records.</div>
+        <div class="d-flex gap-2">
+          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_student_create' %}">Add</a>
+          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_students' %}">View</a>
+        </div>
       </div>
     </div>
-    <div class="kpi-card glass-strong p-3 p-md-4">
-      <div class="smart-muted small">Courses</div>
-      <div class="display-6 mb-2">{{ stats.courses }}</div>
-      <div class="d-flex gap-2 flex-wrap">
-        <a class="btn btn-smart text-white btn-sm" href="{% url 'manage_course_create' %}">Add Course</a>
-        <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_courses' %}">View Courses</a>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="glass-strong p-4 h-100">
+        <div class="fw-semibold mb-1">Courses</div>
+        <div class="smart-muted small mb-3">Add and manage course details.</div>
+        <div class="d-flex gap-2">
+          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_course_create' %}">Add</a>
+          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_courses' %}">View</a>
+        </div>
       </div>
     </div>
-    <div class="kpi-card glass-strong p-3 p-md-4">
-      <div class="smart-muted small">Enrollments</div>
-      <div class="display-6 mb-2">{{ stats.enrollments }}</div>
-      <div class="d-flex gap-2 flex-wrap">
-        <a class="btn btn-smart text-white btn-sm" href="{% url 'manage_enrollment_create' %}">Add Enrollment</a>
-        <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_enrollments' %}">View Enrollments</a>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="glass-strong p-4 h-100">
+        <div class="fw-semibold mb-1">Enrollments</div>
+        <div class="smart-muted small mb-3">Enroll students to courses.</div>
+        <div class="d-flex gap-2">
+          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_enrollment_create' %}">Add</a>
+          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_enrollments' %}">View</a>
+        </div>
       </div>
     </div>
-    <div class="kpi-card glass-strong p-3 p-md-4">
-      <div class="smart-muted small">Face Data</div>
-      <div class="display-6 mb-2">{{ stats.face_samples }}</div>
-      <div class="d-flex gap-2 flex-wrap">
-        <a class="btn btn-smart text-white btn-sm" href="{% url 'manage_face_sample_create' %}">Upload</a>
-        <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_face_samples' %}">View Face Data</a>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="glass-strong p-4 h-100">
+        <div class="fw-semibold mb-1">Face Data</div>
+        <div class="smart-muted small mb-3">Upload and manage face samples.</div>
+        <div class="d-flex gap-2">
+          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_face_sample_create' %}">Upload</a>
+          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_face_samples' %}">View</a>
+        </div>
       </div>
     </div>
-    <div class="kpi-card glass-strong p-3 p-md-4">
-      <div class="smart-muted small">Notifications</div>
-      <div class="display-6 mb-2">{{ stats.notifications }}</div>
-      <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_notifications' %}">View</a>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="glass-strong p-4 h-100">
+        <div class="fw-semibold mb-1">Notifications</div>
+        <div class="smart-muted small mb-3">View attendance notifications.</div>
+        <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_notifications' %}">View</a>
+      </div>
     </div>
-    <div class="kpi-card glass-strong p-3 p-md-4">
-      <div class="smart-muted small">Records</div>
-      <div class="display-6 mb-2">{{ stats.records }}</div>
-      <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_records' %}">View</a>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="glass-strong p-4 h-100">
+        <div class="fw-semibold mb-1">Records</div>
+        <div class="smart-muted small mb-3">View all attendance records.</div>
+        <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_records' %}">View</a>
+      </div>
     </div>
-    <div class="kpi-card glass-strong p-3 p-md-4">
-      <div class="smart-muted small">Sessions</div>
-      <div class="display-6 mb-2">{{ stats.sessions }}</div>
-      <div class="d-flex gap-2 flex-wrap">
-        <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_sessions' %}">View Sessions</a>
-        <a class="btn btn-outline-smart btn-sm" href="{% url 'attendance_home' %}">Open Attendance</a>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="glass-strong p-4 h-100">
+        <div class="fw-semibold mb-1">Sessions</div>
+        <div class="smart-muted small mb-3">View all attendance sessions.</div>
+        <div class="d-flex gap-2">
+          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_sessions' %}">View</a>
+          <a class="btn btn-outline-smart btn-sm" href="{% url 'attendance_home' %}">Open Attendance</a>
+        </div>
       </div>
     </div>
   </div>

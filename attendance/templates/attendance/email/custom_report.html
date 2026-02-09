@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Attendance Report - LPU</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 0;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .content {
+            padding: 30px;
+        }
+        .summary-box {
+            background-color: #e3f2fd;
+            border: 1px solid #1e3c72;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .stat-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #1e3c72;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+            font-size: 14px;
+        }
+        .attendance-table th,
+        .attendance-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .attendance-table th {
+            background-color: #1e3c72;
+            color: white;
+            font-weight: bold;
+        }
+        .attendance-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .present {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .absent {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            margin: 30px 0 0 0;
+            padding: 20px 30px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 14px;
+        }
+        .lpu-blue {
+            color: #1e3c72;
+        }
+        .lpu-light-blue {
+            color: #2a5298;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% include 'attendance/email/logo_header.html' %}
+        
+        <div class="content">
+            <p>Dear Student,</p>
+            <div class="summary-box">
+                <h2>📊 Custom Attendance Report</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">{{ course_code }}</div>
+                        <div class="stat-label">Course</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">{{ start_date }}</div>
+                        <div class="stat-label">From Date</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">{{ end_date }}</div>
+                        <div class="stat-label">To Date</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">{{ total_records }}</div>
+                        <div class="stat-label">Total Records</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number present">{{ present_count }}</div>
+                        <div class="stat-label">Present</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number absent">{{ absent_count }}</div>
+                        <div class="stat-label">Absent</div>
+                    </div>
+                </div>
+            </div>
+
+            <h4>📋 Detailed Attendance Records</h4>
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Roll Number</th>
+                        <th>Course Code</th>
+                        <th>Course Name</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Marked By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in report_data %}
+                    <tr>
+                        <td>{{ record.student_name }}</td>
+                        <td>{{ record.roll_number }}</td>
+                        <td>{{ record.course_code }}</td>
+                        <td>{{ record.course_name }}</td>
+                        <td>{{ record.date }}</td>
+                        <td>{{ record.time }}</td>
+                        <td>
+                            {% if record.status == 'Present' %}
+                                <span class="present">✓ {{ record.status }}</span>
+                            {% else %}
+                                <span class="absent">✗ {{ record.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ record.marked_by }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>This is a custom attendance report generated from <span class="lpu-blue"><strong>LPU Smart Attendance System</strong></span>.</p>
+            <p>For any discrepancies, please contact the administration office.</p>
+            <p>© 2024 <span class="lpu-blue">Lovely Professional University</span>. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

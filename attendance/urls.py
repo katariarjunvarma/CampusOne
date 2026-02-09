@@ -8,6 +8,7 @@ urlpatterns = [
     path("manage/", views.manage_dashboard, name="manage_dashboard"),
     path("manage/students/", views.manage_students, name="manage_students"),
     path("manage/students/new/", views.manage_student_create, name="manage_student_create"),
+    path("manage/students/<int:student_id>/edit/", views.manage_student_edit, name="manage_student_edit"),
     path("manage/students/<int:student_id>/delete/", views.manage_student_delete, name="manage_student_delete"),
     path("manage/courses/", views.manage_courses, name="manage_courses"),
     path("manage/courses/new/", views.manage_course_create, name="manage_course_create"),
@@ -39,6 +40,11 @@ urlpatterns = [
         "faculty/sessions/<int:session_id>/delete/",
         views.delete_session,
         name="delete_session",
+    ),
+    path(
+        "faculty/sessions/<int:session_id>/view/",
+        views.session_view,
+        name="session_view",
     ),
     path(
         "faculty/sessions/<int:session_id>/",

@@ -9,7 +9,7 @@
         <p class="smart-muted mb-0">Create sessions, view recent sessions, and mark attendance.</p>
       </div>
       <div class="col-12 col-lg-4 text-lg-end">
-        <a class="btn btn-success text-white fw-semibold" href="{% url 'create_session' %}">Create Session</a>
+        <a class="btn btn-outline-smart fw-semibold" href="{% url 'create_session' %}">Create Session</a>
       </div>
     </div>
   </div>
@@ -40,9 +40,9 @@
                 <td class="smart-muted">{{ s.time_slot|default:"-" }}</td>
                 <td class="text-end">
                   <div class="d-inline-flex gap-2">
-                    <a class="btn btn-outline-smart btn-sm" href="{% url 'session_detail' session_id=s.id %}">View</a>
-                    <a class="btn btn-outline-smart btn-sm" href="{% url 'edit_session' session_id=s.id %}">Edit</a>
-                    <a class="btn btn-outline-danger btn-sm" href="{% url 'delete_session' session_id=s.id %}">Delete</a>
+                    <a class="btn btn-outline-smart btn-sm" href="{% url 'session_view' session_id=s.id %}">View</a>
+                    <a class="btn btn-outline-smart btn-sm" href="{% url 'session_detail' session_id=s.id %}">Edit</a>
+                    <a class="btn btn-outline-smart btn-sm" href="{% url 'delete_session' session_id=s.id %}">Delete</a>
                   </div>
                 </td>
               </tr>

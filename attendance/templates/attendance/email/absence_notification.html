@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absence Notification - Smart LPU</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 0;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .content {
+            padding: 30px;
+        }
+        .title {
+            font-size: 24px;
+            color: #d32f2f;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .student-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #1e3c72;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 5px 0;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .info-value {
+            color: #333;
+        }
+        .message {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin: 30px 0 0 0;
+            padding: 20px 30px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 14px;
+        }
+        .contact-info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .urgent {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        .lpu-blue {
+            color: #1e3c72;
+        }
+        .lpu-light-blue {
+            color: #2a5298;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% include 'attendance/email/logo_header.html' %}
+        
+        <div class="content">
+            <div class="title">
+                Absence Notification
+            </div>
+
+            <div class="student-info">
+                <div class="info-row">
+                    <span class="info-label">Student Name:</span>
+                    <span class="info-value">{{ student_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Roll Number:</span>
+                    <span class="info-value">{{ roll_number }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Course:</span>
+                    <span class="info-value">{{ course_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Date:</span>
+                    <span class="info-value">{{ date }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Class Time Slot:</span>
+                    <span class="info-value">{{ time_slot }}</span>
+                </div>
+            </div>
+
+            <div class="message">
+                <p>Dear Student,</p>
+                <p>This is to inform you that <strong>{{ student_name }}</strong> was marked <span class="urgent">ABSENT</span> for the {{ course_name }} class on {{ date }} during {{ time_slot }}.</p>
+                
+                <p><strong>Important Notes:</strong></p>
+                <ul>
+                    <li>Regular attendance is crucial for academic success</li>
+                    <li>If you believe this absence was marked by mistake (e.g., due to a system mismatch), please contact your course teacher.</li>
+                </ul>
+            </div>
+
+            <div class="contact-info">
+                <p><strong>📞 Contact Information:</strong></p>
+                <p>If you have any questions or need to report a valid reason for absence, please contact:</p>
+                <p>
+                    📧 Email: admin@lpu.edu<br>
+                    📱 Phone: +91-1824-404404<br>
+                    🏢 Administration Office, LPU Campus
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>This is an automated message from <span class="lpu-blue"><strong>LPU Smart Attendance System</strong></span>.</p>
+            <p>Please do not reply to this email. For inquiries, use the contact information above.</p>
+            <p>© 2024 <span class="lpu-blue">Lovely Professional University</span>. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

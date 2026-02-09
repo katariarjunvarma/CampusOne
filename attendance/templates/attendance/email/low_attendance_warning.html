@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Low Attendance Warning - LPU</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 0;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .content {
+            padding: 30px;
+        }
+        .title {
+            font-size: 24px;
+            color: #ff9800;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .warning-box {
+            background-color: #fff3e0;
+            border: 2px solid #ff9800;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .attendance-stats {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #ff9800;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 5px 0;
+        }
+        .stat-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .stat-value {
+            color: #333;
+            font-weight: bold;
+        }
+        .low-percentage {
+            color: #d32f2f;
+            font-size: 18px;
+        }
+        .footer {
+            text-align: center;
+            margin: 30px 0 0 0;
+            padding: 20px 30px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 14px;
+        }
+        .actions {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .lpu-blue {
+            color: #1e3c72;
+        }
+        .lpu-light-blue {
+            color: #2a5298;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% include 'attendance/email/logo_header.html' %}
+        
+        <div class="content">
+            <div class="title">
+                ⚠️ Low Attendance Warning
+            </div>
+
+            <div class="warning-box">
+                <h3>Attention Required!</h3>
+                <p>Your child's attendance has fallen below the minimum requirement.</p>
+            </div>
+
+            <div class="attendance-stats">
+                <div class="stat-row">
+                    <span class="stat-label">Student Name:</span>
+                    <span class="stat-value">{{ student_name }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Roll Number:</span>
+                    <span class="stat-value">{{ roll_number }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Course:</span>
+                    <span class="stat-value">{{ course_name }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Current Attendance:</span>
+                    <span class="stat-value low-percentage">{{ attendance_percentage }}%</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Required Attendance:</span>
+                    <span class="stat-value">75%</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Classes Attended:</span>
+                    <span class="stat-value">{{ classes_attended }} / {{ total_classes }}</span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <p>Dear Student,</p>
+                <p><strong>⚠️ Consequences of Low Attendance:</strong></p>
+                <ul>
+                    <li>May not be eligible to appear in examinations</li>
+                    <li>Could affect academic performance and grades</li>
+                    <li>May require special permission from administration</li>
+                </ul>
+                
+                <p><strong>📋 Recommended Actions:</strong></p>
+                <ul>
+                    <li>Ensure regular attendance from now on</li>
+                    <li>Submit medical certificates for any genuine absences</li>
+                    <li>Meet with the class advisor or administration</li>
+                    <li>Discuss any issues affecting attendance</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>This is an automated message from <span class="lpu-blue"><strong>LPU Smart Attendance System</strong></span>.</p>
+            <p>Please contact the administration immediately to address this issue.</p>
+            <p>© 2024 <span class="lpu-blue">Lovely Professional University</span>. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

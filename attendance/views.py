@@ -1,22 +1,28 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.template.loader import render_to_string
 
 import cv2
 import numpy as np
 from PIL import Image
 from django.http import JsonResponse
+from django.core.mail import send_mail
+from django.conf import settings
 import base64
 import time
 from collections import deque
+from datetime import timedelta
 
 from .face_recognition import (
+    build_embedding_gallery,
     build_training_set,
     detect_eyes_count,
     detect_faces_count,
+    recognize_embeddings_in_image,
     recognize_faces_in_image,
     train_lbph,
 )
@@ -106,6 +112,20 @@ def manage_student_create(request: HttpRequest) -> HttpResponse:
     else:
         form = StudentForm()
     return render(request, "attendance/manage/form.html", {"form": form, "title": "Add Student"})
+
+
+@login_required
+def manage_student_edit(request: HttpRequest, student_id: int) -> HttpResponse:
+    student = get_object_or_404(Student, id=student_id)
+    if request.method == "POST":
+        form = StudentForm(request.POST, instance=student)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Student updated.")
+            return redirect("manage_students")
+    else:
+        form = StudentForm(instance=student)
+    return render(request, "attendance/manage/form.html", {"form": form, "title": "Edit Student"})
 
 
 @login_required
@@ -332,6 +352,44 @@ def session_detail(request: HttpRequest, session_id: int) -> HttpResponse:
 
 
 @login_required
+def session_view(request: HttpRequest, session_id: int) -> HttpResponse:
+    session = get_object_or_404(AttendanceSession.objects.select_related("course"), id=session_id)
+    students = (
+        Student.objects.filter(enrollments__course=session.course)
+        .order_by("roll_no")
+        .distinct()
+    )
+
+    existing = {
+        r.student_id: r
+        for r in AttendanceRecord.objects.filter(session=session).select_related("student")
+    }
+    
+    present_students = []
+    absent_students = []
+    
+    for s in students:
+        rec = existing.get(s.id)
+        if rec and rec.status == AttendanceRecord.STATUS_PRESENT:
+            present_students.append(s)
+        else:
+            absent_students.append(s)
+
+    return render(
+        request,
+        "attendance/session_view.html",
+        {
+            "session": session,
+            "present_students": present_students,
+            "absent_students": absent_students,
+            "total_count": len(students),
+            "present_count": len(present_students),
+            "absent_count": len(absent_students),
+        },
+    )
+
+
+@login_required
 @transaction.atomic
 def mark_attendance_by_photo(request: HttpRequest, session_id: int) -> HttpResponse:
     session = get_object_or_404(AttendanceSession.objects.select_related("course"), id=session_id)
@@ -379,60 +437,131 @@ def mark_attendance_by_photo(request: HttpRequest, session_id: int) -> HttpRespo
             filtered[sid] = keep
     images_by_label = filtered
 
+    present_ids: set[int] = set()
+    used_method = ""
+
+    # Prefer deep-learning embeddings (YuNet + SFace). If anything fails (no internet, model load error,
+    # OpenCV build mismatch), fall back to existing LBPH pipeline.
     try:
-        train_images, train_labels = build_training_set(images_by_label)
-        recognizer = train_lbph(train_images, train_labels)
-    except Exception:
-        enrolled_ids = [s.id for s in students]
-        parts = []
-        for sid in enrolled_ids:
-            parts.append(f"{sample_counts.get(sid, 0)}/{usable_counts.get(sid, 0)}")
-        counts_str = ", ".join(parts)
-        messages.error(
-            request,
-            "Face training data is missing/invalid. Upload Face Data in Manage Data (need at least 5 clear photos with a detectable face per enrolled student). "
-            f"Samples found (total/usable) in course order: [{counts_str}]",
+        gallery = build_embedding_gallery(images_by_label, min_per_student=min_samples_per_student)
+        if not gallery:
+            raise ValueError("Embedding gallery empty")
+
+        upload = form.cleaned_data["photo"]
+        pil = Image.open(upload).convert("RGB")
+        rgb = np.array(pil)
+        bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+
+        recognized = recognize_embeddings_in_image(
+            bgr,
+            gallery,
+            similarity_threshold=0.45,
+            ambiguity_margin=0.04,
         )
-        return redirect("session_detail", session_id=session.id)
 
-    # Decode uploaded image
-    upload = form.cleaned_data["photo"]
-    pil = Image.open(upload).convert("RGB")
-    rgb = np.array(pil)
-    bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+        if len(recognized) == 0:
+            messages.warning(
+                request,
+                "No confident face match found. Try better lighting/angle or upload clearer Face Data.",
+            )
+        else:
+            present_ids = {r.label for r in recognized}
 
-    recognized = recognize_faces_in_image(recognizer, bgr)
+        used_method = "embedding"
 
-    # LBPH: lower confidence is better.
-    # Strict mode (A1): use a tighter threshold to reduce false positives.
-    threshold = 70.0
-    allowed_ids = {s.id for s in students}
-
-    # Choose best (lowest) confidence per predicted label
-    best_by_id: dict[int, float] = {}
-    for r in recognized:
-        if r.label not in allowed_ids:
-            continue
-        conf = float(r.confidence)
-        prev = best_by_id.get(r.label)
-        if prev is None or conf < prev:
-            best_by_id[r.label] = conf
-
-    sorted_matches = sorted(best_by_id.items(), key=lambda x: x[1])
-
-    # Ambiguity guard: if the best match isn't clearly better than the second best,
-    # treat the image as unknown to prevent look-alike false positives.
-    if len(sorted_matches) >= 2:
-        best_conf = float(sorted_matches[0][1])
-        second_conf = float(sorted_matches[1][1])
-        if (second_conf - best_conf) < 12.0:
+    except Exception as e:
+        messages.warning(
+            request,
+            f"Embedding face recognition unavailable, falling back to LBPH. Reason: {e}",
+        )
+        try:
+            train_images, train_labels = build_training_set(images_by_label)
+            recognizer = train_lbph(train_images, train_labels)
+        except Exception:
+            enrolled_ids = [s.id for s in students]
+            parts = []
+            for sid in enrolled_ids:
+                parts.append(f"{sample_counts.get(sid, 0)}/{usable_counts.get(sid, 0)}")
+            counts_str = ", ".join(parts)
             messages.error(
                 request,
-                "Face match is ambiguous (two students are too close). Please try again with better lighting/angle or improve Face Data.",
+                "Face training data is missing/invalid. Upload Face Data in Manage Data (need at least 5 clear photos with a detectable face per enrolled student). "
+                f"Samples found (total/usable) in course order: [{counts_str}]",
             )
             return redirect("session_detail", session_id=session.id)
 
-    present_ids = {sid for (sid, conf) in sorted_matches if conf <= threshold}
+        # Decode uploaded image
+        upload = form.cleaned_data["photo"]
+        pil = Image.open(upload).convert("RGB")
+        rgb = np.array(pil)
+        bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+
+        recognized = recognize_faces_in_image(recognizer, bgr)
+
+        # Debug info: show detected faces and match details
+        faces_detected_in_image = len(recognized)
+
+        # If no faces detected in the uploaded image, show helpful error
+        if faces_detected_in_image == 0:
+            messages.error(
+                request,
+                "No face detected in the uploaded photo. Please ensure:\n"
+                "1. Your face is clearly visible and well-lit\n"
+                "2. You are facing the camera directly\n"
+                "3. The photo is not blurry\n"
+                "4. Only one person is in the frame\n"
+                "Then try again or use Manual Attendance.",
+            )
+            return redirect("session_detail", session_id=session.id)
+
+        # LBPH: lower confidence is better.
+        # Strict mode (A1): use a tighter threshold to reduce false positives.
+        threshold = 80.0
+        allowed_ids = {s.id for s in students}
+
+        # Choose best (lowest) confidence per predicted label
+        best_by_id: dict[int, float] = {}
+        for r in recognized:
+            if r.label not in allowed_ids:
+                continue
+            conf = float(r.confidence)
+            prev = best_by_id.get(r.label)
+            if prev is None or conf < prev:
+                best_by_id[r.label] = conf
+
+        # Debug: show match info
+        match_info = ", ".join([f"ID:{sid}={conf:.1f}" for sid, conf in best_by_id.items()])
+        messages.info(
+            request,
+            f"Faces detected: {faces_detected_in_image}. Matches: {match_info if match_info else 'None'}",
+        )
+
+        sorted_matches = sorted(best_by_id.items(), key=lambda x: x[1])
+
+        # Ambiguity guard: if the best match isn't clearly better than the second best,
+        # treat the image as unknown to prevent look-alike false positives.
+        if len(sorted_matches) >= 2:
+            best_conf = float(sorted_matches[0][1])
+            second_conf = float(sorted_matches[1][1])
+            if (second_conf - best_conf) < 12.0:
+                messages.error(
+                    request,
+                    "Face match is ambiguous (two students are too close). Please try again with better lighting/angle or improve Face Data.",
+                )
+                return redirect("session_detail", session_id=session.id)
+
+        present_ids = {sid for (sid, conf) in sorted_matches if conf <= threshold}
+
+        # If no students matched, explain why
+        if len(present_ids) == 0 and len(best_by_id) > 0:
+            best_match = sorted_matches[0]
+            messages.warning(
+                request,
+                f"Face detected but confidence too low (best match: {best_match[1]:.1f}, threshold: {threshold}). "
+                f"Try uploading clearer photos with better lighting, or use Manual Attendance.",
+            )
+
+        used_method = "lbph"
 
     for s in students:
         status = (
@@ -440,11 +569,21 @@ def mark_attendance_by_photo(request: HttpRequest, session_id: int) -> HttpRespo
             if s.id in present_ids
             else AttendanceRecord.STATUS_ABSENT
         )
-        AttendanceRecord.objects.update_or_create(
+        prev = AttendanceRecord.objects.filter(session=session, student=s).values_list("status", flat=True).first()
+        rec, _created = AttendanceRecord.objects.update_or_create(
             session=session,
             student=s,
             defaults={"status": status, "source": "face"},
         )
+
+        if status == AttendanceRecord.STATUS_ABSENT and s.email:
+            # Create notification record (but DON'T send email yet - wait for manual submit)
+            msg = (
+                f"Absent detected: {s.full_name} ({s.roll_no}) was marked ABSENT for "
+                f"{session.course.code} on {session.session_date}."
+            )
+            Notification.objects.create(recipient_student=s, channel="simulated", message=msg)
+            # Note: Email will be sent when user clicks Submit button in manual attendance
 
     absentees = [s for s in students if s.id not in present_ids]
     for s in absentees:
@@ -456,62 +595,157 @@ def mark_attendance_by_photo(request: HttpRequest, session_id: int) -> HttpRespo
 
     messages.success(
         request,
-        f"Photo-based marking complete. Detected present: {len(present_ids)} | Absentees: {len(absentees)}",
+        f"Photo-based marking complete. Detected present: {len(present_ids)} | Absentees: {len(absentees)}. "
+        f"Review and click Submit to send absence emails.",
     )
+    if used_method:
+        messages.info(request, f"Face matching method used: {used_method}.")
     return redirect("session_detail", session_id=session.id)
 
 
 @login_required
 @transaction.atomic
 def mark_attendance(request: HttpRequest, session_id: int) -> HttpResponse:
-    session = get_object_or_404(AttendanceSession.objects.select_related("course"), id=session_id)
-    students = (
-        Student.objects.filter(enrollments__course=session.course)
-        .order_by("roll_no")
-        .distinct()
-    )
+    try:
+        session = get_object_or_404(AttendanceSession.objects.select_related("course"), id=session_id)
+        students = (
+            Student.objects.filter(enrollments__course=session.course)
+            .order_by("roll_no")
+            .distinct()
+        )
 
-    if request.method != "POST":
-        return redirect("session_detail", session_id=session.id)
+        if request.method != "POST":
+            return redirect("session_detail", session_id=session.id)
 
-    action = request.POST.get("action", "")
+        action = request.POST.get("action", "")
 
-    if action == "mark_all_present":
+        if action == "mark_all_present":
+            for s in students:
+                AttendanceRecord.objects.update_or_create(
+                    session=session,
+                    student=s,
+                    defaults={"status": AttendanceRecord.STATUS_PRESENT, "source": "manual"},
+                )
+            messages.success(request, "Marked all students present.")
+            return redirect("session_detail", session_id=session.id)
+
+        if action == "mark_all_absent":
+            for s in students:
+                AttendanceRecord.objects.update_or_create(
+                    session=session,
+                    student=s,
+                    defaults={"status": AttendanceRecord.STATUS_ABSENT, "source": "manual"},
+                )
+            messages.success(request, "Marked all students absent.")
+            return redirect("session_detail", session_id=session.id)
+
+        present_ids = {int(x) for x in request.POST.getlist("present") if x.isdigit()}
+
+        emails_attempted = 0
+        emails_sent = 0
+        email_failures = 0
+
+        # Save records
         for s in students:
+            status = (
+                AttendanceRecord.STATUS_PRESENT
+                if s.id in present_ids
+                else AttendanceRecord.STATUS_ABSENT
+            )
+            prev = AttendanceRecord.objects.filter(session=session, student=s).values_list("status", flat=True).first()
             AttendanceRecord.objects.update_or_create(
                 session=session,
                 student=s,
-                defaults={"status": AttendanceRecord.STATUS_PRESENT, "source": "manual"},
+                defaults={"status": status, "source": "manual"},
             )
-        messages.success(request, "Marked all students present.")
+
+            if status == AttendanceRecord.STATUS_ABSENT and s.email:
+                # Create notification record
+                msg = (
+                    f"Absent detected: {s.full_name} ({s.roll_no}) was marked ABSENT for "
+                    f"{session.course.code} on {session.session_date}."
+                )
+                Notification.objects.create(recipient_student=s, channel="email", message=msg)
+                
+                # Send customized email with requested format
+                try:
+                    # Custom subject format: Absent marked for <course code> <date>
+                    subject = f"Absent marked for {session.course.code} {session.session_date.strftime('%Y-%m-%d')}"
+                    
+                    # Prepare template context
+                    context = {
+                        'student_name': s.full_name,
+                        'roll_number': s.roll_no,
+                        'course_name': session.course.name,
+                        'course_code': session.course.code,
+                        'date': session.session_date.strftime('%d %B %Y'),
+                        'time_slot': session.time_slot
+                        or f"{session.session_date.strftime('%I:%M %p')} to {(session.session_date + timedelta(hours=1)).strftime('%I:%M %p')}",
+                    }
+                    
+                    # Render HTML email
+                    html_message = render_to_string('attendance/email/absence_notification.html', context)
+                    
+                    # Render text email with custom message format
+                    text_message = f"""You have been marked absent for {session.course.code} - {session.course.name} from time {context['time_slot']} on {context['date']}
+
+Student Details:
+- Name: {s.full_name}
+- Roll Number: {s.roll_no}
+- Course: {session.course.name} ({session.course.code})
+- Date: {context['date']}
+- Class Time Slot: {context['time_slot']}
+
+Important Notes:
+- Regular attendance is crucial for academic success
+- If you believe this absence was marked by mistake (e.g., due to a system mismatch), please contact your course teacher.
+
+Contact Information:
+Email: admin@lpu.edu
+Phone: +91-1824-404404
+Administration Office, LPU Campus
+
+This is an automated message from LPU Smart Attendance System.
+© 2024 Lovely Professional University. All rights reserved."""
+                    
+                    emails_attempted += 1
+                    sent = send_mail(
+                        subject=subject,
+                        message=text_message,
+                        html_message=html_message,
+                        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
+                        recipient_list=[s.email],
+                        fail_silently=False,
+                    )
+                    if sent:
+                        emails_sent += 1
+                    else:
+                        email_failures += 1
+                except Exception:
+                    email_failures += 1
+
+        absentees = [s for s in students if s.id not in present_ids]
+        for s in absentees:
+            msg = (
+                f"Absent detected: {s.full_name} ({s.roll_no}) was marked ABSENT for "
+                f"{session.course.code} on {session.session_date}."
+            )
+            Notification.objects.create(recipient_student=s, channel="simulated", message=msg)
+
+        messages.success(
+            request,
+            f"Attendance saved. Absentees: {len(absentees)} | Emails sent: {emails_sent}/{emails_attempted}",
+        )
+        if email_failures or emails_sent < emails_attempted:
+            messages.warning(
+                request,
+                f"Some absence emails failed to send ({email_failures}). Please check the server console for the exact error.",
+            )
         return redirect("session_detail", session_id=session.id)
-
-    present_ids = {int(x) for x in request.POST.getlist("present") if x.isdigit()}
-
-    # Save records
-    for s in students:
-        status = (
-            AttendanceRecord.STATUS_PRESENT
-            if s.id in present_ids
-            else AttendanceRecord.STATUS_ABSENT
-        )
-        AttendanceRecord.objects.update_or_create(
-            session=session,
-            student=s,
-            defaults={"status": status, "source": "manual"},
-        )
-
-    # Absentee detection + notifications (simulated)
-    absentees = [s for s in students if s.id not in present_ids]
-    for s in absentees:
-        msg = (
-            f"Absent detected: {s.full_name} ({s.roll_no}) was marked ABSENT for "
-            f"{session.course.code} on {session.session_date}."
-        )
-        Notification.objects.create(recipient_student=s, channel="simulated", message=msg)
-
-    messages.success(request, f"Attendance saved. Absentees: {len(absentees)}")
-    return redirect("session_detail", session_id=session.id)
+    
+    except Exception as e:
+        messages.error(request, f"An error occurred: {str(e)}")
+        return redirect("session_detail", session_id=session.id)
 
 
 @login_required

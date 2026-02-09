@@ -1,0 +1,31 @@
+ABSENCE NOTIFICATION - SMART LPU
+====================================
+
+Dear Student,
+
+Student Information:
+-------------------
+Name: {{ student_name }}
+Roll Number: {{ roll_number }}
+Course: {{ course_name }}
+Date: {{ date }}
+Class Time Slot: {{ time_slot }}
+
+This is to inform you that {{ student_name }} was marked ABSENT for the {{ course_name }} class on {{ date }} during {{ time_slot }}.
+
+Important Notes:
+- Regular attendance is crucial for academic success
+- If you believe this absence was marked by mistake (e.g., due to a system mismatch), please contact your course teacher.
+
+Contact Information:
+-------------------
+If you have any questions or need to report a valid reason for absence, please contact:
+
+Email: admin@lpu.edu
+Phone: +91-1824-404404
+Administration Office
+
+This is an automated message from LPU Smart Attendance System.
+Please do not reply to this email. For inquiries, use the contact information above.
+
+© 2024 Lovely Professional University. All rights reserved.

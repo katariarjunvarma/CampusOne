@@ -1,5 +1,26 @@
 # SmartLPU (Smart Campus Management System)
 
+## Quick Start (Terminal)
+
+```bash
+cd /Users/arjunvarma/Desktop/Pep/smartLPU
+source venv/bin/activate
+python manage.py runserver
+```
+
+Open: http://127.0.0.1:8000/
+
+## Common Commands
+
+| Command | Purpose |
+|---------|---------|
+| `python manage.py runserver` | Start dev server |
+| `python manage.py migrate` | Apply DB migrations |
+| `python manage.py createsuperuser` | Create admin account |
+| `python manage.py shell` | Django shell |
+
+---
+
 SmartLPU is a Django-based Smart Campus Management System prototype for LPU, focused on a **Smart Attendance Management System**.
 
 ## Features

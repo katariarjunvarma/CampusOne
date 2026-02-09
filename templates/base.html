@@ -53,6 +53,32 @@
                 <div class="hint">Students / Courses</div>
               </div>
             </a>
+            <a href="#" id="settings-toggle">
+              <div class="nav-text">
+                <div class="nav-title">Settings</div>
+                <div class="hint">Theme / Preferences</div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Settings Panel (in sidebar) -->
+        <div class="sidebar-card p-3 mb-3" id="settings-panel" style="display: none;">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-semibold">Settings</span>
+            <button type="button" class="btn-close" id="close-settings" style="font-size: 1rem; cursor: pointer;"></button>
+          </div>
+          
+          <div class="p-3" style="background: var(--glass); border-radius: 12px; border: 1px solid var(--stroke);">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-semibold small">Dark Mode</div>
+                <div class="small" style="color: var(--muted);">Toggle theme</div>
+              </div>
+              <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" id="theme-toggle-switch" style="cursor: pointer; width: 2.5em; height: 1.3em;">
+              </div>
+            </div>
           </div>
         </div>
 
@@ -96,11 +122,65 @@
       </main>
     </div>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-      crossorigin="anonymous"
-    ></script>
+      crossorigin="anonymous">
+    </script>
+    <script>
+      // Theme Management
+      (function() {
+        const html = document.documentElement;
+        const themeToggleSwitch = document.getElementById('theme-toggle-switch');
+        const settingsToggle = document.getElementById('settings-toggle');
+        const settingsPanel = document.getElementById('settings-panel');
+        const closeSettings = document.getElementById('close-settings');
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+          html.setAttribute('data-theme', 'dark');
+          if (themeToggleSwitch) themeToggleSwitch.checked = true;
+        }
+        
+        // Theme toggle switch
+        if (themeToggleSwitch) {
+          themeToggleSwitch.addEventListener('change', () => {
+            const newTheme = themeToggleSwitch.checked ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+          });
+        }
+        
+        // Settings panel toggle
+        if (settingsToggle && settingsPanel) {
+          settingsToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'block' : 'none';
+          });
+        }
+        
+        if (closeSettings && settingsPanel) {
+          closeSettings.addEventListener('click', () => {
+            settingsPanel.style.display = 'none';
+          });
+        }
+      })();
+    </script>
+    <script>
+      window.setTimeout(() => {
+        document.querySelectorAll('.content-inner .alert').forEach((el) => {
+          try {
+            if (window.bootstrap && window.bootstrap.Alert) {
+              window.bootstrap.Alert.getOrCreateInstance(el).close();
+            } else {
+              el.remove();
+            }
+          } catch (_e) {
+            try { el.remove(); } catch (__e) {}
+          }
+        });
+      }, 3000);
+    </script>
     {% block scripts %}{% endblock %}
   </body>
 </html>

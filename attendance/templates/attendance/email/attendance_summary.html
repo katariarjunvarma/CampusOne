@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Attendance Summary - LPU</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 0;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .content {
+            padding: 30px;
+        }
+        .summary-box {
+            background-color: #e8f5e8;
+            border: 1px solid #1e3c72;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+        }
+        .attendance-table th,
+        .attendance-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .attendance-table th {
+            background-color: #1e3c72;
+            color: white;
+            font-weight: bold;
+        }
+        .attendance-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .present {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .absent {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        .percentage-good {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .percentage-warning {
+            color: #ff9800;
+            font-weight: bold;
+        }
+        .percentage-danger {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #1e3c72;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .footer {
+            text-align: center;
+            margin: 30px 0 0 0;
+            padding: 20px 30px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 14px;
+        }
+        .lpu-blue {
+            color: #1e3c72;
+        }
+        .lpu-light-blue {
+            color: #2a5298;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% include 'attendance/email/logo_header.html' %}
+        
+        <div class="content">
+            <p>Dear Student,</p>
+            <div class="summary-box">
+                <h2>📊 Monthly Attendance Report</h2>
+                <h3>{{ month }} {{ year }}</h3>
+                <p><strong>{{ student_name }}</strong> | Roll No: {{ roll_number }}</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_classes }}</div>
+                    <div class="stat-label">Total Classes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number present">{{ classes_present }}</div>
+                    <div class="stat-label">Classes Present</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number absent">{{ classes_absent }}</div>
+                    <div class="stat-label">Classes Absent</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number {% if attendance_percentage >= 75 %}percentage-good{% elif attendance_percentage >= 60 %}percentage-warning{% else %}percentage-danger{% endif %}">
+                        {{ attendance_percentage }}%
+                    </div>
+                    <div class="stat-label">Attendance %</div>
+                </div>
+            </div>
+
+            <h4>📅 Detailed Attendance Record</h4>
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Course</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Marked By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in attendance_records %}
+                    <tr>
+                        <td>{{ record.date }}</td>
+                        <td>{{ record.course }}</td>
+                        <td>{{ record.time }}</td>
+                        <td>
+                            {% if record.status == 'present' %}
+                                <span class="present">✓ Present</span>
+                            {% else %}
+                                <span class="absent">✗ Absent</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ record.marked_by }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if attendance_percentage < 75 %}
+            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <p><strong>⚠️ Attention Required:</strong> Attendance is below the required 75%. Please ensure regular attendance to avoid academic consequences.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="footer">
+            <p>This is an automated monthly attendance report from <span class="lpu-blue"><strong>LPU Smart Attendance System</strong></span>.</p>
+            <p>For any discrepancies, please contact the administration office.</p>
+            <p>© 2024 <span class="lpu-blue">Lovely Professional University</span>. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
