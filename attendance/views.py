@@ -563,40 +563,27 @@ def mark_attendance_by_photo(request: HttpRequest, session_id: int) -> HttpRespo
 
         used_method = "lbph"
 
+    # Only mark recognized students as present. Leave others unmarked so teacher can
+    # manually verify or click "Absent Remaining" to mark unchecked students absent.
+    marked_present_count = 0
     for s in students:
-        status = (
-            AttendanceRecord.STATUS_PRESENT
-            if s.id in present_ids
-            else AttendanceRecord.STATUS_ABSENT
-        )
-        prev = AttendanceRecord.objects.filter(session=session, student=s).values_list("status", flat=True).first()
-        rec, _created = AttendanceRecord.objects.update_or_create(
-            session=session,
-            student=s,
-            defaults={"status": status, "source": "face"},
-        )
-
-        if status == AttendanceRecord.STATUS_ABSENT and s.email:
-            # Create notification record (but DON'T send email yet - wait for manual submit)
-            msg = (
-                f"Absent detected: {s.full_name} ({s.roll_no}) was marked ABSENT for "
-                f"{session.course.code} on {session.session_date}."
+        if s.id in present_ids:
+            AttendanceRecord.objects.update_or_create(
+                session=session,
+                student=s,
+                defaults={"status": AttendanceRecord.STATUS_PRESENT, "source": "face"},
             )
-            Notification.objects.create(recipient_student=s, channel="simulated", message=msg)
-            # Note: Email will be sent when user clicks Submit button in manual attendance
+            marked_present_count += 1
 
-    absentees = [s for s in students if s.id not in present_ids]
-    for s in absentees:
-        msg = (
-            f"Absent detected: {s.full_name} ({s.roll_no}) was marked ABSENT for "
-            f"{session.course.code} on {session.session_date}."
-        )
-        Notification.objects.create(recipient_student=s, channel="simulated", message=msg)
+    # Get currently marked absent count for info message
+    currently_absent = AttendanceRecord.objects.filter(
+        session=session, status=AttendanceRecord.STATUS_ABSENT
+    ).count()
 
     messages.success(
         request,
-        f"Photo-based marking complete. Detected present: {len(present_ids)} | Absentees: {len(absentees)}. "
-        f"Review and click Submit to send absence emails.",
+        f"Photo-based marking complete. Marked {marked_present_count} student(s) as present. "
+        f"Review unchecked students, then click 'Absent Remaining' to mark others absent.",
     )
     if used_method:
         messages.info(request, f"Face matching method used: {used_method}.")
@@ -639,7 +626,43 @@ def mark_attendance(request: HttpRequest, session_id: int) -> HttpResponse:
             messages.success(request, "Marked all students absent.")
             return redirect("session_detail", session_id=session.id)
 
+        if action == "mark_remaining_absent":
+            present_ids_post = {
+                int(x) for x in request.POST.getlist("present") if str(x).isdigit()
+            }
+            # Fall back to already-saved present records only if the form didn't send any.
+            # This keeps the behavior safe even if JS submits without checkbox values.
+            present_ids = present_ids_post or {
+                r.student_id
+                for r in AttendanceRecord.objects.filter(
+                    session=session, status=AttendanceRecord.STATUS_PRESENT
+                )
+            }
+
+            marked_count = 0
+            for s in students:
+                if s.id in present_ids:
+                    AttendanceRecord.objects.update_or_create(
+                        session=session,
+                        student=s,
+                        defaults={"status": AttendanceRecord.STATUS_PRESENT, "source": "manual"},
+                    )
+                else:
+                    AttendanceRecord.objects.update_or_create(
+                        session=session,
+                        student=s,
+                        defaults={"status": AttendanceRecord.STATUS_ABSENT, "source": "manual"},
+                    )
+                    marked_count += 1
+            messages.success(request, f"Marked {marked_count} remaining students absent.")
+            return redirect("session_detail", session_id=session.id)
+
         present_ids = {int(x) for x in request.POST.getlist("present") if x.isdigit()}
+        # Debug: print what we received
+        print(f"DEBUG: present_ids from POST: {present_ids}")
+        print(f"DEBUG: Raw present list: {request.POST.getlist('present')}")
+        print(f"DEBUG: Full POST data: {dict(request.POST)}")
+        print(f"DEBUG: Action value: {request.POST.get('action')}")
 
         emails_attempted = 0
         emails_sent = 0
@@ -659,7 +682,7 @@ def mark_attendance(request: HttpRequest, session_id: int) -> HttpResponse:
                 defaults={"status": status, "source": "manual"},
             )
 
-            if status == AttendanceRecord.STATUS_ABSENT and s.email:
+            if status == AttendanceRecord.STATUS_ABSENT and (s.email or s.parent_email):
                 # Create notification record
                 msg = (
                     f"Absent detected: {s.full_name} ({s.roll_no}) was marked ABSENT for "
@@ -683,44 +706,50 @@ def mark_attendance(request: HttpRequest, session_id: int) -> HttpResponse:
                         or f"{session.session_date.strftime('%I:%M %p')} to {(session.session_date + timedelta(hours=1)).strftime('%I:%M %p')}",
                     }
                     
-                    # Render HTML email
-                    html_message = render_to_string('attendance/email/absence_notification.html', context)
-                    
-                    # Render text email with custom message format
-                    text_message = f"""You have been marked absent for {session.course.code} - {session.course.name} from time {context['time_slot']} on {context['date']}
+                    # Send separate emails for student and parent
+                    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None)
 
-Student Details:
-- Name: {s.full_name}
-- Roll Number: {s.roll_no}
-- Course: {session.course.name} ({session.course.code})
-- Date: {context['date']}
-- Class Time Slot: {context['time_slot']}
+                    if s.email:
+                        html_message = render_to_string(
+                            "attendance/email/absence_notification_student.html", context
+                        )
+                        text_message = render_to_string(
+                            "attendance/email/absence_notification_student.txt", context
+                        )
+                        emails_attempted += 1
+                        sent = send_mail(
+                            subject=subject,
+                            message=text_message,
+                            html_message=html_message,
+                            from_email=from_email,
+                            recipient_list=[s.email],
+                            fail_silently=False,
+                        )
+                        if sent:
+                            emails_sent += 1
+                        else:
+                            email_failures += 1
 
-Important Notes:
-- Regular attendance is crucial for academic success
-- If you believe this absence was marked by mistake (e.g., due to a system mismatch), please contact your course teacher.
-
-Contact Information:
-Email: admin@lpu.edu
-Phone: +91-1824-404404
-Administration Office, LPU Campus
-
-This is an automated message from LPU Smart Attendance System.
-© 2024 Lovely Professional University. All rights reserved."""
-                    
-                    emails_attempted += 1
-                    sent = send_mail(
-                        subject=subject,
-                        message=text_message,
-                        html_message=html_message,
-                        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
-                        recipient_list=[s.email],
-                        fail_silently=False,
-                    )
-                    if sent:
-                        emails_sent += 1
-                    else:
-                        email_failures += 1
+                    if s.parent_email:
+                        html_message = render_to_string(
+                            "attendance/email/absence_notification_parent.html", context
+                        )
+                        text_message = render_to_string(
+                            "attendance/email/absence_notification_parent.txt", context
+                        )
+                        emails_attempted += 1
+                        sent = send_mail(
+                            subject=subject,
+                            message=text_message,
+                            html_message=html_message,
+                            from_email=from_email,
+                            recipient_list=[s.parent_email],
+                            fail_silently=False,
+                        )
+                        if sent:
+                            emails_sent += 1
+                        else:
+                            email_failures += 1
                 except Exception:
                     email_failures += 1
 
@@ -741,6 +770,8 @@ This is an automated message from LPU Smart Attendance System.
                 request,
                 f"Some absence emails failed to send ({email_failures}). Please check the server console for the exact error.",
             )
+        # Debug: confirm we are redirecting to session_detail
+        print(f"DEBUG: Redirecting to session_detail with session_id={session.id}")
         return redirect("session_detail", session_id=session.id)
     
     except Exception as e:

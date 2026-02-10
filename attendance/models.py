@@ -4,6 +4,7 @@ class Student(models.Model):
     roll_no = models.CharField(max_length=32, unique=True)
     full_name = models.CharField(max_length=128)
     email = models.EmailField(blank=True)
+    parent_email = models.EmailField(blank=True)
     parent_phone = models.CharField(max_length=32, blank=True)
 
     def __str__(self) -> str:

@@ -76,9 +76,13 @@
         <div id="snapshot-controls" class="mb-3">
           <form method="post" enctype="multipart/form-data" action="{% url 'mark_attendance_by_photo' session_id=session.id %}">
             {% csrf_token %}
-            <div class="d-none">{{ photo_form.photo }}</div>
+            <div class="mb-2">
+              <label for="id_photo" class="form-label small fw-semibold">Upload Photo from PC</label>
+              <input type="file" name="photo" accept="image/*" class="form-control" id="id_photo" onchange="document.getElementById('selected-filename').textContent = this.files[0] ? this.files[0].name : 'No file selected'" />
+              <div class="form-text small" id="selected-filename">No file selected</div>
+            </div>
             <div class="d-grid">
-              <button class="btn btn-smart text-white fw-semibold" type="submit" id="upload-photo-btn" disabled>Upload Photo + Auto Mark</button>
+              <button class="btn btn-smart text-white fw-semibold" type="submit" id="upload-photo-btn">Upload Photo + Auto Mark</button>
             </div>
           </form>
         </div>
@@ -114,6 +118,7 @@
               {% csrf_token %}
               <button class="btn btn-outline-smart btn-sm fw-semibold" type="submit" name="action" value="mark_all_absent">Absent All</button>
             </form>
+            <button class="btn btn-outline-smart btn-sm fw-semibold" type="button" onclick="markRemainingAbsent()">Absent Remaining</button>
           </div>
         </div>
 
@@ -166,41 +171,46 @@
     </div>
   </div>
 
-<!-- Modal placed outside all containers for perfect centering -->
-<div class="modal" id="attendanceConfirmModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Confirm Attendance</h5>
-        <button type="button" class="btn-close" id="close-modal-btn"></button>
-      </div>
-      <div class="modal-body">
-        <div class="fw-semibold mb-2">Absentees</div>
-        <div class="small smart-muted mb-2" id="absentees-summary"></div>
-        <div class="border rounded-3 p-2" style="max-height: 180px; overflow:auto;" id="absentees-list">
-          <div class="d-flex justify-content-between py-1 border-bottom fw-semibold text-muted small">
-            <span>Roll No</span>
-            <span>Name</span>
+  <!-- Modal placed outside all containers for perfect centering -->
+  <div class="modal" id="attendanceConfirmModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Attendance</h5>
+          <button type="button" class="btn-close" id="close-modal-btn"></button>
+        </div>
+        <div class="modal-body">
+          <div class="fw-semibold mb-2">Absentees</div>
+          <div class="small smart-muted mb-2" id="absentees-summary"></div>
+          <div class="border rounded-3 p-2" style="max-height: 180px; overflow:auto;" id="absentees-list">
+            <div class="d-flex justify-content-between py-1 border-bottom fw-semibold text-muted small">
+              <span>Roll No</span>
+              <span>Name</span>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <label for="presentCountConfirm" class="form-label fw-semibold">Type total presentees to confirm</label>
+            <input type="number" class="form-control" id="presentCountConfirm" inputmode="numeric" min="0" />
           </div>
         </div>
-
-        <div class="mt-3">
-          <label for="presentCountConfirm" class="form-label fw-semibold">Type total presentees to confirm</label>
-          <input type="number" class="form-control" id="presentCountConfirm" inputmode="numeric" min="0" />
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-smart" id="cancel-modal-btn">Cancel</button>
+          <button type="button" class="btn btn-smart text-white fw-semibold" id="final-submit" disabled>Submit and Send Mail</button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-smart" id="cancel-modal-btn">Cancel</button>
-        <button type="button" class="btn btn-smart text-white fw-semibold" id="final-submit" disabled>Submit and Send Mail</button>
       </div>
     </div>
   </div>
-</div>
+
 {% endblock %}
 
 {% block scripts %}
   {{ block.super }}
   <script>
+    // Global live timer variables so modal can stop them
+    let liveTimer = null;
+    let liveRefreshTimer = null;
+    
     (function () {
       const openModalBtn = document.getElementById('open-submit-modal');
       const modalEl = document.getElementById('attendanceConfirmModal');
@@ -213,6 +223,37 @@
       const form = document.getElementById('manual-attendance-form');
 
       if (!modalEl || !absList || !presentConfirm || !finalSubmit || !form) return;
+
+      const setRowStatusBadge = (row, isPresent) => {
+        const statusCell = row.querySelector('td:nth-child(4)');
+        if (!statusCell) return;
+        if (isPresent) {
+          statusCell.innerHTML = '<span class="badge text-bg-success">present</span>';
+        } else {
+          const original = row.dataset.originalStatusHtml;
+          if (original != null) {
+            statusCell.innerHTML = original;
+          }
+        }
+      };
+
+      const wireImmediateStatusUpdates = () => {
+        const rows = Array.from(document.querySelectorAll('tbody tr'));
+        for (const row of rows) {
+          const cb = row.querySelector('input[type="checkbox"][name="present"]');
+          if (!cb) continue;
+          const statusCell = row.querySelector('td:nth-child(4)');
+          if (statusCell && row.dataset.originalStatusHtml == null) {
+            row.dataset.originalStatusHtml = statusCell.innerHTML;
+          }
+          setRowStatusBadge(row, !!cb.checked);
+          cb.addEventListener('change', () => {
+            setRowStatusBadge(row, !!cb.checked);
+          });
+        }
+      };
+
+      wireImmediateStatusUpdates();
 
       const collect = () => {
         const rows = Array.from(document.querySelectorAll('tbody tr'));
@@ -285,13 +326,17 @@
       });
 
       finalSubmit.addEventListener('click', () => {
+        // Stop live detection timers to prevent interference with redirect
+        if (liveTimer) clearInterval(liveTimer);
+        if (liveRefreshTimer) clearInterval(liveRefreshTimer);
+        liveTimer = null;
+        liveRefreshTimer = null;
+        
         closeModal();
         form.submit();
       });
     })();
-  </script>
 
-  <script>
     // Unified Camera Interface
     (function () {
       const video = document.getElementById('unified-video');
@@ -320,8 +365,6 @@
       let rafId = null;
       let detector = null;
       let currentMode = 'snapshot';
-      let liveTimer = null;
-      let liveRefreshTimer = null;
       let inflight = false;
 
       const endpoint = "{% url 'live_attendance_frame' session_id=session.id %}";
@@ -586,5 +629,22 @@
       liveStopBtn.addEventListener('click', stopLive);
       window.addEventListener('beforeunload', stopCamera);
     })();
+  </script>
+
+  <script>
+    // Mark Remaining Absent - submits form and server marks unchecked students as absent
+    function markRemainingAbsent() {
+      const form = document.getElementById('manual-attendance-form');
+      if (!form) return;
+      
+      // Change action to mark_remaining_absent
+      const actionInput = form.querySelector('input[name="action"]');
+      if (actionInput) {
+        actionInput.value = 'mark_remaining_absent';
+      }
+      
+      // Submit the form
+      form.submit();
+    }
   </script>
 {% endblock %}

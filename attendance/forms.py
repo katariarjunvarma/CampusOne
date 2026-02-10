@@ -75,7 +75,7 @@ class AttendancePhotoUploadForm(forms.Form):
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ["roll_no", "full_name", "email", "parent_phone"]
+        fields = ["roll_no", "full_name", "email", "parent_email", "parent_phone"]
 
 
 class EnrollmentForm(forms.ModelForm):

@@ -121,6 +121,22 @@ def _extract_embeddings(image_bgr: np.ndarray) -> List[tuple[np.ndarray, Tuple[i
     return out
 
 
+def detect_faces_count_embedding(image_bgr: np.ndarray) -> int:
+    detector, _recognizer = _get_yunet_and_sface()
+    h, w = image_bgr.shape[:2]
+    detector.setInputSize((w, h))
+    ok, faces = detector.detect(image_bgr)
+    if not ok or faces is None:
+        return 0
+    # Count only reasonably sized faces
+    c = 0
+    for f in faces:
+        fw, fh = int(f[2]), int(f[3])
+        if fw >= 60 and fh >= 60:
+            c += 1
+    return int(c)
+
+
 def build_embedding_gallery(images_by_label: Dict[int, List[np.ndarray]], min_per_student: int = 5) -> Dict[int, np.ndarray]:
     gallery: Dict[int, np.ndarray] = {}
     for sid, imgs in images_by_label.items():
