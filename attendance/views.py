@@ -994,27 +994,3 @@ def live_attendance_frame(request: HttpRequest, session_id: int) -> JsonResponse
     )
 
 
-# Food Pre-Ordering System - View Stubs (to be implemented)
-@login_required
-def food_home(request: HttpRequest) -> HttpResponse:
-    return render(request, "attendance/food/home.html")
-
-
-@login_required
-def food_menu(request: HttpRequest) -> HttpResponse:
-    return render(request, "attendance/food/menu.html")
-
-
-@login_required
-def create_order(request: HttpRequest) -> HttpResponse:
-    return render(request, "attendance/food/order.html")
-
-
-@login_required
-def my_orders(request: HttpRequest) -> HttpResponse:
-    return render(request, "attendance/food/my_orders.html")
-
-
-@login_required
-def food_dashboard(request: HttpRequest) -> HttpResponse:
-    return render(request, "attendance/food/dashboard.html")

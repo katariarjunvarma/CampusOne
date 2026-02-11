@@ -66,10 +66,4 @@ urlpatterns = [
         views.mark_attendance,
         name="mark_attendance",
     ),
-    # Food Pre-Ordering System
-    path("food/", views.food_home, name="food_home"),
-    path("food/menu/", views.food_menu, name="food_menu"),
-    path("food/order/", views.create_order, name="create_order"),
-    path("food/my-orders/", views.my_orders, name="my_orders"),
-    path("food/dashboard/", views.food_dashboard, name="food_dashboard"),
 ]
