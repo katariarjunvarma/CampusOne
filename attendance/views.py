@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.template.loader import render_to_string
 
@@ -657,12 +658,11 @@ def mark_attendance(request: HttpRequest, session_id: int) -> HttpResponse:
             messages.success(request, f"Marked {marked_count} remaining students absent.")
             return redirect("session_detail", session_id=session.id)
 
+        if action != "submit_manual":
+            messages.error(request, "Invalid attendance action.")
+            return redirect("session_detail", session_id=session.id)
+
         present_ids = {int(x) for x in request.POST.getlist("present") if x.isdigit()}
-        # Debug: print what we received
-        print(f"DEBUG: present_ids from POST: {present_ids}")
-        print(f"DEBUG: Raw present list: {request.POST.getlist('present')}")
-        print(f"DEBUG: Full POST data: {dict(request.POST)}")
-        print(f"DEBUG: Action value: {request.POST.get('action')}")
 
         emails_attempted = 0
         emails_sent = 0
@@ -675,14 +675,19 @@ def mark_attendance(request: HttpRequest, session_id: int) -> HttpResponse:
                 if s.id in present_ids
                 else AttendanceRecord.STATUS_ABSENT
             )
-            prev = AttendanceRecord.objects.filter(session=session, student=s).values_list("status", flat=True).first()
+            prev = (
+                AttendanceRecord.objects.filter(session=session, student=s)
+                .values_list("status", flat=True)
+                .first()
+            )
             AttendanceRecord.objects.update_or_create(
                 session=session,
                 student=s,
                 defaults={"status": status, "source": "manual"},
             )
 
-            if status == AttendanceRecord.STATUS_ABSENT and (s.email or s.parent_email):
+            became_absent = status == AttendanceRecord.STATUS_ABSENT and prev != AttendanceRecord.STATUS_ABSENT
+            if became_absent and (s.email or s.parent_email):
                 # Create notification record
                 msg = (
                     f"Absent detected: {s.full_name} ({s.roll_no}) was marked ABSENT for "
@@ -754,12 +759,6 @@ def mark_attendance(request: HttpRequest, session_id: int) -> HttpResponse:
                     email_failures += 1
 
         absentees = [s for s in students if s.id not in present_ids]
-        for s in absentees:
-            msg = (
-                f"Absent detected: {s.full_name} ({s.roll_no}) was marked ABSENT for "
-                f"{session.course.code} on {session.session_date}."
-            )
-            Notification.objects.create(recipient_student=s, channel="simulated", message=msg)
 
         messages.success(
             request,
@@ -770,8 +769,6 @@ def mark_attendance(request: HttpRequest, session_id: int) -> HttpResponse:
                 request,
                 f"Some absence emails failed to send ({email_failures}). Please check the server console for the exact error.",
             )
-        # Debug: confirm we are redirecting to session_detail
-        print(f"DEBUG: Redirecting to session_detail with session_id={session.id}")
         return redirect("session_detail", session_id=session.id)
     
     except Exception as e:
@@ -780,7 +777,6 @@ def mark_attendance(request: HttpRequest, session_id: int) -> HttpResponse:
 
 
 @login_required
-@transaction.atomic
 def live_attendance_frame(request: HttpRequest, session_id: int) -> JsonResponse:
     if request.method != "POST":
         return JsonResponse({"ok": False, "error": "POST required"}, status=405)
@@ -996,3 +992,29 @@ def live_attendance_frame(request: HttpRequest, session_id: int) -> JsonResponse
             "blink_recent": (now - float(state.get("last_blink_ts", 0.0)) <= 6.0),
         }
     )
+
+
+# Food Pre-Ordering System - View Stubs (to be implemented)
+@login_required
+def food_home(request: HttpRequest) -> HttpResponse:
+    return render(request, "attendance/food/home.html")
+
+
+@login_required
+def food_menu(request: HttpRequest) -> HttpResponse:
+    return render(request, "attendance/food/menu.html")
+
+
+@login_required
+def create_order(request: HttpRequest) -> HttpResponse:
+    return render(request, "attendance/food/order.html")
+
+
+@login_required
+def my_orders(request: HttpRequest) -> HttpResponse:
+    return render(request, "attendance/food/my_orders.html")
+
+
+@login_required
+def food_dashboard(request: HttpRequest) -> HttpResponse:
+    return render(request, "attendance/food/dashboard.html")

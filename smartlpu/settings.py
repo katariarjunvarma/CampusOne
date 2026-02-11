@@ -32,7 +32,22 @@ SECRET_KEY = 'django-insecure-+@7t79ho(s0v$ah_-1g-_lw-lu-h@k$(*s+6%kxh90opo7m&v#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
+# CSRF trusted origins
+# For local development / IDE previews, set `CSRF_TRUSTED_ORIGINS` in your .env
+# as a comma-separated list, e.g.
+# CSRF_TRUSTED_ORIGINS=http://127.0.0.1:8000,http://127.0.0.1:56853
+_csrf_trusted_env = os.getenv("CSRF_TRUSTED_ORIGINS", "").strip()
+if _csrf_trusted_env:
+    CSRF_TRUSTED_ORIGINS = [
+        o.strip() for o in _csrf_trusted_env.split(",") if o.strip()
+    ]
+else:
+    CSRF_TRUSTED_ORIGINS = [
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+    ]
 
 
 # Application definition
@@ -84,6 +99,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {
+            # Increase busy timeout to reduce 'database is locked' under concurrent writes.
+            'timeout': int(os.getenv('SQLITE_TIMEOUT', '30')),
+        },
     }
 }
 
