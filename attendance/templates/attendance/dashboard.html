@@ -14,5 +14,27 @@
         <a class="btn btn-light-blue" href="{% url 'attendance_home' %}">Open</a>
       </div>
     </div>
+
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="glass-strong p-4 h-100">
+        <div class="fw-semibold mb-1">Food Order</div>
+        <div class="smart-muted small mb-3">Pre-order meals from campus canteens and stalls.</div>
+        {% if recent_food_orders %}
+          <div class="mb-3">
+            <div class="small fw-semibold mb-2">Recent Orders:</div>
+            {% for order in recent_food_orders %}
+              <div class="d-flex justify-content-between align-items-center py-1 border-bottom">
+                <span class="small">{{ order.food_item.name }} ({{ order.quantity }})</span>
+                <span class="badge {% if order.status == 'pending' %}bg-warning{% elif order.status == 'ready' %}bg-success{% elif order.status == 'collected' %}bg-primary{% else %}bg-danger{% endif %}">{{ order.get_status_display }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <div class="d-flex gap-2">
+          <a class="btn btn-light-blue" href="{% url 'food:create_order' %}">Place Order</a>
+          <a class="btn btn-light-blue" href="{% url 'food:my_orders' %}">View Orders</a>
+        </div>
+      </div>
+    </div>
   </div>
 {% endblock %}

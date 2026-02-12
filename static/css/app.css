@@ -12,21 +12,6 @@
   --card-bg: rgba(255, 255, 255, 0.8);
 }
 
-[data-theme="dark"] {
-  --primary: #60a5fa;
-  --primary-dark: #3b82f6;
-  --secondary: #93c5fd;
-  --accent: #bfdbfe;
-  --ink: #f1f5f9;
-  --muted: rgba(241, 245, 249, 0.68);
-  --glass: rgba(15, 23, 42, 0.58);
-  --glass-strong: rgba(15, 23, 42, 0.72);
-  --stroke: rgba(241, 245, 249, 0.10);
-  --bg-primary: #0f172a;
-  --card-bg: rgba(30, 41, 59, 0.8);
-}
-
-
 .bg-surface {
   min-height: 100vh;
   color: var(--ink);

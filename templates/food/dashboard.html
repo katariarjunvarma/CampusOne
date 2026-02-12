@@ -4,17 +4,60 @@
 
 {% block content %}
 <div class="container">
+  <!-- Header -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
       <h1 class="mb-1">Food Demand Dashboard</h1>
       <div class="text-muted">Track demand and peak slots to reduce congestion.</div>
+      {% if loyalty %}
+        <div class="text-muted small">Reward Points: <span class="fw-semibold">{{ loyalty.total_points }}</span></div>
+      {% endif %}
     </div>
     <div class="d-flex gap-2">
-      <a class="btn btn-outline-smart" href="{% url 'food:food_menu' %}">Menu</a>
+      <a class="btn btn-outline-smart" href="{% url 'food:create_order' %}">Back to Order</a>
+      <a class="btn btn-outline-smart" href="{% url 'food:create_order' %}">Place Order</a>
       <a class="btn btn-outline-smart" href="{% url 'food:my_orders' %}">Orders</a>
     </div>
   </div>
 
+  <!-- Summary Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card border-primary">
+        <div class="card-body text-center">
+          <div class="h2 text-primary mb-1" id="totalOrders">{{ total_orders|default:0 }}</div>
+          <div class="text-muted small">Total Orders</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-success">
+        <div class="card-body text-center">
+          <div class="h2 text-success mb-1" id="totalQuantity">{{ total_quantity|default:0 }}</div>
+          <div class="text-muted small">Items Ordered</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-info">
+        <div class="card-body text-center">
+          <div class="h2 text-info mb-1">{% if peak_slot %}{{ peak_slot.total_qty }}{% else %}0{% endif %}</div>
+          <div class="text-muted small">Peak Slot Orders</div>
+          <div class="small text-info">{% if peak_slot %}{{ peak_slot.slot__name }}{% endif %}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-danger">
+        <div class="card-body text-center">
+          <div class="h2 text-danger mb-1" id="missedOrders">{{ missed_orders|default:0 }}</div>
+          <div class="text-muted small">Missed Orders</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date Filter -->
   <div class="card shadow-sm mb-3">
     <div class="card-body">
       <form method="get" class="row g-2 align-items-end">
@@ -25,76 +68,156 @@
         <div class="col-sm-3">
           <button class="btn btn-outline-smart" type="submit">Refresh</button>
         </div>
-        {% if peak_slot %}
-          <div class="col-sm-5 text-sm-end">
-            <div class="fw-semibold">Peak Slot</div>
-            <div class="text-muted">{{ peak_slot.slot__name }} ({{ peak_slot.total_qty }})</div>
-          </div>
-        {% endif %}
+        <div class="col-sm-5 text-sm-end">
+          <small class="text-muted">Auto-refreshes every 5 minutes</small>
+          <div id="lastUpdated">Last updated: {% now "H:i" %}</div>
+        </div>
       </form>
     </div>
   </div>
 
-  <div class="row g-3">
-    <div class="col-lg-6">
-      <div class="card shadow-sm">
+  <!-- Visualizations Row -->
+  <div class="row g-3 mb-4">
+    <!-- Item Popularity -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-white fw-semibold">
+          Item Popularity
+        </div>
         <div class="card-body">
-          <div class="fw-semibold mb-2">Demand by Item</div>
           {% if by_item %}
-            <div class="table-responsive">
-              <table class="table align-middle">
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th class="text-end">Total Qty</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for r in by_item %}
-                    <tr>
-                      <td class="fw-semibold">{{ r.food_item__name }}</td>
-                      <td class="text-end">{{ r.total_qty }}</td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
+            {% for item in by_item|slice:":10" %}
+              <div class="mb-2">
+                <div class="d-flex justify-content-between small mb-1">
+                  <span>{{ item.food_item__name }}</span>
+                  <span class="text-muted">{{ item.total_qty }}</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div class="progress-bar bg-primary" role="progressbar" 
+                       style="width: {% widthratio item.total_qty 1 100 %}%" 
+                       aria-valuenow="{{ item.total_qty }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+            {% endfor %}
           {% else %}
-            <div class="text-muted">No orders for this date.</div>
+            <div class="text-muted text-center py-4">No data available</div>
           {% endif %}
         </div>
       </div>
     </div>
 
-    <div class="col-lg-6">
-      <div class="card shadow-sm">
+    <!-- Stall-wise Breakdown -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-white fw-semibold">
+          Stall-wise Demand
+        </div>
         <div class="card-body">
-          <div class="fw-semibold mb-2">Demand by Slot</div>
-          {% if by_slot %}
-            <div class="table-responsive">
-              <table class="table align-middle">
-                <thead>
-                  <tr>
-                    <th>Slot</th>
-                    <th class="text-end">Total Qty</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for r in by_slot %}
-                    <tr {% if peak_slot and r.slot__name == peak_slot.slot__name %}style="background: rgba(13,110,253,.08);"{% endif %}>
-                      <td class="fw-semibold">{{ r.slot__name }}</td>
-                      <td class="text-end">{{ r.total_qty }}</td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
+          {% if by_stall %}
+            {% for stall in by_stall|slice:":8" %}
+              <div class="d-flex align-items-center mb-2 p-2 bg-light rounded">
+                <div class="flex-grow-1">
+                  <div class="fw-semibold small">{{ stall.food_item__stall_name }}</div>
+                  <div class="text-muted smaller">{{ stall.food_item__location }}</div>
+                </div>
+                <div class="badge bg-primary">{{ stall.total_qty }}</div>
+              </div>
+            {% endfor %}
           {% else %}
-            <div class="text-muted">No orders for this date.</div>
+            <div class="text-muted text-center py-4">No data available</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Demand by Slot -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-white fw-semibold">
+          Peak Time Slots
+        </div>
+        <div class="card-body">
+          {% if by_slot %}
+            {% for slot in by_slot|slice:":8" %}
+              <div class="d-flex justify-content-between align-items-center mb-2 p-2 {% if peak_slot and slot.slot__name == peak_slot.slot__name %}bg-info bg-opacity-25{% else %}bg-light{% endif %} rounded">
+                <span class="fw-semibold small">{{ slot.slot__name }}</span>
+                <span class="badge {% if peak_slot and slot.slot__name == peak_slot.slot__name %}bg-info text-dark{% else %}bg-secondary{% endif %}">
+                  {{ slot.total_qty }} orders
+                </span>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="text-muted text-center py-4">No data available</div>
           {% endif %}
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- New Order Notification Toast -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <div id="orderToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header bg-success text-white">
+      <strong class="me-auto">New Order!</strong>
+      <small>Just now</small>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body" id="orderToastBody">
+      A new order has been placed.
+    </div>
+  </div>
+</div>
+
+{% block scripts %}
+<script>
+  // Auto-refresh every 5 minutes
+  setInterval(function() {
+    window.location.reload();
+  }, 300000);
+
+  // Update last updated time
+  function updateTime() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    const lastUpdatedEl = document.getElementById('lastUpdated');
+    if (lastUpdatedEl) {
+      lastUpdatedEl.innerHTML = 'Last updated: ' + timeStr;
+    }
+  }
+  setInterval(updateTime, 60000);
+
+  // Check for new orders every 30 seconds
+  let lastOrderCount = {{ total_orders|default:0 }};
+  
+  function checkNewOrders() {
+    fetch(window.location.href, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => response.text())
+    .then(html => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const newCount = parseInt(doc.getElementById('totalOrders')?.textContent || '0');
+      
+      if (newCount > lastOrderCount) {
+        const toast = new bootstrap.Toast(document.getElementById('orderToast'));
+        const diff = newCount - lastOrderCount;
+        document.getElementById('orderToastBody').textContent = 
+          diff + ' new order' + (diff > 1 ? 's' : '') + ' placed!';
+        toast.show();
+        
+        lastOrderCount = newCount;
+        document.getElementById('totalOrders').textContent = newCount;
+      }
+    })
+    .catch(err => console.log('Refresh check failed'));
+  }
+
+  setInterval(checkNewOrders, 30000);
+</script>
+{% endblock %}
+
 {% endblock %}

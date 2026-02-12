@@ -73,7 +73,14 @@ def _blink_seen(state: dict[str, object]) -> bool:
 
 @login_required
 def home(request: HttpRequest) -> HttpResponse:
-    return render(request, "attendance/dashboard.html")
+    # Import here to avoid circular imports
+    from food.models import PreOrder
+    recent_food_orders = (
+        PreOrder.objects.filter(ordered_by=request.user)
+        .select_related("food_item", "slot")
+        .order_by("-created_at")[:5]
+    )
+    return render(request, "attendance/dashboard.html", {"recent_food_orders": recent_food_orders})
 
 
 @login_required

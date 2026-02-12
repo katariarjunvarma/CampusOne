@@ -10,8 +10,8 @@
       <div class="text-muted">View and manage your pre-orders.</div>
     </div>
     <div class="d-flex gap-2">
-      <a class="btn btn-outline-smart" href="{% url 'food:food_menu' %}">Menu</a>
-      <a class="btn btn-smart text-white" href="{% url 'food:create_order' %}">Place Order</a>
+      <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#instructionsModal">Instructions & Penalty</button>
+      <a class="btn btn-outline-smart" href="{% url 'food:create_order' %}">Back to Order</a>
       <a class="btn btn-outline-smart" href="{% url 'food:food_dashboard' %}">Dashboard</a>
     </div>
   </div>
@@ -37,6 +37,7 @@
           <table class="table align-middle">
             <thead>
               <tr>
+                <th>Order #</th>
                 <th>Slot</th>
                 <th>Item</th>
                 <th>Stall</th>
@@ -49,9 +50,9 @@
             <tbody>
               {% for o in orders %}
                 <tr>
+                  <td><span class="font-monospace fw-bold text-primary">{% if o.order_number %}{{ o.order_number }}{% else %}#{{ o.id }}{% endif %}</span></td>
                   <td>
                     <div class="fw-semibold">{{ o.slot.name }}</div>
-                    <div class="text-muted small">{{ o.slot.start_time }} - {{ o.slot.end_time }}</div>
                   </td>
                   <td class="fw-semibold">{{ o.food_item.name }}</td>
                   <td>{{ o.food_item.stall_name }}</td>
@@ -62,6 +63,8 @@
                       <span class="badge text-bg-warning">pending</span>
                     {% elif o.status == 'ready' %}
                       <span class="badge text-bg-info">ready</span>
+                    {% elif o.status == 'missed' %}
+                      <span class="badge text-bg-danger">missed</span>
                     {% else %}
                       <span class="badge text-bg-success">collected</span>
                     {% endif %}
@@ -85,6 +88,77 @@
       {% else %}
         <div class="text-muted">No orders found for this date.</div>
       {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Instructions & Penalty Modal -->
+<div class="modal fade" id="instructionsModal" tabindex="-1" aria-labelledby="instructionsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="instructionsModalLabel">Food Pre-Order Instructions & Penalty Rules</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h6 class="fw-bold text-primary">How to Order:</h6>
+        <ol>
+          <li>Select your break time slot</li>
+          <li>Add items from one stall only (multi-stall orders not allowed)</li>
+          <li>Place your order before the break slot starts</li>
+          <li>Collect your food during the selected break time</li>
+          <li>Payment is made at the stall during pickup (Cash/UPI)</li>
+        </ol>
+        
+        <h6 class="fw-bold text-danger mt-4">Penalty for Missed Orders:</h6>
+        <p class="text-muted small">If you order food but don't pick it up, the stall wastes prepared food. Penalties apply:</p>
+        <table class="table table-sm table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Missed Orders</th>
+              <th>Penalty Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1st Miss</td>
+              <td>Warning notification</td>
+            </tr>
+            <tr>
+              <td>2nd Miss</td>
+              <td>1-day ordering ban</td>
+            </tr>
+            <tr>
+              <td>3rd Miss</td>
+              <td>3-day ordering ban</td>
+            </tr>
+            <tr class="table-danger">
+              <td>4+ Misses</td>
+              <td>1-week ban or account review</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="alert alert-warning mt-3">
+          <strong>Your Current Penalty Count:</strong> 
+          {% if user.preorder_set.exists %}
+            {{ user.preorder_set.first.penalty_count|default:0 }} missed orders
+          {% else %}
+            0 missed orders
+          {% endif %}
+        </div>
+        
+        <h6 class="fw-bold text-success mt-4">Important Notes:</h6>
+        <ul>
+          <li>Orders must be from a single stall only</li>
+          <li>Orders cannot be cancelled after the break slot starts</li>
+          <li>You will receive an email when your order is ready</li>
+          <li>All payments are made at the stall during pickup</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
     </div>
   </div>
 </div>

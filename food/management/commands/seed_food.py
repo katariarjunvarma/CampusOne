@@ -22,56 +22,67 @@ class Command(BaseCommand):
             self.stderr.write(self.style.ERROR("Invalid start/end hours."))
             return
 
-        # Create hourly slots
+        # Clear old break slots and create hourly slots with 12-hour AM/PM labels
+        BreakSlot.objects.all().delete()
         created_slots = 0
         for h in range(start, end):
             s = time(hour=h, minute=0)
             e = time(hour=h + 1, minute=0)
-            label = f"{h:02d}:00-{h+1:02d}:00"
-            _, created = BreakSlot.objects.get_or_create(
+            # Format as 12-hour with AM/PM (e.g., "8am - 9am", "12pm - 1pm")
+            def fmt_hour(hour):
+                if hour == 0:
+                    return "12am"
+                elif hour == 12:
+                    return "12pm"
+                elif hour < 12:
+                    return f"{hour}am"
+                else:
+                    return f"{hour - 12}pm"
+            label = f"{fmt_hour(h)} - {fmt_hour(h + 1)}"
+            BreakSlot.objects.create(
                 name=label,
-                defaults={"start_time": s, "end_time": e},
+                start_time=s,
+                end_time=e,
             )
-            if created:
-                created_slots += 1
+            created_slots += 1
 
         # Seed food items (updates on re-run)
         allowed_locations = [
             "25 Block",
             "41 Block",
-            "Bh-1",
+            "BH-1",
             "34 Block",
-            "33 Block Canteen",
-            "32 Block Canteen",
-            "31 Block Canteen",
-            "29 Block Canteen",
+            "33 Block",
+            "32 Block",
+            "31 Block",
+            "29 Block",
             "27 Block",
-            "37 Block Canteen",
-            "Near Boys studios-9",
+            "37 Block",
+            "Boys studios-9",
             "Near Gh-2",
             "14 Block Canteen",
             "18 Block Canteen",
-            "Near Unimall",
-            "Near Uni Hospital",
+            "Unimall",
+            "Uni Hospital",
         ]
 
         stalls = {
             "kannu_ki_chai": {"name": "25 Block Canteen", "location": "25 Block"},
-            "oven_express": {"name": "Oven Express", "location": "Near Unimall"},
-            "kitchen_ette": {"name": "Kitchen Ette", "location": "Bh-1"},
+            "oven_express": {"name": "Oven Express", "location": "Unimall"},
+            "kitchen_ette": {"name": "Kitchen Ette", "location": "BH-1"},
             "south_tiffins": {"name": "34 Block Canteen", "location": "34 Block"},
-            "thali_house": {"name": "Thali House", "location": "33 Block Canteen"},
-            "chinese_wok": {"name": "Wok n Roll", "location": "32 Block Canteen"},
-            "punjabi_tadka": {"name": "Punjabi Tadka", "location": "31 Block Canteen"},
-            "campus_bites": {"name": "Campus Bites", "location": "29 Block Canteen"},
-            "healthy_bowl": {"name": "Green Bowl", "location": "Near Uni Hospital"},
-            "night_mess": {"name": "Night Mess", "location": "37 Block Canteen"},
-            "studio_snacks": {"name": "Studio Snacks", "location": "Near Boys studios-9"},
+            "thali_house": {"name": "Thali House", "location": "33 Block"},
+            "chinese_wok": {"name": "Wok n Roll", "location": "32 Block"},
+            "punjabi_tadka": {"name": "Punjabi Tadka", "location": "31 Block"},
+            "campus_bites": {"name": "Campus Bites", "location": "29 Block"},
+            "healthy_bowl": {"name": "Green Bowl", "location": "Uni Hospital"},
+            "night_mess": {"name": "Night Mess", "location": "37 Block"},
+            "studio_snacks": {"name": "Studio Snacks", "location": "Boys studios-9"},
             "gh2_cafe": {"name": "GH-2 Cafe", "location": "Near Gh-2"},
             "apartment_mess": {"name": "Apartment Canteen", "location": "41 Block"},
             "canteen_14": {"name": "Block 14 Canteen", "location": "14 Block Canteen"},
             "canteen_18": {"name": "Block 18 Canteen", "location": "18 Block Canteen"},
-            "creamstone": {"name": "Creamstone", "location": "Near Unimall"},
+            "creamstone": {"name": "Creamstone", "location": "Unimall"},
             "canteen_27": {"name": "Block 27 Canteen", "location": "27 Block"},
         }
 
@@ -100,6 +111,9 @@ class Command(BaseCommand):
 
         # Mark any items from "Apartment Canteen Near" as inactive (old data cleanup)
         FoodItem.objects.filter(stall_name="Apartment Canteen Near").update(is_active=False)
+
+        # Mark "Ice Cream Cup" items as inactive (renamed to "Ice Cream")
+        FoodItem.objects.filter(name="Ice Cream Cup").update(is_active=False)
 
         for k, v in stalls.items():
             if v["location"] not in allowed_locations:
@@ -218,7 +232,7 @@ class Command(BaseCommand):
             ("Rice + Dal + Sabzi", "Simple home-style meal", 95, "apartment_mess"),
 
             # Common
-            ("Water Bottle", "500ml purified water", 20, "campus_bites"),
+            ("Water Bottle", "500ml purified water", 20, "kannu_ki_chai"),
             ("Soft Drink", "300ml soft drink", 30, "campus_bites"),
             ("Ice Cream", "Vanilla ice cream cup", 35, "creamstone"),
         ]

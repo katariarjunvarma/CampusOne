@@ -44,30 +44,32 @@
         <div>
           <h1 class="text-2xl font-bold">Food Pre-Order</h1>
           <p class="text-slate-500 mt-1">Skip the queue. Pick up during your break.</p>
+          <div class="flex items-center gap-1.5 mt-1.5 text-xs">
+            <span class="text-slate-600">{{ loyalty.total_points|default:0 }} reward points</span>
+            <span class="text-slate-300">|</span>
+            <span class="text-slate-500">₹{{ loyalty.rupee_value|default:0 }} value</span>
+            <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded text-xs font-medium ml-1" onclick="document.getElementById('rewardInfoModal').showModal()">How to earn?</button>
+          </div>
         </div>
         <div class="flex items-center gap-2">
+          <button type="button" class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-medium text-sm text-info" data-bs-toggle="modal" data-bs-target="#instructionsModal">Instructions & Penalty</button>
+          <button type="button" class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-medium text-sm text-warning" data-bs-toggle="modal" data-bs-target="#bulkOrderModal">Bulk Order</button>
+          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-medium text-sm" href="{% url 'food:food_dashboard' %}">Dashboard</a>
           <a class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-medium text-sm" href="{% url 'food:my_orders' %}">My Orders</a>
         </div>
       </div>
 
       <div class="mt-4 flex items-center gap-3 shrink-0">
-        <div class="relative flex-1">
+        <div class="relative flex-1 min-w-[400px]">
           <div class="absolute inset-y-0 left-3 flex items-center text-slate-400">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="opacity-80">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-80">
               <path d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             </svg>
           </div>
-          <input id="menuSearch" class="w-full pl-9 pr-3 py-2.5 rounded-xl bg-white border border-slate-200 shadow-softer focus:outline-none focus:ring-2 focus:ring-smart-blue/25 text-sm" placeholder="Search items..." type="text" />
+          <input id="menuSearch" class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate-200 shadow-softer focus:outline-none focus:ring-2 focus:ring-smart-blue/25 text-base text-slate-800 placeholder:text-slate-400" placeholder="Search for items, canteens..." type="text" />
         </div>
 
-        <select id="stallFilter" class="px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-smart-blue/25">
-          <option value="">All Stalls</option>
-          {% for stall in stalls %}
-            <option value="{{ stall|lower }}">{{ stall }}</option>
-          {% endfor %}
-        </select>
-
-        <select id="locationFilter" class="px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-smart-blue/25">
+        <select id="locationFilter" class="px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-base focus:outline-none focus:ring-2 focus:ring-smart-blue/25 min-w-[180px]">
           <option value="">All Locations</option>
           {% for loc in locations %}
             <option value="{{ loc|lower }}">{{ loc }}</option>
@@ -96,23 +98,19 @@
               data-category="{{ item.category }}"
               data-price="{{ item.price }}"
             >
-              <div class="h-24 bg-smart-light relative">
-                <img src="{{ item.image_url|default:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400' }}&cb=2" alt="{{ item.name }}" class="h-24 w-full object-cover" loading="lazy" />
-                <div class="absolute top-2 left-2 text-xs bg-white/90 rounded-md px-2 py-0.5 shadow-softer">{{ item.stall_name }}</div>
-              </div>
               <div class="p-3">
                 <div class="flex items-start justify-between gap-2">
                   <div class="min-w-0">
                     <div class="font-semibold leading-tight text-sm truncate">{{ item.name }}</div>
-                    <div class="text-xs text-slate-500 mt-0.5 truncate">{{ item.location }}</div>
+                    <div class="text-xs text-slate-500 mt-0.5 truncate">{{ item.stall_name }}</div>
+                    <div class="text-xs text-slate-400 truncate">{{ item.location }}</div>
                   </div>
                   <button type="button" class="addBtn shrink-0 h-8 w-8 rounded-lg bg-smart-blue text-white grid place-items-center shadow-softer hover:brightness-95 transition" aria-label="Add" title="Add">
                     <span class="text-lg leading-none">+</span>
                   </button>
                 </div>
-                <div class="mt-2 flex items-center justify-between">
-                  <div></div>
-                  <div class="font-bold text-smart-blue text-sm">₹{{ item.price }}</div>
+                <div class="mt-3 flex items-center justify-between">
+                  <div class="text-sm font-semibold text-smart-blue">₹{{ item.price|floatformat:0 }}</div>
                 </div>
               </div>
             </article>
@@ -128,7 +126,7 @@
     <section class="h-full">
       <div class="rounded-xl2 bg-white shadow-soft p-4 h-full flex flex-col">
         <div class="flex items-center justify-between shrink-0">
-          <h2 class="text-lg font-bold">Cart</h2>
+          <h2 class="text-lg font-bold">Order For Today</h2>
           <span id="cartCount" class="text-xs font-semibold bg-smart-light text-smart-blue px-2 py-1 rounded-lg">0 items</span>
         </div>
 
@@ -137,6 +135,7 @@
         <form id="placeOrderForm" method="post" class="mt-3 border-t border-slate-100 pt-3 space-y-2 shrink-0">
           {% csrf_token %}
           <input type="hidden" name="cart_json" id="cartJson" value="" />
+          <input type="hidden" name="redeemed_points" id="redeemedPoints" value="0" />
 
           <div>
             <label class="text-sm font-semibold">Break Slot</label>
@@ -148,27 +147,50 @@
             </select>
           </div>
 
+          <div>
+            <label class="text-sm font-semibold">Packaging Option</label>
+            <div class="mt-1 flex gap-3">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="packaging" value="eat" checked class="accent-smart-blue" />
+                <span class="text-sm">Eat there only</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="packaging" value="parcel" class="accent-smart-blue" />
+                <span class="text-sm">Pack for parcel</span>
+              </label>
+            </div>
+          </div>
+
           <div class="space-y-1 text-sm">
-            <div class="flex items-center justify-between text-slate-600">
-              <span>Subtotal</span>
-              <span id="subtotal">₹0</span>
+            <div class="d-flex justify-content-between">
+              <span class="text-slate-500">Items Subtotal (<span id="totalQtyDisplay">0</span> items)</span>
+              <span id="itemsSubtotal">₹0</span>
             </div>
-            <div class="flex items-center justify-between text-slate-600">
-              <span>Tax</span>
-              <span id="tax">₹0</span>
+            <div id="packingChargeRow" class="d-flex justify-content-between" style="display: none;">
+              <span class="text-slate-500">Packing Charges (₹5 × <span id="packingQtyDisplay">0</span>)</span>
+              <span id="packingCharge">₹0</span>
             </div>
+            <div id="rewardDiscountRow" class="d-flex justify-content-between text-green-600" style="display: none;">
+              <span>Reward Points Discount (<span id="redeemedPointsDisplay">0</span> pts)</span>
+              <span id="rewardDiscount">-₹0</span>
+            </div>
+            <div class="border-t border-slate-200 my-2"></div>
             <div class="flex items-center justify-between text-base font-bold">
               <span>Total</span>
               <span id="total" class="text-smart-blue">₹0</span>
             </div>
           </div>
 
+          <button id="redeemBtn" type="button" class="w-full rounded-xl bg-amber-100 text-amber-700 border border-amber-300 py-2 font-semibold hover:bg-amber-200 transition text-sm" onclick="toggleRedeemPoints()">
+            Redeem Points ({{ loyalty.total_points|default:0 }} available)
+          </button>
+
           <button id="placeBtn" type="submit" class="w-full rounded-xl bg-smart-blue text-white py-2.5 font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm" disabled>
             Place Order
           </button>
 
           <div class="text-xs text-slate-500 text-center space-y-1">
-            <div>Do Payment at stalls during pickup • {{ today_str }}</div>
+            <div>Do Payment at stalls during pickup</div>
             <div><span class="font-semibold text-amber-600">Note:</span> Orders must be from a single stall only. Multi-stall orders are not allowed.</div>
           </div>
           <div id="cartError" class="hidden text-xs text-rose-600 text-center bg-rose-50 rounded-lg p-2"></div>
@@ -183,21 +205,28 @@
 <script>
   const menuGrid = document.getElementById('menuGrid');
   const menuSearch = document.getElementById('menuSearch');
-  const stallFilter = document.getElementById('stallFilter');
   const locationFilter = document.getElementById('locationFilter');
   const emptyState = document.getElementById('emptyState');
   const categoryList = document.getElementById('categoryList');
   const cartList = document.getElementById('cartList');
   const cartCount = document.getElementById('cartCount');
   const cartJson = document.getElementById('cartJson');
-  const subtotalEl = document.getElementById('subtotal');
-  const taxEl = document.getElementById('tax');
   const totalEl = document.getElementById('total');
   const placeBtn = document.getElementById('placeBtn');
+  const packagingRadios = document.querySelectorAll('input[name="packaging"]');
+  const redeemedPointsInput = document.getElementById('redeemedPoints');
+  const redeemBtn = document.getElementById('redeemBtn');
 
   let activeCategory = 'All Items';
   const cart = new Map(); // id -> {id, name, price, qty, stall_name}
   const cartError = document.getElementById('cartError');
+  
+  // Reward points state
+  let isRedeeming = false;
+  let availablePoints = parseInt('{{ loyalty.total_points|default:0 }}') || 0;
+  const MIN_REDEEM_POINTS = 20;
+  const MAX_REDEEM_POINTS = 40;
+  const POINT_VALUE = 0.25;
 
   function showCartError(msg) {
     cartError.textContent = msg;
@@ -224,15 +253,89 @@
     }
   }
 
-  function computeTotals() {
-    let subtotal = 0;
-    cart.forEach((x) => { subtotal += (Number(x.price) || 0) * (Number(x.qty) || 0); });
-    const tax = Math.round(subtotal * 0.05);
-    const total = subtotal + tax;
-    subtotalEl.textContent = formatINR(subtotal);
-    taxEl.textContent = formatINR(tax);
-    totalEl.textContent = formatINR(total);
+  function getPackagingCharge() {
+    const selected = document.querySelector('input[name="packaging"]:checked');
+    if (!selected || selected.value !== 'parcel') return 0;
+    // 5 rupees per item quantity
+    let totalQty = 0;
+    cart.forEach((x) => { totalQty += (Number(x.qty) || 0); });
+    return totalQty * 5;
   }
+
+  function computeTotals() {
+    let itemsSubtotal = 0;
+    let totalQty = 0;
+    cart.forEach((x) => { 
+      itemsSubtotal += (Number(x.price) || 0) * (Number(x.qty) || 0); 
+      totalQty += (Number(x.qty) || 0);
+    });
+    const packingCharge = getPackagingCharge();
+    
+    // Calculate reward discount if redeeming
+    let rewardDiscount = 0;
+    let redeemedPts = 0;
+    if (isRedeeming && availablePoints >= MIN_REDEEM_POINTS) {
+      redeemedPts = Math.min(availablePoints, MAX_REDEEM_POINTS);
+      rewardDiscount = redeemedPts * POINT_VALUE;
+    }
+    
+    const total = itemsSubtotal + packingCharge - rewardDiscount;
+    
+    // Update breakdown display
+    document.getElementById('itemsSubtotal').textContent = formatINR(itemsSubtotal);
+    document.getElementById('packingChargeRow').style.display = packingCharge > 0 ? 'flex' : 'none';
+    document.getElementById('packingCharge').textContent = formatINR(packingCharge);
+    document.getElementById('totalQtyDisplay').textContent = totalQty;
+    document.getElementById('packingQtyDisplay').textContent = totalQty;
+    
+    // Update reward discount row
+    const rewardRow = document.getElementById('rewardDiscountRow');
+    if (isRedeeming && rewardDiscount > 0) {
+      rewardRow.style.display = 'flex';
+      document.getElementById('redeemedPointsDisplay').textContent = redeemedPts;
+      document.getElementById('rewardDiscount').textContent = '-' + formatINR(rewardDiscount);
+      redeemedPointsInput.value = redeemedPts;
+    } else {
+      rewardRow.style.display = 'none';
+      redeemedPointsInput.value = 0;
+    }
+    
+    totalEl.textContent = formatINR(Math.max(0, total));
+  }
+
+  // Toggle reward points redemption
+  function toggleRedeemPoints() {
+    if (availablePoints < MIN_REDEEM_POINTS) {
+      showCartError(`Need at least ${MIN_REDEEM_POINTS} points to redeem. You have ${availablePoints}.`);
+      return;
+    }
+    
+    if (cart.size === 0) {
+      showCartError('Add items to cart before redeeming points.');
+      return;
+    }
+    
+    isRedeeming = !isRedeeming;
+    
+    if (isRedeeming) {
+      const redeemingPts = Math.min(availablePoints, MAX_REDEEM_POINTS);
+      const discount = redeemingPts * POINT_VALUE;
+      redeemBtn.textContent = `Cancel Redemption (₹${discount.toFixed(0)} off)`;
+      redeemBtn.classList.remove('bg-amber-100', 'text-amber-700', 'border-amber-300');
+      redeemBtn.classList.add('bg-rose-100', 'text-rose-700', 'border-rose-300');
+    } else {
+      redeemBtn.textContent = `Redeem Points (${availablePoints} available)`;
+      redeemBtn.classList.remove('bg-rose-100', 'text-rose-700', 'border-rose-300');
+      redeemBtn.classList.add('bg-amber-100', 'text-amber-700', 'border-amber-300');
+    }
+    
+    computeTotals();
+  }
+
+  // Listen for packaging option changes
+  packagingRadios.forEach(radio => {
+    radio.addEventListener('change', computeTotals);
+  });
 
   function syncCartJson() {
     const payload = Array.from(cart.values()).map((x) => ({ id: x.id, qty: x.qty }));
@@ -283,17 +386,16 @@
 
   function matchesCard(card) {
     const q = (menuSearch.value || '').trim().toLowerCase();
-    const selectedStall = (stallFilter.value || '').toLowerCase();
     const selectedLocation = (locationFilter.value || '').toLowerCase();
     const name = card.dataset.name || '';
     const stall = card.dataset.stall || '';
     const location = card.dataset.location || '';
     const category = card.dataset.category || 'All Items';
     const matchCategory = (activeCategory === 'All Items') || (category === activeCategory);
-    const matchSearch = !q || name.includes(q);
-    const matchStall = !selectedStall || stall === selectedStall;
+    // Search by item name OR stall name OR location
+    const matchSearch = !q || name.includes(q) || stall.includes(q) || location.includes(q);
     const matchLocation = !selectedLocation || location === selectedLocation;
-    return matchCategory && matchSearch && matchStall && matchLocation;
+    return matchCategory && matchSearch && matchLocation;
   }
 
   function applyFilters() {
@@ -321,7 +423,6 @@
   });
 
   menuSearch.addEventListener('input', applyFilters);
-  stallFilter.addEventListener('change', applyFilters);
   locationFilter.addEventListener('change', applyFilters);
 
   menuGrid.addEventListener('click', (e) => {
@@ -386,4 +487,392 @@
   applyFilters();
   renderCart();
 </script>
+
+<!-- Instructions & Penalty Modal -->
+<div class="modal fade" id="instructionsModal" tabindex="-1" aria-labelledby="instructionsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="instructionsModalLabel">Food Pre-Order Instructions & Penalty Rules</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h6 class="fw-bold text-primary">How to Order:</h6>
+        <ol>
+          <li>Select your break time slot</li>
+          <li>Add items from one stall only (multi-stall orders not allowed)</li>
+          <li>Place your order before the break slot starts</li>
+          <li>Collect your food during the selected break time</li>
+          <li>Payment is made at the stall during pickup (Cash/UPI)</li>
+        </ol>
+        
+        <h6 class="fw-bold text-danger mt-4">Penalty for Missed Orders:</h6>
+        <p class="text-muted small">If you order food but don't pick it up, the stall wastes prepared food. Penalties apply:</p>
+        <table class="table table-sm table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Missed Orders</th>
+              <th>Penalty Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1st Miss</td>
+              <td>Warning notification</td>
+            </tr>
+            <tr>
+              <td>2nd Miss</td>
+              <td>1-day ordering ban</td>
+            </tr>
+            <tr>
+              <td>3rd Miss</td>
+              <td>3-day ordering ban</td>
+            </tr>
+            <tr class="table-danger">
+              <td>4+ Misses</td>
+              <td>1-week ban or account review</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="alert alert-warning mt-3">
+          <strong>Your Current Penalty Count:</strong> 
+          {% if user.preorder_set.exists %}
+            {{ user.preorder_set.first.penalty_count|default:0 }} missed orders
+          {% else %}
+            0 missed orders
+          {% endif %}
+        </div>
+        
+        <h6 class="fw-bold text-success mt-4">Reward Points Program:</h6>
+        <p class="text-muted small">Earn points automatically when you place orders. 1 Point = ₹0.25</p>
+        <table class="table table-sm table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Action</th>
+              <th>Points</th>
+              <th>Condition</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Base order</td>
+              <td class="text-primary fw-bold">+1</td>
+              <td>Every order placed</td>
+            </tr>
+            <tr>
+              <td>First ever order</td>
+              <td class="text-success fw-bold">+5</td>
+              <td>One-time welcome bonus</td>
+            </tr>
+            <tr>
+              <td>First order of week</td>
+              <td class="text-success fw-bold">+2</td>
+              <td>First order each Monday-Sunday</td>
+            </tr>
+            <tr>
+              <td>Regular customer</td>
+              <td class="text-success fw-bold">+10</td>
+              <td>6+ orders/week from same stall</td>
+            </tr>
+            <tr>
+              <td>7-day streak</td>
+              <td class="text-success fw-bold">+15</td>
+              <td>Consecutive daily orders</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="alert alert-info mt-3">
+          <strong>Redemption Rules:</strong>
+          <ul class="mb-0 small">
+            <li>1 Point = ₹0.25 off your order</li>
+            <li>Minimum 20 points required to redeem</li>
+            <li>Maximum 40 points per order (₹10 max discount)</li>
+            <li>Points are auto-allotted by the system after each order</li>
+          </ul>
+        </div>
+        
+        <h6 class="fw-bold text-success mt-4">Important Notes:</h6>
+        <ul>
+          <li>Orders must be from a single stall only</li>
+          <li>Orders cannot be cancelled after the break slot starts</li>
+          <li>You will receive an email when your order is ready</li>
+          <li>All payments are made at the stall during pickup</li>
+          <li>Bulk orders must be placed at least 2 days in advance</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Order Modal -->
+<div class="modal fade" id="bulkOrderModal" tabindex="-1" aria-labelledby="bulkOrderModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="bulkOrderModalLabel">Bulk Order for Events/Groups</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="bulkOrderForm">
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Event/Group Name</label>
+              <input type="text" class="form-control" id="eventName" placeholder="e.g., Class Trip, Birthday Party" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Number of People</label>
+              <input type="number" class="form-control" id="peopleCount" min="5" max="50" placeholder="10" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Delivery Date</label>
+              <input type="date" class="form-control" id="deliveryDate" required>
+            </div>
+          </div>
+          
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Break Slot</label>
+              <select class="form-control" id="bulkSlot" required>
+                <option value="">Select slot...</option>
+                {% for slot in slots %}
+                  <option value="{{ slot.id }}">{{ slot.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Stall</label>
+              <select class="form-control" id="bulkStall" required>
+                <option value="">Select stall...</option>
+                {% for stall in stalls %}
+                  <option value="{{ stall.stall_name }}">{{ stall.stall_name }} - {{ stall.location }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Contact Person</label>
+              <input type="text" class="form-control" id="contactPerson" placeholder="Your name" required>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Contact Number</label>
+              <input type="tel" class="form-control" id="contactPhone" placeholder="Phone number" required>
+            </div>
+            <div class="col-md-8">
+              <div class="small text-muted" style="margin-top: 32px;">Note: Bulk orders must be placed at least 2 days in advance.</div>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Special Instructions</label>
+            <textarea class="form-control" id="specialInstructions" rows="2" placeholder="Any special requirements..."></textarea>
+          </div>
+          
+          <div class="alert alert-info">
+            <strong>Bulk Order Benefits:</strong>
+            <ul class="mb-0">
+              <li>10% discount for orders of 20+ people</li>
+              <li>Priority preparation for large groups</li>
+              <li>Dedicated contact person for coordination</li>
+            </ul>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="submitBulkOrder()">Submit Bulk Order</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return '';
+}
+
+function formatDateYYYYMMDD(d) {
+  try {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  } catch (_e) {
+    return '';
+  }
+}
+
+function getMinBulkDeliveryDateStr() {
+  const t = new Date();
+  t.setHours(0, 0, 0, 0);
+  t.setDate(t.getDate() + 2);
+  return formatDateYYYYMMDD(t);
+}
+
+// Enforce min date in the date picker UI
+(function initBulkOrderMinDate() {
+  const el = document.getElementById('deliveryDate');
+  if (!el) return;
+  el.min = getMinBulkDeliveryDateStr();
+})();
+
+function submitBulkOrder() {
+  const form = document.getElementById('bulkOrderForm');
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+
+  const deliveryDateStr = document.getElementById('deliveryDate').value;
+  const minDateStr = getMinBulkDeliveryDateStr();
+  if (deliveryDateStr && minDateStr && deliveryDateStr < minDateStr) {
+    alert('Bulk orders must be placed at least 2 days in advance. Please select a later date.');
+    return;
+  }
+  
+  const bulkData = {
+    event_name: document.getElementById('eventName').value,
+    people_count: Number(document.getElementById('peopleCount').value),
+    delivery_date: deliveryDateStr,
+    slot_id: Number(document.getElementById('bulkSlot').value),
+    stall_name: document.getElementById('bulkStall').value,
+    contact_person: document.getElementById('contactPerson').value,
+    contact_phone: document.getElementById('contactPhone').value,
+    special_instructions: document.getElementById('specialInstructions').value,
+    requested_items: [],
+  };
+
+  fetch("{% url 'food:submit_bulk_order' %}", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCookie('csrftoken'),
+    },
+    body: JSON.stringify(bulkData),
+  })
+    .then((r) => r.json())
+    .then((data) => {
+      if (!data || !data.ok) {
+        if (data && data.error === 'too_soon') {
+          alert('Bulk orders must be placed at least 2 days in advance. Please select a later date.');
+          return;
+        }
+        alert("Could not submit bulk order. Please check details and try again.");
+        return;
+      }
+      alert(`Bulk order submitted!\n\nRequest ID: #${data.id}\nEvent: ${bulkData.event_name}\nPeople: ${bulkData.people_count}`);
+      const modal = bootstrap.Modal.getInstance(document.getElementById('bulkOrderModal'));
+      modal.hide();
+    })
+    .catch(() => {
+      alert("Could not submit bulk order. Please try again.");
+    });
+}
+</script>
+
+<!-- Reward Points Info Modal -->
+<dialog id="rewardInfoModal" class="rounded-xl p-0 shadow-2xl max-w-md w-full backdrop:bg-black/50">
+  <div class="p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-blue-700 flex items-center gap-2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        Reward Points Program
+      </h3>
+      <button onclick="document.getElementById('rewardInfoModal').close()" class="text-slate-400 hover:text-slate-600">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="space-y-4 text-sm">
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div class="text-blue-800 font-semibold">Current Balance</div>
+        <div class="text-2xl font-bold text-blue-700">{{ loyalty.total_points|default:0 }} pts</div>
+        <div class="text-blue-600">= ₹{{ loyalty.rupee_value|default:0 }}</div>
+      </div>
+      
+      <div>
+        <h4 class="font-semibold text-slate-800 mb-2">How to Earn Points (Auto-Allotted)</h4>
+        <table class="w-full text-xs">
+          <tbody class="space-y-1">
+            <tr class="border-b border-slate-100">
+              <td class="py-2">Base order points</td>
+              <td class="py-2 text-right font-semibold text-blue-600">+1 per order</td>
+            </tr>
+            <tr class="border-b border-slate-100">
+              <td class="py-2">First ever order</td>
+              <td class="py-2 text-right font-semibold text-green-600">+5 bonus</td>
+            </tr>
+            <tr class="border-b border-slate-100">
+              <td class="py-2">First order of the week</td>
+              <td class="py-2 text-right font-semibold text-green-600">+2 bonus</td>
+            </tr>
+            <tr class="border-b border-slate-100">
+              <td class="py-2">Regular customer (6+ orders/week, same stall)</td>
+              <td class="py-2 text-right font-semibold text-green-600">+10 bonus</td>
+            </tr>
+            <tr class="border-b border-slate-100">
+              <td class="py-2">7-day streak (consecutive daily orders)</td>
+              <td class="py-2 text-right font-semibold text-green-600">+15 bonus</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
+        <h4 class="font-semibold text-amber-800 mb-1">How to Redeem</h4>
+        <ul class="text-amber-700 text-xs space-y-1">
+          <li>• 1 Point = ₹0.25 off your order</li>
+          <li>• Points auto-applied at checkout</li>
+          <li>• Use "Apply Points" button before placing order</li>
+          <li>• Minimum 20 points required to redeem</li>
+          <li>• Maximum 40 points per order (₹10 max discount)</li>
+        </ul>
+      </div>
+      
+      {% if loyalty %}
+      <div class="text-xs text-slate-500">
+        <div class="flex justify-between py-1 border-b border-slate-100">
+          <span>Current Streak:</span>
+          <span class="font-semibold">{{ loyalty.current_streak }} days</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-slate-100">
+          <span>Weekly Orders:</span>
+          <span class="font-semibold">{{ loyalty.weekly_orders_count }}</span>
+        </div>
+        {% if loyalty.favorite_stall %}
+        <div class="flex justify-between py-1">
+          <span>Favorite Stall:</span>
+          <span class="font-semibold">{{ loyalty.favorite_stall }}</span>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    
+    <div class="mt-4 text-center">
+      <button onclick="document.getElementById('rewardInfoModal').close()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        Got it!
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  #rewardInfoModal::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+  }
+</style>
 {% endblock %}
