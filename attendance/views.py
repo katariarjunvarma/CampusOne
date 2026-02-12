@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import transaction
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -73,6 +73,15 @@ def _blink_seen(state: dict[str, object]) -> bool:
 
 @login_required
 def home(request: HttpRequest) -> HttpResponse:
+    try:
+        from food.models import StallOwner
+
+        if StallOwner.objects.filter(user=request.user, is_active=True).exists() and not bool(
+            getattr(request.user, "is_superuser", False)
+        ):
+            return redirect("food:vendor_dashboard")
+    except Exception:
+        pass
     # Import here to avoid circular imports
     from food.models import PreOrder
     recent_food_orders = (
@@ -85,6 +94,15 @@ def home(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def attendance_home(request: HttpRequest) -> HttpResponse:
+    try:
+        from food.models import StallOwner
+
+        if StallOwner.objects.filter(user=request.user, is_active=True).exists() and not bool(
+            getattr(request.user, "is_superuser", False)
+        ):
+            return redirect("food:vendor_dashboard")
+    except Exception:
+        pass
     from django.utils import timezone
     from datetime import date
     
@@ -113,6 +131,7 @@ def attendance_home(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_dashboard(request: HttpRequest) -> HttpResponse:
     from django.utils import timezone
     from datetime import date
@@ -134,12 +153,14 @@ def manage_dashboard(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_students(request: HttpRequest) -> HttpResponse:
     students = Student.objects.order_by("roll_no")
     return render(request, "attendance/manage/students.html", {"students": students})
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_student_create(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = StudentForm(request.POST)
@@ -153,6 +174,7 @@ def manage_student_create(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_student_edit(request: HttpRequest, student_id: int) -> HttpResponse:
     student = get_object_or_404(Student, id=student_id)
     if request.method == "POST":
@@ -167,6 +189,7 @@ def manage_student_edit(request: HttpRequest, student_id: int) -> HttpResponse:
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_student_delete(request: HttpRequest, student_id: int) -> HttpResponse:
     student = get_object_or_404(Student, id=student_id)
     if request.method == "POST":
@@ -177,12 +200,14 @@ def manage_student_delete(request: HttpRequest, student_id: int) -> HttpResponse
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_courses(request: HttpRequest) -> HttpResponse:
     courses = Course.objects.order_by("code")
     return render(request, "attendance/manage/courses.html", {"courses": courses})
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_course_create(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = CourseCreateForm(request.POST)
@@ -196,6 +221,7 @@ def manage_course_create(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_course_delete(request: HttpRequest, course_id: int) -> HttpResponse:
     course = get_object_or_404(Course, id=course_id)
     if request.method == "POST":
@@ -206,12 +232,14 @@ def manage_course_delete(request: HttpRequest, course_id: int) -> HttpResponse:
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_enrollments(request: HttpRequest) -> HttpResponse:
     enrollments = Enrollment.objects.select_related("student", "course").order_by("course__code", "student__roll_no")
     return render(request, "attendance/manage/enrollments.html", {"enrollments": enrollments})
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_enrollment_create(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = EnrollmentForm(request.POST)
@@ -225,12 +253,14 @@ def manage_enrollment_create(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_face_samples(request: HttpRequest) -> HttpResponse:
     samples = FaceSample.objects.select_related("student").order_by("-created_at")
     return render(request, "attendance/manage/face_samples.html", {"samples": samples})
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_face_sample_create(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = FaceSampleMultiForm(request.POST, request.FILES)
@@ -247,6 +277,7 @@ def manage_face_sample_create(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_face_sample_delete(request: HttpRequest, face_sample_id: int) -> HttpResponse:
     fs = get_object_or_404(FaceSample.objects.select_related("student"), id=face_sample_id)
     if request.method == "POST":
@@ -261,6 +292,7 @@ def manage_face_sample_delete(request: HttpRequest, face_sample_id: int) -> Http
 
 @login_required
 @transaction.atomic
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_face_samples_delete_all(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         samples = list(FaceSample.objects.all())
@@ -285,18 +317,21 @@ def manage_face_samples_delete_all(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_notifications(request: HttpRequest) -> HttpResponse:
     notifications = Notification.objects.select_related("recipient_student").order_by("-created_at")[:200]
     return render(request, "attendance/manage/notifications.html", {"notifications": notifications})
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_sessions(request: HttpRequest) -> HttpResponse:
     sessions = AttendanceSession.objects.select_related("course").order_by("-created_at")[:200]
     return render(request, "attendance/manage/sessions.html", {"sessions": sessions})
 
 
 @login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_records(request: HttpRequest) -> HttpResponse:
     session_id = request.GET.get("session")
     qs = AttendanceRecord.objects.select_related("session", "session__course", "student").order_by(

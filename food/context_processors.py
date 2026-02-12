@@ -22,4 +22,21 @@ def emergency_alerts(request):
     alerts = list(qs.order_by("-created_at")[:5])
     alerts.sort(key=lambda a: severity_order.get(a.severity, 0), reverse=True)
 
-    return {"emergency_alerts": alerts}
+    is_stall_owner = False
+    is_stall_owner_only = False
+    user = getattr(request, "user", None)
+    if user and getattr(user, "is_authenticated", False):
+        try:
+            from .models import StallOwner
+
+            is_stall_owner = StallOwner.objects.filter(user=user).exists()
+            is_stall_owner_only = bool(is_stall_owner and not getattr(user, "is_superuser", False))
+        except Exception:
+            is_stall_owner = False
+            is_stall_owner_only = False
+
+    return {
+        "emergency_alerts": alerts,
+        "is_stall_owner": is_stall_owner,
+        "is_stall_owner_only": is_stall_owner_only,
+    }

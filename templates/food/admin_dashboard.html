@@ -324,9 +324,17 @@
           <tr>
             <td><strong>{{ stall.name }}</strong></td>
             <td>{{ stall.location }}</td>
-            <td>{{ stall.owner_name|default:"-" }}</td>
-            <td>{{ stall.phone_number|default:"-" }}</td>
-            <td>{{ stall.food_items.count }}</td>
+            <td>
+              {% with owner=stall.stallowner_set.first %}
+                {% if owner %}{{ owner.user.username }}{% else %}-{% endif %}
+              {% endwith %}
+            </td>
+            <td>
+              {% with owner=stall.stallowner_set.first %}
+                {% if owner %}{{ owner.phone|default:"-" }}{% else %}-{% endif %}
+              {% endwith %}
+            </td>
+            <td>{{ stall.fooditem_set.count }}</td>
             <td>
               {% if stall.is_active %}
                 <span class="badge badge-active">Active</span>

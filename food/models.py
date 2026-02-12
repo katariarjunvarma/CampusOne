@@ -13,6 +13,22 @@ class Stall(models.Model):
         return f"{self.name} - {self.location}"
 
 
+class StallOwner(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='stall_owner'
+    )
+    stall = models.ForeignKey(Stall, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=32, blank=True, default="")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'stall')
+
+    def __str__(self) -> str:
+        return f"{self.user.username} - {self.stall.name}"
+
+
 class FoodItem(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField(blank=True)
@@ -46,11 +62,13 @@ class PreOrder(models.Model):
     ]
 
     STATUS_PENDING = "pending"
+    STATUS_COOKING = "cooking"
     STATUS_READY = "ready"
     STATUS_COLLECTED = "collected"
     STATUS_MISSED = "missed"
     STATUS_CHOICES = [
         (STATUS_PENDING, "Pending"),
+        (STATUS_COOKING, "Cooking"),
         (STATUS_READY, "Ready"),
         (STATUS_COLLECTED, "Collected"),
         (STATUS_MISSED, "Missed"),
@@ -77,12 +95,11 @@ class PreOrder(models.Model):
         return f"Order #{self.order_number or self.id} - {self.food_item.name}"
 
     def save(self, *args, **kwargs):
-        if not self.order_number:
-            from django.utils import timezone
-            today = timezone.localdate()
-            today_count = PreOrder.objects.filter(order_date=today).count()
-            self.order_number = str(today_count + 1).zfill(5)
         super().save(*args, **kwargs)
+
+    @property
+    def item_total(self):
+        return self.quantity * self.food_item.price
 
 
 class BulkOrder(models.Model):

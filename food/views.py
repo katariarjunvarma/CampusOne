@@ -13,7 +13,7 @@ from django.utils import timezone
 from datetime import date as _date
 
 from .forms import CancelOrderForm, PreOrderForm
-from .models import BreakSlot, BulkOrder, FoodItem, LoyaltyPoints, PreOrder, Stall
+from .models import BreakSlot, BulkOrder, FoodItem, LoyaltyPoints, PreOrder, Stall, StallOwner
 
 
 def _require_staff(request: HttpRequest) -> bool:
@@ -152,9 +152,16 @@ def create_order(request: HttpRequest) -> HttpResponse:
                 return redirect("food:create_order")
 
             order_date = timezone.localdate()
+            
+            # Generate single order_number for entire cart
+            today = timezone.localdate()
+            today_count = PreOrder.objects.filter(order_date=today).count()
+            order_number = str(today_count + 1).zfill(5)
+            
             created_count = 0
             updated_count = 0
             points_awarded = 0
+            total_cost = 0
 
             packaging = request.POST.get("packaging", PreOrder.PACK_EAT)
             if packaging not in (PreOrder.PACK_EAT, PreOrder.PACK_PARCEL):
@@ -179,12 +186,21 @@ def create_order(request: HttpRequest) -> HttpResponse:
                 except FoodItem.DoesNotExist:
                     continue
 
+                # Calculate item cost
+                item_cost = food_item.price * qty
+                total_cost += item_cost
+
                 obj, created = PreOrder.objects.get_or_create(
                     ordered_by=request.user,
                     food_item=food_item,
                     slot=slot,
                     order_date=order_date,
-                    defaults={"quantity": qty, "status": PreOrder.STATUS_PENDING, "packaging_option": packaging},
+                    defaults={
+                        "quantity": qty, 
+                        "status": PreOrder.STATUS_PENDING, 
+                        "packaging_option": packaging,
+                        "order_number": order_number
+                    },
                 )
                 if created:
                     created_count += 1
@@ -193,7 +209,8 @@ def create_order(request: HttpRequest) -> HttpResponse:
                     if obj.status != PreOrder.STATUS_PENDING:
                         continue
                     obj.quantity = int(obj.quantity) + qty
-                    obj.save(update_fields=["quantity"])
+                    obj.order_number = order_number  # Ensure same order number
+                    obj.save(update_fields=["quantity", "order_number"])
                     updated_count += 1
 
             if created_count or updated_count:
@@ -213,12 +230,26 @@ def create_order(request: HttpRequest) -> HttpResponse:
                 
                 points_result = _award_points(request.user, points_awarded, cart_stall_name)
                 
+                # Calculate final total after discount
+                final_total = total_cost - discount_amount
+                
                 if discount_amount > 0:
-                    messages.success(request, f"Order placed! ₹{discount_amount:.0f} discount applied. You earned {points_result['total']} points.")
+                    messages.success(
+                        request, 
+                        f"Order #{order_number} placed! Total: ₹{final_total:.0f} (saved ₹{discount_amount:.0f}). "
+                        f"You earned {points_result['total']} points."
+                    )
                 elif points_result["total"] > 0:
-                    messages.success(request, f"Order placed! You earned {points_result['total']} points.")
+                    messages.success(
+                        request, 
+                        f"Order #{order_number} placed! Total: ₹{total_cost:.0f}. "
+                        f"You earned {points_result['total']} points."
+                    )
                 else:
-                    messages.success(request, "Order placed successfully.")
+                    messages.success(
+                        request, 
+                        f"Order #{order_number} placed! Total: ₹{total_cost:.0f}."
+                    )
                 return redirect("food:my_orders")
 
             messages.error(request, "No valid items were found in your cart.")
@@ -395,16 +426,33 @@ def my_orders(request: HttpRequest) -> HttpResponse:
     else:
         day = timezone.localdate()
 
+    # Get all orders for the day
     orders = (
         PreOrder.objects.select_related("food_item", "slot")
         .filter(order_date=day, ordered_by=request.user)
-        .order_by("slot__start_time", "created_at")
+        .order_by("order_number", "created_at")
     )
+    
+    # Group by order_number
+    grouped_orders = {}
+    for order in orders:
+        onum = order.order_number
+        if onum not in grouped_orders:
+            grouped_orders[onum] = {
+                "order_number": onum,
+                "slot": order.slot,
+                "status": order.status,
+                "orders": [],
+                "total_cost": 0,
+            }
+        grouped_orders[onum]["orders"].append(order)
+        grouped_orders[onum]["total_cost"] += order.item_total
+    
     return render(
         request,
         "food/my_orders.html",
         {
-            "orders": orders,
+            "grouped_orders": grouped_orders.values(),
             "day": day,
             "cancel_form": CancelOrderForm(),
         },
@@ -478,7 +526,7 @@ def food_dashboard(request: HttpRequest) -> HttpResponse:
 
 
 def _require_admin(request: HttpRequest) -> bool:
-    if bool(getattr(request.user, "is_staff", False)):
+    if bool(getattr(request.user, "is_superuser", False)):
         return True
     messages.error(request, "Admin access required.")
     return False
@@ -619,3 +667,169 @@ def food_admin_item_delete(request: HttpRequest, item_id: int) -> HttpResponse:
     item.delete()
     messages.success(request, f"Food item '{name}' deleted successfully.")
     return redirect("food:food_admin_dashboard")
+
+
+def _get_stall_owner(request: HttpRequest):
+    try:
+        return request.user.stall_owner
+    except Exception:
+        return None
+
+
+@login_required
+def vendor_dashboard(request: HttpRequest) -> HttpResponse:
+    stall_owner = _get_stall_owner(request)
+    if not stall_owner:
+        return render(request, "food/vendor_access_denied.html", {"reason": "not_assigned"})
+    if not stall_owner.is_active:
+        return render(request, "food/vendor_access_denied.html", {"reason": "inactive"})
+
+    today = timezone.localdate()
+    
+    # Get all orders for this stall today
+    all_orders = (
+        PreOrder.objects.select_related("food_item", "slot", "ordered_by")
+        .filter(
+            food_item__stall=stall_owner.stall,
+            order_date=today,
+        )
+        .order_by("slot__start_time", "created_at")
+    )
+
+    # Filter by status for display
+    pending_orders = all_orders.filter(status=PreOrder.STATUS_PENDING)
+    cooking_orders = all_orders.filter(status=PreOrder.STATUS_COOKING)
+    ready_orders = all_orders.filter(status=PreOrder.STATUS_READY)
+    collected_orders = all_orders.filter(status=PreOrder.STATUS_COLLECTED)
+    missed_orders = all_orders.filter(status=PreOrder.STATUS_MISSED)
+
+    # Stats
+    pending = pending_orders.count()
+    cooking = cooking_orders.count()
+    ready = ready_orders.count()
+    collected = collected_orders.count()
+    missed = missed_orders.count()
+    total_orders = all_orders.count()
+    total_quantity = all_orders.aggregate(total=Sum("quantity"))["total"] or 0
+
+    menu_items = FoodItem.objects.filter(stall=stall_owner.stall, is_active=True).order_by("name")
+
+    return render(
+        request,
+        "food/vendor_dashboard.html",
+        {
+            "stall": stall_owner.stall,
+            "orders": all_orders,
+            "orders_by_status": {
+                "pending": pending_orders,
+                "cooking": cooking_orders,
+                "ready": ready_orders,
+                "completed": collected_orders,
+                "missed": missed_orders,
+            },
+            "today": today,
+            "pending": pending,
+            "cooking": cooking,
+            "ready": ready,
+            "collected": collected,
+            "missed": missed,
+            "total_orders": total_orders,
+            "total_quantity": total_quantity,
+            "menu_items": menu_items,
+            "stats": {"pending": pending, "cooking": cooking, "ready": ready, "collected": collected, "missed": missed},
+        },
+    )
+
+
+@login_required
+def vendor_update_order(request: HttpRequest) -> HttpResponse:
+    stall_owner = _get_stall_owner(request)
+    if not stall_owner or not stall_owner.is_active:
+        return JsonResponse({"ok": False, "error": "access_denied"}, status=403)
+
+    if request.method != "POST":
+        return JsonResponse({"ok": False, "error": "method_not_allowed"}, status=405)
+
+    try:
+        payload = json.loads((request.body or b"{}").decode("utf-8"))
+    except Exception:
+        return JsonResponse({"ok": False, "error": "invalid_payload"}, status=400)
+
+    order_id = payload.get("order_id")
+    new_status = payload.get("status")
+
+    if not order_id or new_status not in (PreOrder.STATUS_COOKING, PreOrder.STATUS_READY, PreOrder.STATUS_COLLECTED, PreOrder.STATUS_MISSED):
+        return JsonResponse({"ok": False, "error": "invalid_data"}, status=400)
+
+    try:
+        order = PreOrder.objects.get(
+            id=order_id,
+            food_item__stall_name=stall_owner.stall.name,
+            order_date=timezone.localdate(),
+        )
+    except PreOrder.DoesNotExist:
+        return JsonResponse({"ok": False, "error": "not_found"}, status=404)
+
+    order.status = new_status
+    order.save(update_fields=["status"])
+
+    return JsonResponse({"ok": True, "status": new_status})
+
+
+@login_required
+def vendor_menu(request: HttpRequest) -> HttpResponse:
+    """Separate page showing only the stall's menu items."""
+    stall_owner = _get_stall_owner(request)
+    if not stall_owner or not stall_owner.is_active:
+        messages.error(request, "Stall owner access required.")
+        return redirect("home")
+
+    # Show all items for this stall (both active and inactive) so vendor can toggle
+    menu_items = FoodItem.objects.filter(stall=stall_owner.stall).order_by("name")
+
+    return render(
+        request,
+        "food/vendor_menu.html",
+        {
+            "stall": stall_owner.stall,
+            "menu_items": menu_items,
+        },
+    )
+
+
+@login_required
+def vendor_toggle_item(request: HttpRequest) -> HttpResponse:
+    """Toggle food item availability (active/inactive)."""
+    stall_owner = _get_stall_owner(request)
+    if not stall_owner or not stall_owner.is_active:
+        return JsonResponse({"ok": False, "error": "access_denied"}, status=403)
+
+    if request.method != "POST":
+        return JsonResponse({"ok": False, "error": "method_not_allowed"}, status=405)
+
+    try:
+        payload = json.loads((request.body or b"{}").decode("utf-8"))
+    except Exception:
+        return JsonResponse({"ok": False, "error": "invalid_payload"}, status=400)
+
+    item_id = payload.get("item_id")
+    if not item_id:
+        return JsonResponse({"ok": False, "error": "missing_item_id"}, status=400)
+
+    try:
+        item = FoodItem.objects.get(
+            id=item_id,
+            stall=stall_owner.stall,
+        )
+    except FoodItem.DoesNotExist:
+        return JsonResponse({"ok": False, "error": "not_found"}, status=404)
+
+    # Toggle is_active
+    item.is_active = not item.is_active
+    item.save(update_fields=["is_active"])
+
+    return JsonResponse({
+        "ok": True,
+        "is_active": item.is_active,
+        "message": f"'{item.name}' is now {'available' if item.is_active else 'not available'}"
+    })

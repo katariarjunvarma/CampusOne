@@ -36,6 +36,7 @@
         <div class="sidebar-card p-3 mb-3">
           <div class="fw-semibold mb-2">Navigation</div>
           <div class="nav-soft d-grid gap-1">
+            {% if not is_stall_owner_only %}
             <a href="{% url 'home' %}">
               <div class="nav-text">
                 <div class="nav-title">Dashboard</div>
@@ -54,12 +55,54 @@
                 <div class="hint">Pre-Order Meals</div>
               </div>
             </a>
+            {% endif %}
+            {% if user.is_authenticated and user.is_superuser %}
             <a href="{% url 'manage_dashboard' %}">
               <div class="nav-text">
                 <div class="nav-title">Manage Data</div>
                 <div class="hint">Students / Courses</div>
               </div>
             </a>
+            {% endif %}
+
+            {% if user.is_authenticated and is_stall_owner %}
+            <a href="{% url 'food:vendor_dashboard' %}">
+              <div class="nav-text">
+                <div class="nav-title">Vendor Dashboard</div>
+                <div class="hint">Overview</div>
+              </div>
+            </a>
+            <a href="{% url 'food:vendor_dashboard' %}#pending" onclick="localStorage.setItem('showSection', 'pending')">
+              <div class="nav-text">
+                <div class="nav-title">Orders Pending</div>
+                <div class="hint">View Pending</div>
+              </div>
+            </a>
+            <a href="{% url 'food:vendor_dashboard' %}#ready" onclick="localStorage.setItem('showSection', 'ready')">
+              <div class="nav-text">
+                <div class="nav-title">Orders Pickup</div>
+                <div class="hint">Ready for Pickup</div>
+              </div>
+            </a>
+            <a href="{% url 'food:vendor_dashboard' %}#completed" onclick="localStorage.setItem('showSection', 'completed')">
+              <div class="nav-text">
+                <div class="nav-title">Orders Completed</div>
+                <div class="hint">Collected Orders</div>
+              </div>
+            </a>
+            <a href="{% url 'food:vendor_dashboard' %}#missed" onclick="localStorage.setItem('showSection', 'missed')">
+              <div class="nav-text">
+                <div class="nav-title">Orders Missed</div>
+                <div class="hint">Missed Orders</div>
+              </div>
+            </a>
+            <a href="{% url 'food:vendor_menu' %}">
+              <div class="nav-text">
+                <div class="nav-title">My Menu</div>
+                <div class="hint">View Menu Items</div>
+              </div>
+            </a>
+            {% endif %}
           </div>
         </div>
 

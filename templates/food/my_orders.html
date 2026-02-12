@@ -127,6 +127,63 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
   
+  .order-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+  }
+  
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .order-total {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  
+  .order-meta {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  
+  .order-items-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .order-items-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+  }
+  
+  .order-items-table td {
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #1e293b;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .order-items-table tr:hover td {
+    background: #f9fafb;
+  }
+  
   .data-table {
     width: 100%;
     border-collapse: separate;
@@ -234,6 +291,11 @@
     .filter-group {
       max-width: 100%;
     }
+    .order-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
   }
 </style>
 
@@ -262,61 +324,72 @@
     </form>
   </div>
   
-  <!-- Orders Table -->
-  <div class="data-card">
-    {% if orders %}
-      <table class="data-table">
+  <!-- Grouped Orders -->
+  {% if grouped_orders %}
+    {% for group in grouped_orders %}
+    <div class="order-card">
+      <div class="order-header">
+        <div>
+          <span class="order-number">#{{ group.order_number }}</span>
+          <span style="margin-left: 16px; color: #6b7280;">{{ group.slot.name }}</span>
+        </div>
+        <div class="order-meta">
+          <span class="order-total">Total: ₹{{ group.total_cost }}</span>
+          {% if group.status == 'pending' %}
+            <span class="status-badge status-pending">Pending</span>
+          {% elif group.status == 'ready' %}
+            <span class="status-badge status-ready">Ready</span>
+          {% elif group.status == 'missed' %}
+            <span class="status-badge status-missed">Missed</span>
+          {% else %}
+            <span class="status-badge status-collected">Collected</span>
+          {% endif %}
+        </div>
+      </div>
+      
+      <table class="order-items-table">
         <thead>
           <tr>
-            <th>Order #</th>
-            <th>Slot</th>
             <th>Item</th>
             <th>Stall</th>
             <th>Location</th>
             <th class="text-right">Qty</th>
-            <th>Status</th>
+            <th class="text-right">Price</th>
+            <th class="text-right">Subtotal</th>
+            {% if group.status == 'pending' %}
             <th class="text-right">Action</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody>
-          {% for o in orders %}
-            <tr>
-              <td><span class="order-number">{% if o.order_number %}{{ o.order_number }}{% else %}#{{ o.id }}{% endif %}</span></td>
-              <td class="slot-name">{{ o.slot.name }}</td>
-              <td class="item-name">{{ o.food_item.name }}</td>
-              <td class="muted-cell">{{ o.food_item.stall_name }}</td>
-              <td class="muted-cell">{{ o.food_item.location }}</td>
-              <td class="text-right">{{ o.quantity }}</td>
-              <td>
-                {% if o.status == 'pending' %}
-                  <span class="status-badge status-pending">Pending</span>
-                {% elif o.status == 'ready' %}
-                  <span class="status-badge status-ready">Ready</span>
-                {% elif o.status == 'missed' %}
-                  <span class="status-badge status-missed">Missed</span>
-                {% else %}
-                  <span class="status-badge status-collected">Collected</span>
-                {% endif %}
-              </td>
-              <td class="text-right">
-                {% if o.status == 'pending' %}
-                  <form method="post" class="d-inline">
-                    {% csrf_token %}
-                    <input type="hidden" name="order_id" value="{{ o.id }}">
-                    <button type="submit" class="btn-cancel">Cancel</button>
-                  </form>
-                {% else %}
-                  <span class="muted-cell">-</span>
-                {% endif %}
-              </td>
-            </tr>
+          {% for o in group.orders %}
+          <tr>
+            <td class="item-name">{{ o.food_item.name }}</td>
+            <td class="muted-cell">{{ o.food_item.stall_name }}</td>
+            <td class="muted-cell">{{ o.food_item.location }}</td>
+            <td class="text-right">{{ o.quantity }}</td>
+            <td class="text-right">₹{{ o.food_item.price }}</td>
+            <td class="text-right">₹{{ o.item_total }}</td>
+            {% if group.status == 'pending' %}
+            <td class="text-right">
+              <form method="post" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="order_id" value="{{ o.id }}">
+                <button type="submit" class="btn-cancel">Cancel</button>
+              </form>
+            </td>
+            {% endif %}
+          </tr>
           {% endfor %}
         </tbody>
       </table>
-    {% else %}
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="order-card">
       <div class="empty-state">No orders found for this date.</div>
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
 </div>
 
 <!-- Instructions Modal -->

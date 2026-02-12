@@ -1,6 +1,46 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
-from .models import BreakSlot, BulkOrder, EmergencyAlert, FoodItem, LoyaltyPoints, PreOrder
+from .models import (
+    BreakSlot,
+    BulkOrder,
+    EmergencyAlert,
+    FoodItem,
+    LoyaltyPoints,
+    PreOrder,
+    Stall,
+    StallOwner,
+)
+
+
+User = get_user_model()
+
+
+class StallOwnerInline(admin.StackedInline):
+    model = StallOwner
+    can_delete = True
+    extra = 0
+
+
+class UserAdmin(DjangoUserAdmin):
+    inlines = [StallOwnerInline]
+
+    def is_stall_owner(self, obj):
+        return StallOwner.objects.filter(user=obj).exists()
+
+    is_stall_owner.boolean = True
+    is_stall_owner.short_description = "Stall owner"
+
+    list_display = tuple(getattr(DjangoUserAdmin, "list_display", ())) + ("is_stall_owner",)
+
+
+try:
+    admin.site.unregister(User)
+except Exception:
+    pass
+
+admin.site.register(User, UserAdmin)
 
 
 @admin.register(FoodItem)
@@ -50,3 +90,17 @@ class EmergencyAlertAdmin(admin.ModelAdmin):
     list_display = ("created_at", "severity", "alert_type", "title", "is_active", "expires_at")
     list_filter = ("is_active", "severity", "alert_type")
     search_fields = ("title", "message")
+
+
+@admin.register(Stall)
+class StallAdmin(admin.ModelAdmin):
+    list_display = ("name", "location", "is_active", "created_at")
+    list_filter = ("is_active", "location")
+    search_fields = ("name", "location")
+
+
+@admin.register(StallOwner)
+class StallOwnerAdmin(admin.ModelAdmin):
+    list_display = ("user", "stall", "phone", "is_active", "created_at")
+    list_filter = ("is_active", "stall")
+    search_fields = ("user__username", "user__email", "stall__name", "phone")

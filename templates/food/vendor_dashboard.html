@@ -8,171 +8,351 @@
     <div class="col-12">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h1 class="h3 mb-1">{{ stall_owner.stall_name }} - Vendor Dashboard</h1>
+          <h1 class="h3 mb-1">Vendor Dashboard</h1>
+          <h5 class="text-primary mb-2">{{ stall.name }}</h5>
           <p class="text-muted mb-0">Manage orders for {{ today|date:"d M Y" }}</p>
-        </div>
-        <div>
-          <a href="{% url 'food:food_dashboard' %}" class="btn btn-outline-secondary btn-sm">Admin Dashboard</a>
         </div>
       </div>
 
-      <!-- Summary Cards -->
+      <!-- Summary Cards - Clickable -->
       <div class="row mb-4">
-        <div class="col-md-3">
-          <div class="card bg-primary text-white">
-            <div class="card-body">
-              <h5 class="card-title">{{ total_orders }}</h5>
+        <div class="col-md-3" onclick="showSection('all')" style="cursor: pointer;">
+          <div class="card bg-primary text-white hover-shadow">
+            <div class="card-body text-center">
+              <h3 class="card-title">{{ total_orders }}</h3>
               <p class="card-text">Total Orders</p>
             </div>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card bg-info text-white">
-            <div class="card-body">
-              <h5 class="card-title">{{ total_quantity }}</h5>
-              <p class="card-text">Total Quantity</p>
+        <div class="col-md-3" onclick="showSection('pending')" style="cursor: pointer;">
+          <div class="card bg-warning text-white hover-shadow">
+            <div class="card-body text-center">
+              <h3 class="card-title">{{ pending }}</h3>
+              <p class="card-text">Orders Pending</p>
             </div>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card bg-warning text-white">
-            <div class="card-body">
-              <h5 class="card-title">{{ pending + ready }}</h5>
-              <p class="card-text">Pending + Ready</p>
+        <div class="col-md-3" onclick="showSection('cooking')" style="cursor: pointer;">
+          <div class="card hover-shadow" style="background-color: #fd7e14; color: white; cursor: pointer;">
+            <div class="card-body text-center">
+              <h3 class="card-title">{{ cooking }}</h3>
+              <p class="card-text">Cooking</p>
             </div>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card bg-success text-white">
-            <div class="card-body">
-              <h5 class="card-title">{{ completed }}</h5>
-              <p class="card-text">Completed</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Orders by Status -->
-      <div class="row">
-        <!-- Pending Orders -->
-        <div class="col-md-6 mb-4">
-          <div class="card">
-            <div class="card-header bg-warning text-white">
-              <h6 class="mb-0">Pending Orders ({{ pending }})</h6>
-            </div>
-            <div class="card-body p-2">
-              {% if orders_by_status.pending %}
-                {% for order in orders_by_status.pending %}
-                  <div class="border-bottom pb-2 mb-2" data-order-id="{{ order.id }}">
-                    <div class="d-flex justify-content-between align-items-start">
-                      <div class="flex-grow-1">
-                        <strong>{{ order.food_item.name }}</strong>
-                        <small class="d-block text-muted">
-                          {{ order.quantity }} × ₹{{ order.food_item.price }} 
-                          | {{ order.ordered_by.get_full_name|default:order.ordered_by.username }}
-                        </small>
-                      </div>
-                      <div class="text-end">
-                        <div class="btn-group btn-group-sm" role="group">
-                          <button type="button" class="btn btn-success btn-sm" onclick="updateStatus('{{ order.id }}', 'ready')">
-                            Mark Ready
-                          </button>
-                          <button type="button" class="btn btn-danger btn-sm" onclick="updateStatus('{{ order.id }}', 'missed')">
-                            Mark Missed
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  {% endfor %}
-              {% else %}
-                <p class="text-muted text-center py-3">No pending orders</p>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-
-        <!-- Ready Orders -->
-        <div class="col-md-6 mb-4">
-          <div class="card">
-            <div class="card-header bg-info text-white">
-              <h6 class="mb-0">Ready Orders ({{ ready }})</h6>
-            </div>
-            <div class="card-body p-2">
-              {% if orders_by_status.ready %}
-                {% for order in orders_by_status.ready %}
-                  <div class="border-bottom pb-2 mb-2" data-order-id="{{ order.id }}">
-                    <div class="d-flex justify-content-between align-items-start">
-                      <div class="flex-grow-1">
-                        <strong>{{ order.food_item.name }}</strong>
-                        <small class="d-block text-muted">
-                          {{ order.quantity }} × ₹{{ order.food_item.price }} 
-                          | {{ order.ordered_by.get_full_name|default:order.ordered_by.username }}
-                        </small>
-                      </div>
-                      <div class="text-end">
-                        <div class="btn-group btn-group-sm" role="group">
-                          <button type="button" class="btn btn-success btn-sm" onclick="updateStatus('{{ order.id }}', 'collected')">
-                            Mark Collected
-                          </button>
-                          <button type="button" class="btn btn-danger btn-sm" onclick="updateStatus('{{ order.id }}', 'missed')">
-                            Mark Missed
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  {% endfor %}
-              {% else %}
-                <p class="text-muted text-center py-3">No ready orders</p>
-              {% endif %}
+        <div class="col-md-3" onclick="showSection('ready')" style="cursor: pointer;">
+          <div class="card bg-info text-white hover-shadow">
+            <div class="card-body text-center">
+              <h3 class="card-title">{{ ready }}</h3>
+              <p class="card-text">Orders Pickup</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Completed & Missed -->
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <div class="card">
-            <div class="card-header bg-success text-white">
-              <h6 class="mb-0">Completed Orders ({{ completed }})</h6>
-            </div>
-            <div class="card-body p-2">
-              {% if orders_by_status.completed %}
-                {% for order in orders_by_status.completed %}
-                  <div class="border-bottom pb-2 mb-2">
-                    <strong>{{ order.food_item.name }}</strong>
-                    <small class="d-block text-muted">
-                      {{ order.quantity }} × ₹{{ order.food_item.price }} 
-                      | {{ order.ordered_by.get_full_name|default:order.ordered_by.username }}
-                    </small>
-                  </div>
-                {% endfor %}
-              {% else %}
-                <p class="text-muted text-center py-3">No completed orders</p>
-              {% endif %}
-            </div>
+      <style>
+        .hover-shadow:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          transition: all 0.2s ease;
+        }
+        .order-section {
+          display: none;
+        }
+        .order-section.active {
+          display: block;
+        }
+        .order-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        .order-table th {
+          background: #f8f9fa;
+          padding: 12px;
+          text-align: left;
+          font-weight: 600;
+          border-bottom: 2px solid #dee2e6;
+          font-size: 13px;
+        }
+        .order-table td {
+          padding: 12px;
+          border-bottom: 1px solid #dee2e6;
+          font-size: 14px;
+        }
+        .btn-action {
+          padding: 6px 12px;
+          font-size: 12px;
+          border-radius: 4px;
+          border: none;
+          cursor: pointer;
+          margin: 2px;
+        }
+        .btn-cooking {
+          background: #fd7e14;
+          color: white;
+        }
+        .btn-ready {
+          background: #10b981;
+          color: white;
+        }
+        .btn-missed {
+          background: #ef4444;
+          color: white;
+        }
+        .btn-collected {
+          background: #3b82f6;
+          color: white;
+        }
+        .badge-parcel {
+          background: #6f42c1;
+          color: white;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-size: 11px;
+        }
+        .badge-eat {
+          background: #20c997;
+          color: white;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-size: 11px;
+        }
+        .order-number {
+          font-family: monospace;
+          font-weight: bold;
+          color: #3b82f6;
+        }
+      </style>
+
+      <!-- Pending Orders Section -->
+      <div class="order-section" id="pending-section">
+        <div class="card">
+          <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Orders Pending ({{ pending }})</h5>
+            <button class="btn btn-sm btn-light" onclick="showSection('all')">Show All</button>
+          </div>
+          <div class="card-body p-0">
+            {% if orders_by_status.pending %}
+              <table class="order-table">
+                <thead>
+                  <tr>
+                    <th>S.No</th>
+                    <th>Order ID</th>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Customer</th>
+                    <th>Type</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for order in orders_by_status.pending %}
+                  <tr data-order-id="{{ order.id }}">
+                    <td>{{ forloop.counter }}</td>
+                    <td><span class="order-number">#{{ order.order_number|default:order.id }}</span></td>
+                    <td><strong>{{ order.food_item.name }}</strong></td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.ordered_by.get_full_name|default:order.ordered_by.username }}</td>
+                    <td>
+                      {% if order.packaging_option == 'parcel' %}
+                        <span class="badge-parcel">Parcel</span>
+                      {% else %}
+                        <span class="badge-eat">Eat There</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <button type="button" class="btn-action btn-cooking" onclick="updateStatus({{ order.id }}, 'cooking')">
+                        Cooking Completed
+                      </button>
+                      <button type="button" class="btn-action btn-missed" onclick="updateStatus({{ order.id }}, 'missed')">
+                        Mark Missed
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p class="text-muted text-center py-4">No pending orders</p>
+            {% endif %}
           </div>
         </div>
-        <div class="col-md-6 mb-4">
-          <div class="card">
-            <div class="card-header bg-danger text-white">
-              <h6 class="mb-0">Missed Orders ({{ missed }})</h6>
-            </div>
-            <div class="card-body p-2">
-              {% if orders_by_status.missed %}
-                {% for order in orders_by_status.missed %}
-                  <div class="border-bottom pb-2 mb-2">
-                    <strong>{{ order.food_item.name }}</strong>
-                    <small class="d-block text-muted">
-                      {{ order.quantity }} × ₹{{ order.food_item.price }} 
-                      | {{ order.ordered_by.get_full_name|default:order.ordered_by.username }}
-                    </small>
-                  </div>
-                {% endfor %}
-              {% else %}
-                <p class="text-muted text-center py-3">No missed orders</p>
-              {% endif %}
-            </div>
+      </div>
+
+      <!-- Cooking Orders Section -->
+      <div class="order-section" id="cooking-section">
+        <div class="card">
+          <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #fd7e14;">
+            <h5 class="mb-0">Cooking ({{ cooking }})</h5>
+            <button class="btn btn-sm btn-light" onclick="showSection('all')">Show All</button>
+          </div>
+          <div class="card-body p-0">
+            {% if orders_by_status.cooking %}
+              <table class="order-table">
+                <thead>
+                  <tr>
+                    <th>S.No</th>
+                    <th>Order ID</th>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Customer</th>
+                    <th>Type</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for order in orders_by_status.cooking %}
+                  <tr data-order-id="{{ order.id }}">
+                    <td>{{ forloop.counter }}</td>
+                    <td><span class="order-number">#{{ order.order_number|default:order.id }}</span></td>
+                    <td><strong>{{ order.food_item.name }}</strong></td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.ordered_by.get_full_name|default:order.ordered_by.username }}</td>
+                    <td>
+                      {% if order.packaging_option == 'parcel' %}
+                        <span class="badge-parcel">Parcel</span>
+                      {% else %}
+                        <span class="badge-eat">Eat There</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <button type="button" class="btn-action btn-ready" onclick="updateStatus({{ order.id }}, 'ready')">
+                        Mark Ready
+                      </button>
+                      <button type="button" class="btn-action btn-missed" onclick="updateStatus({{ order.id }}, 'missed')">
+                        Mark Missed
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p class="text-muted text-center py-4">No orders cooking</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Ready/Pickup Orders Section -->
+      <div class="order-section" id="ready-section">
+        <div class="card">
+          <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Orders Pickup ({{ ready }})</h5>
+            <button class="btn btn-sm btn-light" onclick="showSection('all')">Show All</button>
+          </div>
+          <div class="card-body p-0">
+            {% if orders_by_status.ready %}
+              <table class="order-table">
+                <thead>
+                  <tr>
+                    <th>S.No</th>
+                    <th>Order ID</th>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Customer</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for order in orders_by_status.ready %}
+                  <tr data-order-id="{{ order.id }}">
+                    <td>{{ forloop.counter }}</td>
+                    <td><span class="order-number">#{{ order.order_number|default:order.id }}</span></td>
+                    <td><strong>{{ order.food_item.name }}</strong></td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.ordered_by.get_full_name|default:order.ordered_by.username }}</td>
+                    <td>
+                      <button type="button" class="btn-action btn-collected" onclick="updateStatus({{ order.id }}, 'collected')">
+                        Picked Up
+                      </button>
+                      <button type="button" class="btn-action btn-missed" onclick="updateStatus({{ order.id }}, 'missed')">
+                        Missed
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p class="text-muted text-center py-4">No orders ready for pickup</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Completed Orders Section -->
+      <div class="order-section" id="completed-section">
+        <div class="card">
+          <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Orders Completed ({{ collected }})</h5>
+            <button class="btn btn-sm btn-light" onclick="showSection('all')">Show All</button>
+          </div>
+          <div class="card-body p-0">
+            {% if orders_by_status.completed %}
+              <table class="order-table">
+                <thead>
+                  <tr>
+                    <th>S.No</th>
+                    <th>Order ID</th>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Customer</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for order in orders_by_status.completed %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><span class="order-number">#{{ order.order_number|default:order.id }}</span></td>
+                    <td><strong>{{ order.food_item.name }}</strong></td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.ordered_by.get_full_name|default:order.ordered_by.username }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p class="text-muted text-center py-4">No completed orders</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Missed Orders Section -->
+      <div class="order-section" id="missed-section">
+        <div class="card">
+          <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Orders Missed ({{ missed }})</h5>
+            <button class="btn btn-sm btn-light" onclick="showSection('all')">Show All</button>
+          </div>
+          <div class="card-body p-0">
+            {% if orders_by_status.missed %}
+              <table class="order-table">
+                <thead>
+                  <tr>
+                    <th>S.No</th>
+                    <th>Order ID</th>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Customer</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for order in orders_by_status.missed %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><span class="order-number">#{{ order.order_number|default:order.id }}</span></td>
+                    <td><strong>{{ order.food_item.name }}</strong></td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.ordered_by.get_full_name|default:order.ordered_by.username }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p class="text-muted text-center py-4">No missed orders</p>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -191,13 +371,18 @@ function getCookie(name) {
 }
 
 function updateStatus(orderId, newStatus) {
-  fetch(`/food/vendor/update/${orderId}/`, {
+  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+  
+  fetch('/food/vendor/update/', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'X-CSRFToken': getCookie('csrftoken')
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken
     },
-    body: `status=${newStatus}`
+    body: JSON.stringify({
+      order_id: orderId,
+      status: newStatus
+    })
   })
   .then(response => response.json())
   .then(data => {
@@ -229,5 +414,55 @@ function updateStatus(orderId, newStatus) {
     alert('Network error while updating order status');
   });
 }
+// Show section based on hash or parameter
+function showSection(section) {
+  // Hide all sections
+  document.querySelectorAll('.order-section').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  
+  // Show requested section
+  if (section === 'all') {
+    document.querySelectorAll('.order-section').forEach(function(el) {
+      el.classList.add('active');
+    });
+  } else {
+    const target = document.getElementById(section + '-section');
+    if (target) {
+      target.classList.add('active');
+    }
+  }
+  
+  // Update URL hash
+  if (section !== 'all') {
+    window.location.hash = section;
+  } else {
+    history.pushState('', document.title, window.location.pathname + window.location.search);
+  }
+}
+
+// Handle URL hash on page load and hash changes
+function handleHash() {
+  const hash = window.location.hash.replace('#', '');
+  if (hash && ['pending', 'cooking', 'ready', 'completed', 'missed'].includes(hash)) {
+    showSection(hash);
+  } else {
+    showSection('all');
+  }
+}
+
+// Listen for hash changes
+window.addEventListener('hashchange', handleHash);
+
+// Handle page load
+window.addEventListener('DOMContentLoaded', function() {
+  // Check for stored section from sidebar click
+  const storedSection = localStorage.getItem('showSection');
+  if (storedSection) {
+    localStorage.removeItem('showSection');
+    window.location.hash = storedSection;
+  }
+  handleHash();
+});
 </script>
 {% endblock %}
