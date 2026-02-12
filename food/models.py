@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class FoodItem(models.Model):
@@ -6,9 +7,13 @@ class FoodItem(models.Model):
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     is_active = models.BooleanField(default=True)
+    stall_name = models.CharField(max_length=128, default="Main Canteen")
+    location = models.CharField(max_length=128, default="Campus Center")
+    category = models.CharField(max_length=64, default="All Items")
+    image_url = models.URLField(blank=True, default="")
 
     def __str__(self) -> str:
-        return f"{self.name} - ₹{self.price}"
+        return f"{self.name} - ₹{self.price} ({self.stall_name})"
 
 
 class BreakSlot(models.Model):
@@ -17,7 +22,7 @@ class BreakSlot(models.Model):
     end_time = models.TimeField()
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.start_time} - {self.end_time})"
+        return f"{self.name}"
 
 
 class PreOrder(models.Model):
@@ -30,7 +35,9 @@ class PreOrder(models.Model):
         (STATUS_COLLECTED, "Collected"),
     ]
 
-    student = models.ForeignKey("attendance.Student", on_delete=models.CASCADE)
+    ordered_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
+    )
     food_item = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
     slot = models.ForeignKey(BreakSlot, on_delete=models.CASCADE)
     order_date = models.DateField()
@@ -39,9 +46,7 @@ class PreOrder(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("student", "food_item", "slot", "order_date")
+        unique_together = ("ordered_by", "food_item", "slot", "order_date")
 
     def __str__(self) -> str:
-        return f"{self.student.roll_no} - {self.food_item.name} ({self.slot.name})"
-
-# Create your models here.
+        return f"{self.ordered_by} - {self.food_item.name} ({self.slot.name})"

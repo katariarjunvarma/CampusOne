@@ -2,9 +2,141 @@
 
 {% block title %}Food Menu{% endblock %}
 
+{% block extra_head %}
+<style>
+  .search-highlight {
+    background-color: #fff3cd;
+    padding: 2px 4px;
+    border-radius: 3px;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container">
-  <h1>Food Menu</h1>
-  <p>Menu will be displayed here.</p>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="mb-1">Menu</h1>
+      <div class="text-muted">Select items and place your pre-order for a break slot.</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-smart text-white" href="{% url 'food:create_order' %}">Place Order</a>
+      <a class="btn btn-outline-smart" href="{% url 'food:my_orders' %}">My Orders</a>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="row mb-3">
+    <div class="col-lg-8">
+      <input type="text" id="foodSearch" class="form-control" placeholder="Search for food items, stalls, or locations...">
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          {% if items %}
+            <div class="table-responsive">
+              <table class="table align-middle" id="foodTable">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Stall</th>
+                    <th>Location</th>
+                    <th class="text-end">Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% regroup items by stall_name as stall_groups %}
+                  {% for stall in stall_groups %}
+                    <tr class="table-secondary">
+                      <td colspan="4" class="fw-bold text-uppercase">{{ stall.grouper }}</td>
+                    </tr>
+                    {% for item in stall.list %}
+                      <tr data-search="{{ item.name|lower }} {{ item.stall_name|lower }} {{ item.location|lower }}">
+                        <td class="fw-semibold">{{ item.name }}</td>
+                        <td>{{ item.stall_name }}</td>
+                        <td>{{ item.location }}</td>
+                        <td class="text-end">₹{{ item.price }}</td>
+                      </tr>
+                    {% endfor %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-muted">No active menu items. Ask admin to add items in Django Admin.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="fw-semibold mb-2">Break Time Slots</div>
+          {% if slots %}
+            <div class="d-grid gap-2">
+              {% for s in slots %}
+                <div class="p-2 rounded" style="border: 1px solid var(--stroke); background: var(--glass);">
+                  <div class="fw-semibold">{{ s.name }}</div>
+                  <div class="text-muted small">{{ s.start_time }} - {{ s.end_time }}</div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-muted">No break slots configured. Add slots in Django Admin.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<script>
+document.getElementById('foodSearch').addEventListener('input', function(e) {
+  const searchTerm = e.target.value.toLowerCase();
+  const rows = document.querySelectorAll('#foodTable tbody tr');
+  let lastStallHeader = null;
+  
+  rows.forEach(row => {
+    // Check if this is a stall header
+    if (row.classList.contains('table-secondary')) {
+      lastStallHeader = row;
+      row.style.display = '';
+      return;
+    }
+    
+    // This is an item row
+    const searchContent = row.getAttribute('data-search');
+    if (searchContent.includes(searchTerm)) {
+      row.style.display = '';
+      // Highlight matching text
+      const cells = row.querySelectorAll('td');
+      cells.forEach(cell => {
+        const text = cell.textContent;
+        const regex = new RegExp(`(${e.target.value})`, 'gi');
+        if (e.target.value && text.match(regex)) {
+          cell.innerHTML = text.replace(regex, '<span class="search-highlight">$1</span>');
+        } else {
+          cell.innerHTML = text;
+        }
+      });
+    } else {
+      row.style.display = 'none';
+    }
+  });
+  
+  // Hide empty stall headers
+  rows.forEach(row => {
+    if (row.classList.contains('table-secondary')) {
+      const nextRow = row.nextElementSibling;
+      if (!nextRow || nextRow.style.display === 'none') {
+        row.style.display = 'none';
+      }
+    }
+  });
+});
+</script>
 {% endblock %}

@@ -4,7 +4,97 @@
 
 {% block content %}
 <div class="container">
-  <h1>Food Dashboard</h1>
-  <p>Demand analytics and peak times will be shown here.</p>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="mb-1">Food Demand Dashboard</h1>
+      <div class="text-muted">Track demand and peak slots to reduce congestion.</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-smart" href="{% url 'food:food_menu' %}">Menu</a>
+      <a class="btn btn-outline-smart" href="{% url 'food:my_orders' %}">Orders</a>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mb-3">
+    <div class="card-body">
+      <form method="get" class="row g-2 align-items-end">
+        <div class="col-sm-4">
+          <label class="form-label">Date</label>
+          <input class="form-control" type="date" name="date" value="{{ day|date:'Y-m-d' }}" />
+        </div>
+        <div class="col-sm-3">
+          <button class="btn btn-outline-smart" type="submit">Refresh</button>
+        </div>
+        {% if peak_slot %}
+          <div class="col-sm-5 text-sm-end">
+            <div class="fw-semibold">Peak Slot</div>
+            <div class="text-muted">{{ peak_slot.slot__name }} ({{ peak_slot.total_qty }})</div>
+          </div>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="fw-semibold mb-2">Demand by Item</div>
+          {% if by_item %}
+            <div class="table-responsive">
+              <table class="table align-middle">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th class="text-end">Total Qty</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for r in by_item %}
+                    <tr>
+                      <td class="fw-semibold">{{ r.food_item__name }}</td>
+                      <td class="text-end">{{ r.total_qty }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-muted">No orders for this date.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="fw-semibold mb-2">Demand by Slot</div>
+          {% if by_slot %}
+            <div class="table-responsive">
+              <table class="table align-middle">
+                <thead>
+                  <tr>
+                    <th>Slot</th>
+                    <th class="text-end">Total Qty</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for r in by_slot %}
+                    <tr {% if peak_slot and r.slot__name == peak_slot.slot__name %}style="background: rgba(13,110,253,.08);"{% endif %}>
+                      <td class="fw-semibold">{{ r.slot__name }}</td>
+                      <td class="text-end">{{ r.total_qty }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-muted">No orders for this date.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

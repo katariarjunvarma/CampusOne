@@ -4,7 +4,44 @@
 
 {% block content %}
 <div class="container">
-  <h1>Food Pre-Order System</h1>
-  <p>Coming soon: Pre-order your meals and reduce waiting time!</p>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="mb-1">Food Pre-Order</h1>
+      <div class="text-muted">Pre-order your food and pick it up during your break slot.</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-smart text-white" href="{% url 'food:food_menu' %}">View Menu</a>
+      <a class="btn btn-outline-smart" href="{% url 'food:create_order' %}">Place Order</a>
+      <a class="btn btn-outline-smart" href="{% url 'food:my_orders' %}">My Orders</a>
+      <a class="btn btn-outline-smart" href="{% url 'food:food_dashboard' %}">Dashboard</a>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="fw-semibold">Today</div>
+          <div class="text-muted">{{ today }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="fw-semibold">Active Menu Items</div>
+          <div class="display-6">{{ items_count }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="fw-semibold">Break Slots</div>
+          <div class="display-6">{{ slots_count }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

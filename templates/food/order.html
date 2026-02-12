@@ -1,10 +1,389 @@
 {% extends "base.html" %}
 
-{% block title %}Create Order{% endblock %}
+{% block title %}Food Pre-Order{% endblock %}
+
+{% block head %}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui"] },
+          colors: {
+            smart: {
+              blue: "#2563EB",
+              bg: "#F8FAFC",
+              light: "#EFF6FF",
+              text: "#1E293B",
+            },
+          },
+          boxShadow: {
+            soft: "0 10px 30px rgba(15, 23, 42, 0.08)",
+            softer: "0 6px 16px rgba(15, 23, 42, 0.06)",
+          },
+          borderRadius: {
+            xl2: "16px",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    .pos-page * { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif; }
+  </style>
+{% endblock %}
 
 {% block content %}
-<div class="container">
-  <h1>Create Order</h1>
-  <p>Order form will be here.</p>
+<div class="pos-page text-smart-text w-full">
+  <div class="grid grid-cols-[1fr_320px] gap-4 h-[calc(100vh-120px)]">
+    <main class="rounded-xl2 bg-white shadow-soft p-5 overflow-hidden flex flex-col">
+      <div class="flex items-start justify-between gap-4 shrink-0">
+        <div>
+          <h1 class="text-2xl font-bold">Food Pre-Order</h1>
+          <p class="text-slate-500 mt-1">Skip the queue. Pick up during your break.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-medium text-sm" href="{% url 'food:my_orders' %}">My Orders</a>
+        </div>
+      </div>
+
+      <div class="mt-4 flex items-center gap-3 shrink-0">
+        <div class="relative flex-1">
+          <div class="absolute inset-y-0 left-3 flex items-center text-slate-400">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="opacity-80">
+              <path d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </div>
+          <input id="menuSearch" class="w-full pl-9 pr-3 py-2.5 rounded-xl bg-white border border-slate-200 shadow-softer focus:outline-none focus:ring-2 focus:ring-smart-blue/25 text-sm" placeholder="Search items..." type="text" />
+        </div>
+
+        <select id="stallFilter" class="px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-smart-blue/25">
+          <option value="">All Stalls</option>
+          {% for stall in stalls %}
+            <option value="{{ stall|lower }}">{{ stall }}</option>
+          {% endfor %}
+        </select>
+
+        <select id="locationFilter" class="px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-smart-blue/25">
+          <option value="">All Locations</option>
+          {% for loc in locations %}
+            <option value="{{ loc|lower }}">{{ loc }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mt-3 flex items-center gap-2 overflow-auto shrink-0 pb-1" id="categoryList">
+        <button type="button" data-category="All Items" class="shrink-0 px-3 py-1.5 rounded-lg bg-smart-light text-smart-blue font-semibold text-sm">All Items</button>
+        {% for c in categories %}
+          {% if c and c != 'All Items' %}
+            <button type="button" data-category="{{ c }}" class="shrink-0 px-3 py-1.5 rounded-lg border border-slate-200 font-semibold hover:bg-slate-50 transition text-sm">{{ c }}</button>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="mt-4 overflow-auto flex-1">
+        <div class="grid grid-cols-3 gap-3" id="menuGrid">
+          {% for item in items %}
+            <article
+              class="group rounded-xl bg-white border border-slate-100 shadow-softer hover:shadow-soft hover:-translate-y-[1px] transition-all overflow-hidden"
+              data-id="{{ item.id }}"
+              data-name="{{ item.name|lower }}"
+              data-stall="{{ item.stall_name|lower }}"
+              data-location="{{ item.location|lower }}"
+              data-category="{{ item.category }}"
+              data-price="{{ item.price }}"
+            >
+              <div class="h-24 bg-smart-light relative">
+                <img src="{{ item.image_url|default:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400' }}&cb=2" alt="{{ item.name }}" class="h-24 w-full object-cover" loading="lazy" />
+                <div class="absolute top-2 left-2 text-xs bg-white/90 rounded-md px-2 py-0.5 shadow-softer">{{ item.stall_name }}</div>
+              </div>
+              <div class="p-3">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="min-w-0">
+                    <div class="font-semibold leading-tight text-sm truncate">{{ item.name }}</div>
+                    <div class="text-xs text-slate-500 mt-0.5 truncate">{{ item.location }}</div>
+                  </div>
+                  <button type="button" class="addBtn shrink-0 h-8 w-8 rounded-lg bg-smart-blue text-white grid place-items-center shadow-softer hover:brightness-95 transition" aria-label="Add" title="Add">
+                    <span class="text-lg leading-none">+</span>
+                  </button>
+                </div>
+                <div class="mt-2 flex items-center justify-between">
+                  <div></div>
+                  <div class="font-bold text-smart-blue text-sm">₹{{ item.price }}</div>
+                </div>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+
+        <div id="emptyState" class="hidden rounded-xl border border-dashed border-slate-200 p-6 text-center text-slate-500 mt-4">
+          No items found.
+        </div>
+      </div>
+    </main>
+
+    <section class="h-full">
+      <div class="rounded-xl2 bg-white shadow-soft p-4 h-full flex flex-col">
+        <div class="flex items-center justify-between shrink-0">
+          <h2 class="text-lg font-bold">Cart</h2>
+          <span id="cartCount" class="text-xs font-semibold bg-smart-light text-smart-blue px-2 py-1 rounded-lg">0 items</span>
+        </div>
+
+        <div id="cartList" class="mt-3 space-y-2 overflow-auto flex-1"></div>
+
+        <form id="placeOrderForm" method="post" class="mt-3 border-t border-slate-100 pt-3 space-y-2 shrink-0">
+          {% csrf_token %}
+          <input type="hidden" name="cart_json" id="cartJson" value="" />
+
+          <div>
+            <label class="text-sm font-semibold">Break Slot</label>
+            <select name="slot" id="slotSelect" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-smart-blue/25 text-sm" required>
+              <option value="">Select a break slot</option>
+              {% for s in slots %}
+                <option value="{{ s.id }}">{{ s.start_time }} - {{ s.end_time }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="space-y-1 text-sm">
+            <div class="flex items-center justify-between text-slate-600">
+              <span>Subtotal</span>
+              <span id="subtotal">₹0</span>
+            </div>
+            <div class="flex items-center justify-between text-slate-600">
+              <span>Tax</span>
+              <span id="tax">₹0</span>
+            </div>
+            <div class="flex items-center justify-between text-base font-bold">
+              <span>Total</span>
+              <span id="total" class="text-smart-blue">₹0</span>
+            </div>
+          </div>
+
+          <button id="placeBtn" type="submit" class="w-full rounded-xl bg-smart-blue text-white py-2.5 font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm" disabled>
+            Place Order
+          </button>
+
+          <div class="text-xs text-slate-500 text-center space-y-1">
+            <div>Do Payment at stalls during pickup • {{ today_str }}</div>
+            <div><span class="font-semibold text-amber-600">Note:</span> Orders must be from a single stall only. Multi-stall orders are not allowed.</div>
+          </div>
+          <div id="cartError" class="hidden text-xs text-rose-600 text-center bg-rose-50 rounded-lg p-2"></div>
+        </form>
+      </div>
+    </section>
+  </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const menuGrid = document.getElementById('menuGrid');
+  const menuSearch = document.getElementById('menuSearch');
+  const stallFilter = document.getElementById('stallFilter');
+  const locationFilter = document.getElementById('locationFilter');
+  const emptyState = document.getElementById('emptyState');
+  const categoryList = document.getElementById('categoryList');
+  const cartList = document.getElementById('cartList');
+  const cartCount = document.getElementById('cartCount');
+  const cartJson = document.getElementById('cartJson');
+  const subtotalEl = document.getElementById('subtotal');
+  const taxEl = document.getElementById('tax');
+  const totalEl = document.getElementById('total');
+  const placeBtn = document.getElementById('placeBtn');
+
+  let activeCategory = 'All Items';
+  const cart = new Map(); // id -> {id, name, price, qty, stall_name}
+  const cartError = document.getElementById('cartError');
+
+  function showCartError(msg) {
+    cartError.textContent = msg;
+    cartError.classList.remove('hidden');
+    setTimeout(() => cartError.classList.add('hidden'), 3000);
+  }
+
+  function getCartStall() {
+    // Returns the stall name if all items are from same stall, null if empty, 'MULTIPLE' if mixed
+    if (cart.size === 0) return null;
+    let stall = null;
+    for (const item of cart.values()) {
+      if (!stall) stall = item.stall_name;
+      else if (stall !== item.stall_name) return 'MULTIPLE';
+    }
+    return stall;
+  }
+
+  function formatINR(n) {
+    try {
+      return '₹' + Number(n).toFixed(0);
+    } catch (_e) {
+      return '₹0';
+    }
+  }
+
+  function computeTotals() {
+    let subtotal = 0;
+    cart.forEach((x) => { subtotal += (Number(x.price) || 0) * (Number(x.qty) || 0); });
+    const tax = Math.round(subtotal * 0.05);
+    const total = subtotal + tax;
+    subtotalEl.textContent = formatINR(subtotal);
+    taxEl.textContent = formatINR(tax);
+    totalEl.textContent = formatINR(total);
+  }
+
+  function syncCartJson() {
+    const payload = Array.from(cart.values()).map((x) => ({ id: x.id, qty: x.qty }));
+    cartJson.value = JSON.stringify(payload);
+    placeBtn.disabled = payload.length === 0;
+    cartCount.textContent = payload.length + (payload.length === 1 ? ' item' : ' items');
+    computeTotals();
+  }
+
+  function renderCart() {
+    cartList.innerHTML = '';
+    if (cart.size === 0) {
+      cartList.innerHTML = '<div class="rounded-xl2 border border-dashed border-slate-200 p-6 text-center text-slate-500">Your cart is empty. Click <b>+</b> on an item.</div>';
+      syncCartJson();
+      return;
+    }
+
+    cart.forEach((x) => {
+      const row = document.createElement('div');
+      row.className = 'rounded-xl border border-slate-100 p-3 shadow-softer';
+      row.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <div class="font-semibold leading-tight truncate">${x.name}</div>
+            <div class="text-xs text-slate-500 mt-0.5 truncate">${x.stall_name || ''}</div>
+            <div class="text-xs text-slate-400 truncate">${x.stall_location || ''}</div>
+          </div>
+          <button type="button" class="removeBtn text-slate-400 hover:text-rose-500 transition shrink-0" data-id="${x.id}" aria-label="Remove">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="mt-3 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <button type="button" class="decBtn h-9 w-9 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-semibold" data-id="${x.id}">-</button>
+            <div class="min-w-10 text-center font-semibold">${x.qty}</div>
+            <button type="button" class="incBtn h-9 w-9 rounded-xl bg-smart-blue text-white hover:brightness-95 transition font-semibold" data-id="${x.id}">+</button>
+          </div>
+          <div class="font-semibold">${formatINR((Number(x.price) || 0) * (Number(x.qty) || 0))}</div>
+        </div>
+      `;
+      cartList.appendChild(row);
+    });
+
+    syncCartJson();
+  }
+
+  function matchesCard(card) {
+    const q = (menuSearch.value || '').trim().toLowerCase();
+    const selectedStall = (stallFilter.value || '').toLowerCase();
+    const selectedLocation = (locationFilter.value || '').toLowerCase();
+    const name = card.dataset.name || '';
+    const stall = card.dataset.stall || '';
+    const location = card.dataset.location || '';
+    const category = card.dataset.category || 'All Items';
+    const matchCategory = (activeCategory === 'All Items') || (category === activeCategory);
+    const matchSearch = !q || name.includes(q);
+    const matchStall = !selectedStall || stall === selectedStall;
+    const matchLocation = !selectedLocation || location === selectedLocation;
+    return matchCategory && matchSearch && matchStall && matchLocation;
+  }
+
+  function applyFilters() {
+    const cards = Array.from(menuGrid.querySelectorAll('article'));
+    let shown = 0;
+    cards.forEach((card) => {
+      const ok = matchesCard(card);
+      card.style.display = ok ? '' : 'none';
+      if (ok) shown += 1;
+    });
+    emptyState.classList.toggle('hidden', shown !== 0);
+  }
+
+  categoryList.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-category]');
+    if (!btn) return;
+    activeCategory = btn.dataset.category;
+    Array.from(categoryList.querySelectorAll('button[data-category]')).forEach((b) => {
+      const active = b.dataset.category === activeCategory;
+      b.className = active
+        ? 'w-full text-left rounded-xl px-3 py-2 bg-smart-light text-smart-blue font-semibold'
+        : 'w-full text-left rounded-xl px-3 py-2 hover:bg-smart-light/70 transition font-medium';
+    });
+    applyFilters();
+  });
+
+  menuSearch.addEventListener('input', applyFilters);
+  stallFilter.addEventListener('change', applyFilters);
+  locationFilter.addEventListener('change', applyFilters);
+
+  menuGrid.addEventListener('click', (e) => {
+    const btn = e.target.closest('button.addBtn');
+    if (!btn) return;
+    const card = e.target.closest('article');
+    if (!card) return;
+    const id = Number(card.dataset.id);
+    const name = card.querySelector('.font-semibold')?.textContent?.trim() || 'Item';
+    const price = Number(card.dataset.price) || 0;
+    const stall_name = card.dataset.stall || '';
+    const stall_location = card.dataset.location || '';
+
+    // Check single-stall policy
+    const currentStall = getCartStall();
+    if (currentStall && currentStall !== 'MULTIPLE' && currentStall !== stall_name) {
+      showCartError('Cannot add items from different stalls. Please complete or clear your current order first.');
+      return;
+    }
+
+    const existing = cart.get(id);
+    const nextQty = Math.min(6, (existing?.qty || 0) + 1);
+    cart.set(id, { id, name, price, qty: nextQty, stall_name, stall_location });
+    renderCart();
+  });
+
+  cartList.addEventListener('click', (e) => {
+    const idAttr = e.target.closest('button')?.dataset?.id;
+    if (!idAttr) return;
+    const id = Number(idAttr);
+    if (e.target.closest('.removeBtn')) {
+      cart.delete(id);
+      renderCart();
+      return;
+    }
+    if (e.target.closest('.incBtn')) {
+      const x = cart.get(id);
+      if (!x) return;
+      x.qty = Math.min(6, x.qty + 1);
+      cart.set(id, x);
+      renderCart();
+      return;
+    }
+    if (e.target.closest('.decBtn')) {
+      const x = cart.get(id);
+      if (!x) return;
+      x.qty = x.qty - 1;
+      if (x.qty <= 0) cart.delete(id);
+      else cart.set(id, x);
+      renderCart();
+      return;
+    }
+  });
+
+  document.getElementById('placeOrderForm').addEventListener('submit', (e) => {
+    if (cart.size === 0) {
+      e.preventDefault();
+      return;
+    }
+  });
+
+  applyFilters();
+  renderCart();
+</script>
 {% endblock %}

@@ -4,7 +4,88 @@
 
 {% block content %}
 <div class="container">
-  <h1>My Orders</h1>
-  <p>Your orders will be listed here.</p>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="mb-1">My Orders</h1>
+      <div class="text-muted">View and manage your pre-orders.</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-smart" href="{% url 'food:food_menu' %}">Menu</a>
+      <a class="btn btn-smart text-white" href="{% url 'food:create_order' %}">Place Order</a>
+      <a class="btn btn-outline-smart" href="{% url 'food:food_dashboard' %}">Dashboard</a>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mb-3">
+    <div class="card-body">
+      <form method="get" class="row g-2 align-items-end">
+        <div class="col-sm-4">
+          <label class="form-label">Date</label>
+          <input class="form-control" type="date" name="date" value="{{ day|date:'Y-m-d' }}" />
+        </div>
+        <div class="col-sm-3">
+          <button class="btn btn-outline-smart" type="submit">Filter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      {% if orders %}
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Slot</th>
+                <th>Item</th>
+                <th>Stall</th>
+                <th>Location</th>
+                <th class="text-end">Qty</th>
+                <th>Status</th>
+                <th class="text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for o in orders %}
+                <tr>
+                  <td>
+                    <div class="fw-semibold">{{ o.slot.name }}</div>
+                    <div class="text-muted small">{{ o.slot.start_time }} - {{ o.slot.end_time }}</div>
+                  </td>
+                  <td class="fw-semibold">{{ o.food_item.name }}</td>
+                  <td>{{ o.food_item.stall_name }}</td>
+                  <td>{{ o.food_item.location }}</td>
+                  <td class="text-end">{{ o.quantity }}</td>
+                  <td>
+                    {% if o.status == 'pending' %}
+                      <span class="badge text-bg-warning">pending</span>
+                    {% elif o.status == 'ready' %}
+                      <span class="badge text-bg-info">ready</span>
+                    {% else %}
+                      <span class="badge text-bg-success">collected</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">
+                    {% if o.status == 'pending' %}
+                      <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="order_id" value="{{ o.id }}" />
+                        <button class="btn btn-sm btn-outline-danger" type="submit">Cancel</button>
+                      </form>
+                    {% else %}
+                      <span class="text-muted">-</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-muted">No orders found for this date.</div>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}
