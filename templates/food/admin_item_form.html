@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% block title %}Smart LPU - {{ title }}{% endblock %}
+
+{% block content %}
+<style>
+  .form-page {
+    padding: 24px 32px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .form-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .form-header {
+    margin-bottom: 24px;
+  }
+  
+  .form-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .form-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1e293b;
+    background: #ffffff;
+    transition: all 0.2s;
+  }
+  
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  .form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #3b82f6;
+  }
+  
+  .checkbox-group label {
+    margin: 0;
+    cursor: pointer;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #f1f5f9;
+  }
+  
+  .btn-primary {
+    padding: 12px 24px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+  
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+  
+  .btn-secondary {
+    padding: 12px 24px;
+    background: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-secondary:hover {
+    background: #eff6ff;
+  }
+  
+  .help-text {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+  
+  @media (max-width: 600px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="form-page">
+  <div class="form-card">
+    <div class="form-header">
+      <h1>{{ title }}</h1>
+      <div class="form-subtitle">Fill the details and save the food item.</div>
+    </div>
+    
+    <form method="post">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label for="name">Item Name *</label>
+        <input type="text" id="name" name="name" required 
+               value="{{ item.name|default:'' }}" 
+               placeholder="e.g., Chicken Biryani">
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="price">Price (₹) *</label>
+          <input type="number" id="price" name="price" required step="0.01" min="0"
+                 value="{{ item.price|default:'' }}"
+                 placeholder="e.g., 120.00">
+        </div>
+        
+        <div class="form-group">
+          <label for="category">Category</label>
+          <input type="text" id="category" name="category" list="categories"
+                 value="{{ item.category|default:'All Items' }}"
+                 placeholder="e.g., Main Course, Snacks, Beverages">
+          <datalist id="categories">
+            <option value="All Items">
+            <option value="Breakfast">
+            <option value="Main Course">
+            <option value="Snacks">
+            <option value="Beverages">
+            <option value="Desserts">
+          </datalist>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="location">Location</label>
+          <input type="text" id="location" name="location"
+                 value="{{ item.location|default:'Campus Center' }}"
+                 placeholder="e.g., Campus Center, Block 25">
+        </div>
+        
+        <div class="form-group">
+          <label for="stall">Stall</label>
+          <select id="stall" name="stall">
+            <option value="">-- Select Stall --</option>
+            {% for stall in stalls %}
+              <option value="{{ stall.id }}" 
+                      {% if item and item.stall and item.stall.id == stall.id %}selected{% endif %}>
+                {{ stall.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" placeholder="Brief description of the item...">{{ item.description|default:'' }}</textarea>
+      </div>
+      
+      {% if item %}
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="is_active" name="is_active" {% if item.is_active %}checked{% endif %}>
+          <label for="is_active">Item is active (available for ordering)</label>
+        </div>
+      </div>
+      {% endif %}
+      
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Save Food Item</button>
+        <a href="{% url 'food:food_admin_dashboard' %}" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,425 @@
+{% extends 'base.html' %}
+{% block title %}Smart LPU - Food Order Editor{% endblock %}
+
+{% block content %}
+<style>
+  .admin-container {
+    padding: 24px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .page-header {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  
+  .header-title h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .header-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .stat-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    text-align: center;
+  }
+  
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  
+  .stat-label {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  
+  .stat-active { color: #22c55e; }
+  .stat-blocked { color: #ef4444; }
+  
+  .section {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .btn-primary {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+  
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+  
+  .btn-success {
+    padding: 8px 14px;
+    background: #22c55e;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-success:hover {
+    background: #16a34a;
+  }
+  
+  .btn-danger {
+    padding: 8px 14px;
+    background: #ef4444;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-danger:hover {
+    background: #dc2626;
+  }
+  
+  .btn-secondary {
+    padding: 8px 14px;
+    background: #f3f4f6;
+    color: #374151;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-secondary:hover {
+    background: #e5e7eb;
+  }
+  
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .data-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+  }
+  
+  .data-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #1e293b;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .data-table tr:hover td {
+    background: #f9fafb;
+  }
+  
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .badge-active {
+    background: #d1fae5;
+    color: #059669;
+  }
+  
+  .badge-blocked {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+  
+  .badge-category {
+    background: #dbeafe;
+    color: #3b82f6;
+  }
+  
+  .actions-cell {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-size: 14px;
+  }
+  
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 12px;
+  }
+  
+  .tab {
+    padding: 8px 16px;
+    background: #f1f5f9;
+    color: #64748b;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+  
+  .tab:hover {
+    background: #e2e8f0;
+  }
+  
+  .tab.active {
+    background: #3b82f6;
+    color: #ffffff;
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+  }
+</style>
+
+<div class="admin-container">
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-title">
+        <h1>Food Order Editor</h1>
+        <div class="header-subtitle">Manage food items, stalls, and menu categories</div>
+      </div>
+      <a href="{% url 'manage_dashboard' %}" class="btn-secondary">Back to Manage</a>
+    </div>
+    
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.total_stalls }}</div>
+        <div class="stat-label">Total Stalls</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value stat-active">{{ stats.active_stalls }}</div>
+        <div class="stat-label">Active Stalls</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value stat-blocked">{{ stats.blocked_stalls }}</div>
+        <div class="stat-label">Blocked Stalls</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.total_items }}</div>
+        <div class="stat-label">Total Items</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value stat-active">{{ stats.active_items }}</div>
+        <div class="stat-label">Active Items</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('stalls')">Stalls</button>
+    <button class="tab" onclick="showTab('items')">Food Items</button>
+  </div>
+  
+  <!-- Stalls Tab -->
+  <div id="stalls" class="tab-content active">
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">All Stalls</h2>
+        <span class="badge badge-active">Manage stall status (Active/Blocked)</span>
+      </div>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Stall Name</th>
+            <th>Location</th>
+            <th>Owner</th>
+            <th>Phone</th>
+            <th>Items Count</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for stall in stalls %}
+          <tr>
+            <td><strong>{{ stall.name }}</strong></td>
+            <td>{{ stall.location }}</td>
+            <td>{{ stall.owner_name|default:"-" }}</td>
+            <td>{{ stall.phone_number|default:"-" }}</td>
+            <td>{{ stall.food_items.count }}</td>
+            <td>
+              {% if stall.is_active %}
+                <span class="badge badge-active">Active</span>
+              {% else %}
+                <span class="badge badge-blocked">Blocked</span>
+              {% endif %}
+            </td>
+            <td class="actions-cell">
+              {% if stall.is_active %}
+                <a href="{% url 'food:food_admin_stall_toggle' stall.id %}" class="btn-danger">Block</a>
+              {% else %}
+                <a href="{% url 'food:food_admin_stall_toggle' stall.id %}" class="btn-success">Unblock</a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="empty-state">No stalls found. Create stalls in Django Admin.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Food Items Tab -->
+  <div id="items" class="tab-content">
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">All Food Items</h2>
+        <a href="{% url 'food:food_admin_item_create' %}" class="btn-primary">+ Add Food Item</a>
+      </div>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Item Name</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Stall</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in food_items %}
+          <tr>
+            <td><strong>{{ item.name }}</strong></td>
+            <td>₹{{ item.price }}</td>
+            <td><span class="badge badge-category">{{ item.category }}</span></td>
+            <td>{{ item.stall.name|default:item.stall_name|default:"-" }}</td>
+            <td>{{ item.location }}</td>
+            <td>
+              {% if item.is_active %}
+                <span class="badge badge-active">Active</span>
+              {% else %}
+                <span class="badge badge-blocked">Inactive</span>
+              {% endif %}
+            </td>
+            <td class="actions-cell">
+              <a href="{% url 'food:food_admin_item_edit' item.id %}" class="btn-secondary">Edit</a>
+              <a href="{% url 'food:food_admin_item_delete' item.id %}" class="btn-danger" onclick="return confirm('Delete this item?')">Delete</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="empty-state">No food items found. Click "Add Food Item" to create one.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(tabName) {
+  // Hide all tab contents
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.remove('active');
+  });
+  
+  // Remove active class from all tabs
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Show selected tab content
+  document.getElementById(tabName).classList.add('active');
+  
+  // Add active class to clicked tab
+  event.target.classList.add('active');
+}
+</script>
+{% endblock %}

@@ -85,12 +85,41 @@ def home(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def attendance_home(request: HttpRequest) -> HttpResponse:
+    from django.utils import timezone
+    from datetime import date
+    
     sessions = AttendanceSession.objects.select_related("course").order_by("-created_at")[:20]
-    return render(request, "attendance/attendance_home.html", {"sessions": sessions})
+    
+    # Statistics for the new UI
+    today = date.today()
+    sessions_today = AttendanceSession.objects.filter(session_date=today).count()
+    total_students = Student.objects.count()
+    
+    # Get latest session info
+    latest_session = AttendanceSession.objects.select_related("course").order_by("-created_at").first()
+    latest_session_info = None
+    if latest_session:
+        latest_session_info = {
+            "course_code": latest_session.course.code,
+            "time_slot": latest_session.time_slot or "-"
+        }
+    
+    return render(request, "attendance/attendance_home.html", {
+        "sessions": sessions,
+        "sessions_today": sessions_today,
+        "total_students": total_students,
+        "latest_session_info": latest_session_info,
+    })
 
 
 @login_required
 def manage_dashboard(request: HttpRequest) -> HttpResponse:
+    from django.utils import timezone
+    from datetime import date
+    
+    today = date.today()
+    sessions_today = AttendanceSession.objects.filter(session_date=today).count()
+    
     stats = {
         "students": Student.objects.count(),
         "courses": Course.objects.count(),
@@ -98,6 +127,7 @@ def manage_dashboard(request: HttpRequest) -> HttpResponse:
         "face_samples": FaceSample.objects.count(),
         "notifications": Notification.objects.count(),
         "sessions": AttendanceSession.objects.count(),
+        "sessions_today": sessions_today,
         "records": AttendanceRecord.objects.count(),
     }
     return render(request, "attendance/manage/dashboard.html", {"stats": stats})

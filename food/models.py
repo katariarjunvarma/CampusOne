@@ -2,11 +2,23 @@ from django.db import models
 from django.conf import settings
 
 
+class Stall(models.Model):
+    name = models.CharField(max_length=128)
+    location = models.CharField(max_length=128, default="Campus Center")
+    is_active = models.BooleanField(default=True)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"{self.name} - {self.location}"
+
+
 class FoodItem(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     is_active = models.BooleanField(default=True)
+    stall = models.ForeignKey(Stall, on_delete=models.CASCADE, null=True, blank=True)
     stall_name = models.CharField(max_length=128, default="Main Canteen")
     location = models.CharField(max_length=128, default="Campus Center")
     category = models.CharField(max_length=64, default="All Items")
@@ -17,7 +29,7 @@ class FoodItem(models.Model):
 
 
 class BreakSlot(models.Model):
-    name = models.CharField(max_length=32, unique=True)  # e.g., "Morning Break", "Lunch", "Evening Snack"
+    name = models.CharField(max_length=32, unique=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
 
@@ -113,15 +125,13 @@ class LoyaltyPoints(models.Model):
     total_points = models.PositiveIntegerField(default=0)
     points_earned = models.PositiveIntegerField(default=0)
     points_redeemed = models.PositiveIntegerField(default=0)
-    
-    # Bonus tracking fields
-    first_order_bonus = models.BooleanField(default=False)  # +5 pts for first ever order
-    weekly_first_order_date = models.DateField(null=True, blank=True)  # Track first order of week
-    weekly_orders_count = models.PositiveIntegerField(default=0)  # Orders this week
-    current_streak = models.PositiveIntegerField(default=0)  # Consecutive days with orders
-    last_order_date = models.DateField(null=True, blank=True)  # For streak calculation
-    favorite_stall = models.CharField(max_length=128, blank=True, default="")  # Most ordered stall
-    favorite_stall_orders = models.PositiveIntegerField(default=0)  # Orders to favorite stall
+    first_order_bonus = models.BooleanField(default=False)
+    weekly_first_order_date = models.DateField(null=True, blank=True)
+    weekly_orders_count = models.PositiveIntegerField(default=0)
+    current_streak = models.PositiveIntegerField(default=0)
+    last_order_date = models.DateField(null=True, blank=True)
+    favorite_stall = models.CharField(max_length=128, blank=True, default="")
+    favorite_stall_orders = models.PositiveIntegerField(default=0)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -135,7 +145,6 @@ class LoyaltyPoints(models.Model):
     
     @property
     def rupee_value(self):
-        """Convert points to rupee value (1 pt = ₹0.25)"""
         return self.available_points * 0.25
 
 

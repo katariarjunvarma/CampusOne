@@ -1,79 +1,386 @@
 {% extends 'base.html' %}
-{% block title %}Smart LPU - Manage{% endblock %}
+{% block title %}Smart LPU - Manage Data{% endblock %}
 
 {% block content %}
-  <div class="glass-strong p-4 p-md-5 mb-4">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-      <div>
-        <h1 class="h4 mb-1">MANAGE DATA</h1>
-      </div>
-    </div>
-  </div>
+<style>
+  .manage-container {
+    padding: 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .manage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+  }
+  
+  .header-title h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .header-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #f0fdf4;
+    color: #16a34a;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+  }
+  
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 16px 0;
+  }
+  
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  
+  .cards-grid.two-col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .manage-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .card-icon.blue {
+    background: #dbeafe;
+    color: #3b82f6;
+  }
+  
+  .card-icon.yellow {
+    background: #fef3c7;
+    color: #f59e0b;
+  }
+  
+  .card-icon.green {
+    background: #d1fae5;
+    color: #10b981;
+  }
+  
+  .card-icon.purple {
+    background: #ede9fe;
+    color: #8b5cf6;
+  }
+  
+  .card-icon.cyan {
+    background: #cffafe;
+    color: #06b6d4;
+  }
+  
+  .card-icon.orange {
+    background: #ffedd5;
+    color: #f97316;
+  }
+  
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  .card-badge {
+    padding: 4px 10px;
+    background: #f1f5f9;
+    color: #64748b;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: auto;
+  }
+  
+  .card-description {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  
+  .card-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .btn-primary {
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+  
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+  
+  .btn-secondary {
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-secondary:hover {
+    background: #eff6ff;
+  }
+  
+  @media (max-width: 900px) {
+    .cards-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .cards-grid,
+    .cards-grid.two-col {
+      grid-template-columns: 1fr;
+    }
+    
+    .manage-header {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+</style>
 
-  <div class="row g-3">
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="glass-strong p-4 h-100">
-        <div class="fw-semibold mb-1">Students</div>
-        <div class="smart-muted small mb-3">Add and manage student records.</div>
-        <div class="d-flex gap-2">
-          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_student_create' %}">Add</a>
-          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_students' %}">View</a>
+<div class="manage-container">
+  <div class="manage-header">
+    <div class="header-title">
+      <h1>Manage Data</h1>
+      <div class="header-subtitle">Control students, courses & attendance records</div>
+    </div>
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      System Healthy
+    </div>
+  </div>
+  
+  <!-- Academic Setup -->
+  <h2 class="section-title">Academic Setup</h2>
+  <div class="cards-grid">
+    <!-- Students -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon blue">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
         </div>
+        <span class="card-title">Students</span>
+        <span class="card-badge">{{ stats.students }} Students</span>
+      </div>
+      <div class="card-description">Manage student records & profiles</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_students' %}" class="btn-primary">Open Students</a>
+        <a href="{% url 'manage_student_create' %}" class="btn-secondary">Add Student</a>
       </div>
     </div>
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="glass-strong p-4 h-100">
-        <div class="fw-semibold mb-1">Courses</div>
-        <div class="smart-muted small mb-3">Add and manage course details.</div>
-        <div class="d-flex gap-2">
-          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_course_create' %}">Add</a>
-          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_courses' %}">View</a>
+    
+    <!-- Courses -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon yellow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
         </div>
+        <span class="card-title">Courses</span>
+        <span class="card-badge">{{ stats.courses }} Active</span>
+      </div>
+      <div class="card-description">Add and manage course details</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_courses' %}" class="btn-primary">Open Courses</a>
+        <a href="{% url 'manage_course_create' %}" class="btn-secondary">Add Course</a>
       </div>
     </div>
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="glass-strong p-4 h-100">
-        <div class="fw-semibold mb-1">Enrollments</div>
-        <div class="smart-muted small mb-3">Enroll students to courses.</div>
-        <div class="d-flex gap-2">
-          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_enrollment_create' %}">Add</a>
-          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_enrollments' %}">View</a>
+    
+    <!-- Enrollments -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon green">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <path d="M20 8v6"></path>
+            <path d="M23 11h-6"></path>
+          </svg>
         </div>
+        <span class="card-title">Enrollments</span>
       </div>
-    </div>
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="glass-strong p-4 h-100">
-        <div class="fw-semibold mb-1">Face Data</div>
-        <div class="smart-muted small mb-3">Upload and manage face samples.</div>
-        <div class="d-flex gap-2">
-          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_face_sample_create' %}">Upload</a>
-          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_face_samples' %}">View</a>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="glass-strong p-4 h-100">
-        <div class="fw-semibold mb-1">Notifications</div>
-        <div class="smart-muted small mb-3">View attendance notifications.</div>
-        <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_notifications' %}">View</a>
-      </div>
-    </div>
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="glass-strong p-4 h-100">
-        <div class="fw-semibold mb-1">Records</div>
-        <div class="smart-muted small mb-3">View all attendance records.</div>
-        <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_records' %}">View</a>
-      </div>
-    </div>
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="glass-strong p-4 h-100">
-        <div class="fw-semibold mb-1">Sessions</div>
-        <div class="smart-muted small mb-3">View all attendance sessions.</div>
-        <div class="d-flex gap-2">
-          <a class="btn btn-outline-smart btn-sm" href="{% url 'manage_sessions' %}">View</a>
-          <a class="btn btn-outline-smart btn-sm" href="{% url 'attendance_home' %}">Open Attendance</a>
-        </div>
+      <div class="card-description">Enroll students to courses.</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_enrollments' %}" class="btn-primary">Open Enrollments</a>
+        <a href="{% url 'manage_enrollment_create' %}" class="btn-secondary">Add Enrollment</a>
       </div>
     </div>
   </div>
+  
+  <!-- AI & Attendance -->
+  <h2 class="section-title">AI & Attendance</h2>
+  <div class="cards-grid two-col">
+    <!-- Face Data -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon purple">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <span class="card-title">Face Data</span>
+        <span class="card-badge">{{ stats.face_samples }} Faces</span>
+      </div>
+      <div class="card-description">Upload and manage face samples.</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_face_sample_create' %}" class="btn-primary">Upload Data</a>
+        <a href="{% url 'manage_face_samples' %}" class="btn-secondary">Review Faces</a>
+      </div>
+    </div>
+    
+    <!-- Sessions -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon cyan">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <span class="card-title">Sessions</span>
+        <span class="card-badge">{{ stats.sessions_today }} Today</span>
+      </div>
+      <div class="card-description">View all attendance sessions.</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_sessions' %}" class="btn-primary">View Sessions</a>
+        <a href="{% url 'attendance_home' %}" class="btn-secondary">Open Attendance</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Food Management -->
+  <h2 class="section-title">Food Management</h2>
+  <div class="cards-grid two-col">
+    <!-- Food Order Editor -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon" style="background: #fed7aa; color: #f97316;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+          </svg>
+        </div>
+        <span class="card-title">Food Order Editor</span>
+      </div>
+      <div class="card-description">Manage food items, stalls, categories, and pricing for the food ordering system.</div>
+      <div class="card-actions">
+        <a href="{% url 'food:food_admin_dashboard' %}" class="btn-primary">Open Editor</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Monitoring -->
+  <h2 class="section-title">Monitoring</h2>
+  <div class="cards-grid two-col">
+    <!-- Records -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon orange">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </div>
+        <span class="card-title">Records</span>
+      </div>
+      <div class="card-description">View all attendance records.</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_records' %}" class="btn-primary">View Records</a>
+      </div>
+    </div>
+    
+    <!-- Notifications -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon yellow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        </div>
+        <span class="card-title">Notifications</span>
+        <span class="card-badge" style="background: #fef3c7; color: #f59e0b;">{{ stats.notifications }} New</span>
+      </div>
+      <div class="card-description">View attendance notifications.</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_notifications' %}" class="btn-primary">View Notifications</a>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

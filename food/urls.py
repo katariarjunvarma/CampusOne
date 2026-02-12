@@ -12,4 +12,9 @@ urlpatterns = [
     path("bulk-orders/submit/", views.submit_bulk_order, name="submit_bulk_order"),
     path("my-orders/", views.my_orders, name="my_orders"),
     path("dashboard/", views.food_dashboard, name="food_dashboard"),
+    path("admin/", views.food_admin_dashboard, name="food_admin_dashboard"),
+    path("admin/stall/<int:stall_id>/toggle/", views.food_admin_stall_toggle, name="food_admin_stall_toggle"),
+    path("admin/item/create/", views.food_admin_item_create, name="food_admin_item_create"),
+    path("admin/item/<int:item_id>/edit/", views.food_admin_item_edit, name="food_admin_item_edit"),
+    path("admin/item/<int:item_id>/delete/", views.food_admin_item_delete, name="food_admin_item_delete"),
 ]

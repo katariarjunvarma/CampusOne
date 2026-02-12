@@ -1,160 +1,354 @@
 {% extends "base.html" %}
 
-{% block title %}My Orders{% endblock %}
+{% block title %}Smart LPU - My Orders{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h1 class="mb-1">My Orders</h1>
-      <div class="text-muted">View and manage your pre-orders.</div>
+<style>
+  .orders-page {
+    padding: 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+  
+  .header-title h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .header-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .btn-outline {
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-outline:hover {
+    background: #eff6ff;
+  }
+  
+  .btn-cyan {
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #06b6d4;
+    border: 1px solid #cffafe;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-cyan:hover {
+    background: #ecfeff;
+  }
+  
+  .filter-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .filter-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+  }
+  
+  .filter-group {
+    flex: 1;
+    max-width: 300px;
+  }
+  
+  .filter-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+  
+  .filter-group input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1e293b;
+  }
+  
+  .btn-primary {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+  
+  .data-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .data-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+  }
+  
+  .data-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #1e293b;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .data-table tr:hover td {
+    background: #f9fafb;
+  }
+  
+  .order-number {
+    font-family: monospace;
+    font-weight: 700;
+    color: #3b82f6;
+  }
+  
+  .slot-name {
+    font-weight: 500;
+  }
+  
+  .item-name {
+    font-weight: 600;
+  }
+  
+  .muted-cell {
+    color: #6b7280;
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .status-pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  
+  .status-ready {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  
+  .status-missed {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  
+  .status-collected {
+    background: #d1fae5;
+    color: #166534;
+  }
+  
+  .btn-cancel {
+    padding: 6px 12px;
+    background: #ffffff;
+    color: #ef4444;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-cancel:hover {
+    background: #fee2e2;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-size: 14px;
+  }
+  
+  .text-right {
+    text-align: right;
+  }
+  
+  @media (max-width: 768px) {
+    .filter-row {
+      flex-direction: column;
+    }
+    .filter-group {
+      max-width: 100%;
+    }
+  }
+</style>
+
+<div class="orders-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-title">
+      <h1>My Orders</h1>
+      <div class="header-subtitle">View and manage your pre-orders.</div>
     </div>
-    <div class="d-flex gap-2">
-      <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#instructionsModal">Instructions & Penalty</button>
-      <a class="btn btn-outline-smart" href="{% url 'food:create_order' %}">Back to Order</a>
-      <a class="btn btn-outline-smart" href="{% url 'food:food_dashboard' %}">Dashboard</a>
+    <div class="header-actions">
+      <button type="button" class="btn-cyan" data-bs-toggle="modal" data-bs-target="#instructionsModal">Instructions & Penalty</button>
+      <a href="{% url 'food:create_order' %}" class="btn-outline">Back to Order</a>
+      <a href="{% url 'food:food_dashboard' %}" class="btn-outline">Dashboard</a>
     </div>
   </div>
-
-  <div class="card shadow-sm mb-3">
-    <div class="card-body">
-      <form method="get" class="row g-2 align-items-end">
-        <div class="col-sm-4">
-          <label class="form-label">Date</label>
-          <input class="form-control" type="date" name="date" value="{{ day|date:'Y-m-d' }}" />
-        </div>
-        <div class="col-sm-3">
-          <button class="btn btn-outline-smart" type="submit">Filter</button>
-        </div>
-      </form>
-    </div>
+  
+  <!-- Filter -->
+  <div class="filter-card">
+    <form method="get" class="filter-row">
+      <div class="filter-group">
+        <label>Date</label>
+        <input type="date" name="date" value="{{ day|date:'Y-m-d' }}">
+      </div>
+      <button type="submit" class="btn-primary">Filter</button>
+    </form>
   </div>
-
-  <div class="card shadow-sm">
-    <div class="card-body">
-      {% if orders %}
-        <div class="table-responsive">
-          <table class="table align-middle">
-            <thead>
-              <tr>
-                <th>Order #</th>
-                <th>Slot</th>
-                <th>Item</th>
-                <th>Stall</th>
-                <th>Location</th>
-                <th class="text-end">Qty</th>
-                <th>Status</th>
-                <th class="text-end">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for o in orders %}
-                <tr>
-                  <td><span class="font-monospace fw-bold text-primary">{% if o.order_number %}{{ o.order_number }}{% else %}#{{ o.id }}{% endif %}</span></td>
-                  <td>
-                    <div class="fw-semibold">{{ o.slot.name }}</div>
-                  </td>
-                  <td class="fw-semibold">{{ o.food_item.name }}</td>
-                  <td>{{ o.food_item.stall_name }}</td>
-                  <td>{{ o.food_item.location }}</td>
-                  <td class="text-end">{{ o.quantity }}</td>
-                  <td>
-                    {% if o.status == 'pending' %}
-                      <span class="badge text-bg-warning">pending</span>
-                    {% elif o.status == 'ready' %}
-                      <span class="badge text-bg-info">ready</span>
-                    {% elif o.status == 'missed' %}
-                      <span class="badge text-bg-danger">missed</span>
-                    {% else %}
-                      <span class="badge text-bg-success">collected</span>
-                    {% endif %}
-                  </td>
-                  <td class="text-end">
-                    {% if o.status == 'pending' %}
-                      <form method="post" class="d-inline">
-                        {% csrf_token %}
-                        <input type="hidden" name="order_id" value="{{ o.id }}" />
-                        <button class="btn btn-sm btn-outline-danger" type="submit">Cancel</button>
-                      </form>
-                    {% else %}
-                      <span class="text-muted">-</span>
-                    {% endif %}
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <div class="text-muted">No orders found for this date.</div>
-      {% endif %}
-    </div>
+  
+  <!-- Orders Table -->
+  <div class="data-card">
+    {% if orders %}
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Order #</th>
+            <th>Slot</th>
+            <th>Item</th>
+            <th>Stall</th>
+            <th>Location</th>
+            <th class="text-right">Qty</th>
+            <th>Status</th>
+            <th class="text-right">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in orders %}
+            <tr>
+              <td><span class="order-number">{% if o.order_number %}{{ o.order_number }}{% else %}#{{ o.id }}{% endif %}</span></td>
+              <td class="slot-name">{{ o.slot.name }}</td>
+              <td class="item-name">{{ o.food_item.name }}</td>
+              <td class="muted-cell">{{ o.food_item.stall_name }}</td>
+              <td class="muted-cell">{{ o.food_item.location }}</td>
+              <td class="text-right">{{ o.quantity }}</td>
+              <td>
+                {% if o.status == 'pending' %}
+                  <span class="status-badge status-pending">Pending</span>
+                {% elif o.status == 'ready' %}
+                  <span class="status-badge status-ready">Ready</span>
+                {% elif o.status == 'missed' %}
+                  <span class="status-badge status-missed">Missed</span>
+                {% else %}
+                  <span class="status-badge status-collected">Collected</span>
+                {% endif %}
+              </td>
+              <td class="text-right">
+                {% if o.status == 'pending' %}
+                  <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="order_id" value="{{ o.id }}">
+                    <button type="submit" class="btn-cancel">Cancel</button>
+                  </form>
+                {% else %}
+                  <span class="muted-cell">-</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty-state">No orders found for this date.</div>
+    {% endif %}
   </div>
 </div>
 
-<!-- Instructions & Penalty Modal -->
-<div class="modal fade" id="instructionsModal" tabindex="-1" aria-labelledby="instructionsModalLabel" aria-hidden="true">
+<!-- Instructions Modal -->
+<div class="modal fade" id="instructionsModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="instructionsModalLabel">Food Pre-Order Instructions & Penalty Rules</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title">Food Pre-Order Instructions & Penalty Rules</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <h6 class="fw-bold text-primary">How to Order:</h6>
         <ol>
           <li>Select your break time slot</li>
-          <li>Add items from one stall only (multi-stall orders not allowed)</li>
-          <li>Place your order before the break slot starts</li>
-          <li>Collect your food during the selected break time</li>
-          <li>Payment is made at the stall during pickup (Cash/UPI)</li>
+          <li>Add items from one stall only</li>
+          <li>Place order before break slot starts</li>
+          <li>Collect food during break time</li>
+          <li>Payment at stall during pickup</li>
         </ol>
         
         <h6 class="fw-bold text-danger mt-4">Penalty for Missed Orders:</h6>
-        <p class="text-muted small">If you order food but don't pick it up, the stall wastes prepared food. Penalties apply:</p>
         <table class="table table-sm table-bordered">
           <thead class="table-light">
-            <tr>
-              <th>Missed Orders</th>
-              <th>Penalty Action</th>
-            </tr>
+            <tr><th>Missed</th><th>Penalty</th></tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1st Miss</td>
-              <td>Warning notification</td>
-            </tr>
-            <tr>
-              <td>2nd Miss</td>
-              <td>1-day ordering ban</td>
-            </tr>
-            <tr>
-              <td>3rd Miss</td>
-              <td>3-day ordering ban</td>
-            </tr>
-            <tr class="table-danger">
-              <td>4+ Misses</td>
-              <td>1-week ban or account review</td>
-            </tr>
+            <tr><td>1st</td><td>Warning</td></tr>
+            <tr><td>2nd</td><td>1-day ban</td></tr>
+            <tr><td>3rd</td><td>3-day ban</td></tr>
+            <tr class="table-danger"><td>4+</td><td>1-week ban</td></tr>
           </tbody>
         </table>
-        
-        <div class="alert alert-warning mt-3">
-          <strong>Your Current Penalty Count:</strong> 
-          {% if user.preorder_set.exists %}
-            {{ user.preorder_set.first.penalty_count|default:0 }} missed orders
-          {% else %}
-            0 missed orders
-          {% endif %}
-        </div>
-        
-        <h6 class="fw-bold text-success mt-4">Important Notes:</h6>
-        <ul>
-          <li>Orders must be from a single stall only</li>
-          <li>Orders cannot be cancelled after the break slot starts</li>
-          <li>You will receive an email when your order is ready</li>
-          <li>All payments are made at the stall during pickup</li>
-        </ul>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

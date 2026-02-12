@@ -2,56 +2,395 @@
 {% block title %}Smart LPU - Attendance{% endblock %}
 
 {% block content %}
-  <div class="glass-strong p-4 p-md-5 mb-4">
-    <div class="row align-items-center g-3">
-      <div class="col-12 col-lg-8">
-        <h1 class="display-6 mb-2">Attendance</h1>
-        <p class="smart-muted mb-0">Create sessions, view recent sessions, and mark attendance.</p>
+<style>
+  .attendance-container {
+    padding: 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  
+  .page-title h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .page-title p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 4px 0 0 0;
+  }
+  
+  .btn-create {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #3b82f6;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-create:hover {
+    background: #eff6ff;
+  }
+  
+  /* Stats Cards */
+  .stats-card {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    gap: 32px;
+    margin-bottom: 24px;
+  }
+  
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .stat-number {
+    font-size: 32px;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 1;
+  }
+  
+  .stat-icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .stat-icon-circle.blue {
+    background: #dbeafe;
+    color: #3b82f6;
+  }
+  
+  .stat-icon-circle.cyan {
+    background: #cffafe;
+    color: #06b6d4;
+  }
+  
+  .stat-icon-circle.indigo {
+    background: #e0e7ff;
+    color: #6366f1;
+  }
+  
+  .stat-text {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .stat-label {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+  }
+  
+  .stat-sublabel {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  
+  /* Sessions Table */
+  .sessions-section {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  
+  .sessions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .sessions-header h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .latest-link {
+    font-size: 13px;
+    color: #64748b;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .latest-link:hover {
+    color: #3b82f6;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #374151;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  tr:hover td {
+    background: #f1f5f9;
+  }
+  
+  .course-code {
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  
+  .action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  
+  .action-btn:hover {
+    border-color: #9ca3af;
+    color: #374151;
+  }
+  
+  /* Pagination */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 0 0 0;
+    margin-top: 8px;
+  }
+  
+  .pagination-info {
+    font-size: 13px;
+    color: #6b7280;
+    margin-right: auto;
+  }
+  
+  .page-btn {
+    min-width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  
+  .page-btn:hover {
+    background: #e5e7eb;
+  }
+  
+  .page-btn.active {
+    background: #3b82f6;
+    color: #ffffff;
+  }
+  
+  .empty-state {
+    padding: 40px;
+    text-align: center;
+    color: #6b7280;
+  }
+</style>
+
+<div class="attendance-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Attendance</h1>
+      <p>Manage sessions and track records.</p>
+    </div>
+    <a href="{% url 'create_session' %}" class="btn-create">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Create Session
+    </a>
+  </div>
+  
+  <!-- Stats Cards -->
+  <div class="stats-card">
+    <div class="stat-item">
+      <span class="stat-number">{{ sessions_today|default:"0" }}</span>
+      <div class="stat-text">
+        <span class="stat-label">Total</span>
+        <span class="stat-sublabel">Sessions Today</span>
       </div>
-      <div class="col-12 col-lg-4 text-lg-end">
-        <a class="btn btn-outline-smart fw-semibold" href="{% url 'create_session' %}">Create Session</a>
+    </div>
+    
+    <div class="stat-item">
+      <div class="stat-icon-circle cyan">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      </div>
+      <div class="stat-text">
+        <span class="stat-number" style="font-size: 24px;">{{ total_students|default:"0" }}</span>
+        <span class="stat-sublabel">Total Students</span>
+      </div>
+    </div>
+    
+    <div class="stat-item">
+      <div class="stat-icon-circle indigo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <div class="stat-text">
+        {% if latest_session_info %}
+          <span class="stat-number" style="font-size: 18px;">{{ latest_session_info.course_code }}</span>
+          <span class="stat-sublabel">{{ latest_session_info.time_slot }}</span>
+        {% else %}
+          <span class="stat-number" style="font-size: 18px;">-</span>
+          <span class="stat-sublabel">No recent session</span>
+        {% endif %}
       </div>
     </div>
   </div>
-
-  <div class="glass-strong p-3 p-md-4">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <span class="fw-semibold">Recent Sessions</span>
-      <span class="smart-muted small">Latest 20</span>
+  
+  <!-- Recent Sessions -->
+  <div class="sessions-section">
+    <div class="sessions-header">
+      <h2>Recent Sessions</h2>
+      <a href="#" class="latest-link">
+        Latest 20
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </a>
     </div>
+    
     {% if sessions %}
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0 table-clean">
-          <thead>
+      <table>
+        <thead>
+          <tr>
+            <th>Course Code</th>
+            <th>Course Name</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th style="text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in sessions %}
             <tr>
-              <th>Course Code</th>
-              <th>Course Name</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th class="text-end">Actions</th>
+              <td class="course-code">{{ s.course.code }}</td>
+              <td>{{ s.course.name }}</td>
+              <td>{{ s.session_date|date:"M d, Y" }}</td>
+              <td>{{ s.time_slot|default:"-" }}</td>
+              <td>
+                <div class="actions">
+                  <a href="{% url 'session_view' session_id=s.id %}" class="action-btn" title="View">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </a>
+                  <a href="{% url 'session_detail' session_id=s.id %}" class="action-btn" title="Edit">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </a>
+                  <a href="{% url 'delete_session' session_id=s.id %}" class="action-btn" title="Delete">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </a>
+                </div>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {% for s in sessions %}
-              <tr>
-                <td class="fw-semibold">{{ s.course.code }}</td>
-                <td>{{ s.course.name }}</td>
-                <td>{{ s.session_date }}</td>
-                <td class="smart-muted">{{ s.time_slot|default:"-" }}</td>
-                <td class="text-end">
-                  <div class="d-inline-flex gap-2">
-                    <a class="btn btn-outline-smart btn-sm" href="{% url 'session_view' session_id=s.id %}">View</a>
-                    <a class="btn btn-outline-smart btn-sm" href="{% url 'session_detail' session_id=s.id %}">Edit</a>
-                    <a class="btn btn-outline-smart btn-sm" href="{% url 'delete_session' session_id=s.id %}">Delete</a>
-                  </div>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+          {% endfor %}
+        </tbody>
+      </table>
+      
+      <!-- Pagination -->
+      <div class="pagination">
+        <span class="pagination-info">1-8 of 8</span>
+        <button class="page-btn" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">4</button>
+        <button class="page-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
       </div>
     {% else %}
-      <p class="smart-muted mb-0">No sessions yet. Create your first session to start marking attendance.</p>
+      <div class="empty-state">
+        <p>No sessions yet. Create your first session to start marking attendance.</p>
+      </div>
     {% endif %}
   </div>
+</div>
 {% endblock %}

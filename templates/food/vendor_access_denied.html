@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Access Denied{% endblock %}
+
+{% block content %}
+<div class="container vh-100 d-flex align-items-center justify-content-center">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">Access Denied</h5>
+      </div>
+      <div class="card-body text-center">
+        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+        <h4>Vendor Account Inactive</h4>
+        <p class="text-muted">Your stall owner account has been deactivated.</p>
+        <p class="text-muted">Please contact the administrator for assistance.</p>
+        <a href="{% url 'food:food_home' %}" class="btn btn-primary">Go to Home</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

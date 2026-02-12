@@ -2,28 +2,291 @@
 {% block title %}Smart LPU - Create Session{% endblock %}
 
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
-      <div class="glass-strong p-4 p-md-5">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="fw-semibold">Create Attendance Session</span>
-          <span class="badge badge-soft">Smart LPU</span>
-        </div>
-        <form method="post" class="row g-3">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <div class="col-12 d-flex gap-2">
-            <button class="btn btn-smart text-white fw-semibold" type="submit">Create Session</button>
-            <a class="btn btn-outline-smart" href="{% url 'attendance_home' %}">Cancel</a>
-          </div>
-        </form>
+<style>
+  .create-session-container {
+    display: flex;
+    min-height: 100vh;
+    background: #f1f5f9;
+  }
+  
+  .main-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+  }
+  
+  .form-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px 40px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  }
+  
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  
+  .step-indicator {
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+  
+  .step-indicator::before {
+    content: "— ";
+  }
+  
+  .step-indicator::after {
+    content: " —";
+  }
+  
+  .brand-badge {
+    background: #f1f5f9;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+  }
+  
+  .form-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 24px 0;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+  
+  select,
+  input[type="date"],
+  input[type="text"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1e293b;
+    background: #ffffff;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+  
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+  
+  select:focus,
+  input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  .date-input-wrapper {
+    position: relative;
+  }
+  
+  .date-input-wrapper input[type="date"] {
+    padding-right: 40px;
+  }
+  
+  .date-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #94a3b8;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .btn-primary {
+    padding: 10px 20px;
+    background: #60a5fa;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
+  }
+  
+  .btn-primary:hover {
+    background: #3b82f6;
+  }
+  
+  .btn-secondary {
+    padding: 10px 20px;
+    background: #ffffff;
+    color: #60a5fa;
+    border: 1px solid #60a5fa;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  
+  .btn-secondary:hover {
+    background: #eff6ff;
+  }
+  
+  .form-note {
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+    font-size: 13px;
+    color: #64748b;
+  }
+  
+  .form-note a {
+    color: #3b82f6;
+    text-decoration: underline;
+    font-weight: 500;
+  }
+  
+  .form-note a:hover {
+    color: #2563eb;
+  }
+  
+  /* Error styling */
+  .errorlist {
+    list-style: none;
+    margin: 4px 0 0 0;
+    padding: 0;
+    font-size: 12px;
+    color: #ef4444;
+  }
+  
+  .has-error select,
+  .has-error input {
+    border-color: #ef4444;
+  }
+</style>
 
-        <div class="mt-4">
-          <div class="small" style="color: #0b1220;">
-            Please configure courses, students, and enrollments from <a class="fw-semibold" style="color: #0b1220; text-decoration: underline;" href="/admin/">Admin Panel</a> first.
+<div class="create-session-container">
+  <div class="main-content">
+    <div class="form-card">
+      <div class="form-header">
+        <span class="step-indicator">Step 1 of 2</span>
+        <span class="brand-badge">Smart LPU</span>
+      </div>
+      
+      <h1 class="form-title">Create Attendance Session</h1>
+      
+      <form method="post">
+        {% csrf_token %}
+        
+        <!-- Course -->
+        <div class="form-group">
+          <label for="{{ form.course.id_for_label }}">Course:</label>
+          {{ form.course }}
+          {% if form.course.errors %}
+            <ul class="errorlist">
+              {% for error in form.course.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        
+        <!-- Date and Time Slot -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.session_date.id_for_label }}">Session date:</label>
+            <div class="date-input-wrapper">
+              {{ form.session_date }}
+              <span class="date-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </span>
+            </div>
+            {% if form.session_date.errors %}
+              <ul class="errorlist">
+                {% for error in form.session_date.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label for="{{ form.time_slot.id_for_label }}">Time slot:</label>
+            {{ form.time_slot }}
+            {% if form.time_slot.errors %}
+              <ul class="errorlist">
+                {% for error in form.time_slot.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
           </div>
         </div>
+        
+        <!-- Session Label -->
+        <div class="form-group">
+          <label for="{{ form.session_label.id_for_label }}">Session label:</label>
+          {{ form.session_label }}
+          {% if form.session_label.errors %}
+            <ul class="errorlist">
+              {% for error in form.session_label.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">Create Session</button>
+          <a href="{% url 'attendance_home' %}" class="btn-secondary">Cancel</a>
+        </div>
+      </form>
+      
+      <div class="form-note">
+        Please configure courses, students, and enrolments from <a href="/admin/">Admin Panel</a> first.
       </div>
     </div>
   </div>
+</div>
 {% endblock %}

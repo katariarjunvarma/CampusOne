@@ -13,7 +13,7 @@ from django.utils import timezone
 from datetime import date as _date
 
 from .forms import CancelOrderForm, PreOrderForm
-from .models import BreakSlot, BulkOrder, FoodItem, LoyaltyPoints, PreOrder
+from .models import BreakSlot, BulkOrder, FoodItem, LoyaltyPoints, PreOrder, Stall
 
 
 def _require_staff(request: HttpRequest) -> bool:
@@ -63,7 +63,6 @@ def create_order(request: HttpRequest) -> HttpResponse:
         return redirect("home")
 
     def _award_points(user, points: int, stall_name: str = "") -> dict:
-        """Award points with all bonus calculations. Returns dict with breakdown."""
         if not user or points <= 0:
             return {"total": 0, "breakdown": []}
         
@@ -72,21 +71,17 @@ def create_order(request: HttpRequest) -> HttpResponse:
         breakdown = []
         total_bonus = 0
         
-        # Base points for order
         base_points = points
         breakdown.append(f"Base order: +{base_points}")
         total_bonus += base_points
         
-        # 1. First Order Bonus (+5 points for first ever order)
         if not lp.first_order_bonus:
             total_bonus += 5
             lp.first_order_bonus = True
             breakdown.append("First order bonus: +5")
         
-        # 2. First Order of the Week (+2 points)
-        week_start = today - timezone.timedelta(days=today.weekday())  # Monday
+        week_start = today - timezone.timedelta(days=today.weekday())
         if not lp.weekly_first_order_date or lp.weekly_first_order_date < week_start:
-            # New week, reset weekly counter
             lp.weekly_first_order_date = today
             lp.weekly_orders_count = 1
             total_bonus += 2
@@ -94,30 +89,24 @@ def create_order(request: HttpRequest) -> HttpResponse:
         else:
             lp.weekly_orders_count += 1
         
-        # 3. Regular Customer Bonus (+10 for 6+ orders/week from same stall)
         if stall_name and lp.weekly_orders_count >= 6:
             if lp.favorite_stall == stall_name:
-                # Already tracking this stall
                 lp.favorite_stall_orders += 1
                 if lp.favorite_stall_orders == 6:
                     total_bonus += 10
                     breakdown.append("Regular customer bonus (6+ orders): +10")
             else:
-                # New favorite stall
                 lp.favorite_stall = stall_name
                 lp.favorite_stall_orders = 1
         
-        # 4. 7-Day Streak Bonus (+15 for consecutive daily orders)
         if lp.last_order_date:
             days_diff = (today - lp.last_order_date).days
             if days_diff == 1:
-                # Consecutive day
                 lp.current_streak += 1
                 if lp.current_streak == 7:
                     total_bonus += 15
                     breakdown.append("7-day streak bonus: +15")
             elif days_diff > 1:
-                # Streak broken, reset
                 lp.current_streak = 1
         else:
             lp.current_streak = 1
@@ -147,7 +136,6 @@ def create_order(request: HttpRequest) -> HttpResponse:
                 messages.error(request, "Please select a break slot and add at least one item.")
                 return redirect("food:create_order")
 
-            # Validate single-stall policy
             stall_names = set()
             for row in cart:
                 if not isinstance(row, dict):
@@ -168,7 +156,6 @@ def create_order(request: HttpRequest) -> HttpResponse:
             updated_count = 0
             points_awarded = 0
 
-            # Get packaging option from POST data
             packaging = request.POST.get("packaging", PreOrder.PACK_EAT)
             if packaging not in (PreOrder.PACK_EAT, PreOrder.PACK_PARCEL):
                 packaging = PreOrder.PACK_EAT
@@ -210,10 +197,8 @@ def create_order(request: HttpRequest) -> HttpResponse:
                     updated_count += 1
 
             if created_count or updated_count:
-                # Get the stall name for loyalty tracking
                 cart_stall_name = list(stall_names)[0] if len(stall_names) == 1 else ""
                 
-                # Handle redeemed points
                 redeemed_points = int(request.POST.get("redeemed_points") or 0)
                 discount_amount = 0
                 if redeemed_points > 0:
@@ -440,15 +425,12 @@ def food_dashboard(request: HttpRequest) -> HttpResponse:
     else:
         day = timezone.localdate()
 
-    # Get all orders for the day (not just user's orders - for dashboard)
     all_orders = PreOrder.objects.filter(order_date=day)
     
-    # Summary metrics
     total_orders = all_orders.count()
     total_quantity = all_orders.aggregate(total=Sum("quantity"))["total"] or 0
     missed_orders = all_orders.filter(status=PreOrder.STATUS_MISSED).count()
     
-    # Demand by item
     by_item = (
         all_orders
         .values("food_item__name")
@@ -456,7 +438,6 @@ def food_dashboard(request: HttpRequest) -> HttpResponse:
         .order_by("-total_qty", "food_item__name")
     )
     
-    # Demand by slot
     by_slot = (
         all_orders
         .values("slot__name", "slot__start_time")
@@ -464,7 +445,6 @@ def food_dashboard(request: HttpRequest) -> HttpResponse:
         .order_by("-total_qty", "slot__start_time")
     )
     
-    # Stall-wise breakdown
     by_stall = (
         all_orders
         .values("food_item__stall_name", "food_item__location")
@@ -495,3 +475,147 @@ def food_dashboard(request: HttpRequest) -> HttpResponse:
             "loyalty": loyalty,
         },
     )
+
+
+def _require_admin(request: HttpRequest) -> bool:
+    if bool(getattr(request.user, "is_staff", False)):
+        return True
+    messages.error(request, "Admin access required.")
+    return False
+
+
+@login_required
+def food_admin_dashboard(request: HttpRequest) -> HttpResponse:
+    if not _require_admin(request):
+        return redirect("home")
+    
+    stalls = Stall.objects.all().order_by('name')
+    food_items = FoodItem.objects.select_related('stall').all().order_by('stall__name', 'name')
+    
+    stats = {
+        'total_stalls': Stall.objects.count(),
+        'active_stalls': Stall.objects.filter(is_active=True).count(),
+        'blocked_stalls': Stall.objects.filter(is_active=False).count(),
+        'total_items': FoodItem.objects.count(),
+        'active_items': FoodItem.objects.filter(is_active=True).count(),
+    }
+    
+    return render(request, 'food/admin_dashboard.html', {
+        'stalls': stalls,
+        'food_items': food_items,
+        'stats': stats,
+    })
+
+
+@login_required
+def food_admin_stall_toggle(request: HttpRequest, stall_id: int) -> HttpResponse:
+    if not _require_admin(request):
+        return redirect("home")
+    
+    stall = get_object_or_404(Stall, id=stall_id)
+    stall.is_active = not stall.is_active
+    stall.save()
+    
+    status = "unblocked" if stall.is_active else "blocked"
+    messages.success(request, f"Stall '{stall.name}' has been {status}.")
+    return redirect("food:food_admin_dashboard")
+
+
+@login_required
+def food_admin_item_create(request: HttpRequest) -> HttpResponse:
+    if not _require_admin(request):
+        return redirect("home")
+    
+    if request.method == "POST":
+        name = request.POST.get('name', '').strip()
+        price = request.POST.get('price', '').strip()
+        category = request.POST.get('category', '').strip()
+        location = request.POST.get('location', '').strip()
+        stall_id = request.POST.get('stall', '').strip()
+        description = request.POST.get('description', '').strip()
+        
+        if name and price:
+            try:
+                price_val = float(price)
+                stall = None
+                if stall_id:
+                    stall = Stall.objects.filter(id=stall_id).first()
+                
+                FoodItem.objects.create(
+                    name=name,
+                    price=price_val,
+                    category=category or "All Items",
+                    location=location or "Campus Center",
+                    stall=stall,
+                    stall_name=stall.name if stall else (location or "Main Canteen"),
+                    description=description,
+                    is_active=True
+                )
+                messages.success(request, f"Food item '{name}' created successfully.")
+                return redirect("food:food_admin_dashboard")
+            except ValueError:
+                messages.error(request, "Invalid price value.")
+    
+    stalls = Stall.objects.filter(is_active=True).order_by('name')
+    return render(request, 'food/admin_item_form.html', {
+        'title': 'Add Food Item',
+        'stalls': stalls,
+    })
+
+
+@login_required
+def food_admin_item_edit(request: HttpRequest, item_id: int) -> HttpResponse:
+    if not _require_admin(request):
+        return redirect("home")
+    
+    item = get_object_or_404(FoodItem, id=item_id)
+    
+    if request.method == "POST":
+        name = request.POST.get('name', '').strip()
+        price = request.POST.get('price', '').strip()
+        category = request.POST.get('category', '').strip()
+        location = request.POST.get('location', '').strip()
+        stall_id = request.POST.get('stall', '').strip()
+        description = request.POST.get('description', '').strip()
+        is_active = request.POST.get('is_active') == 'on'
+        
+        if name and price:
+            try:
+                price_val = float(price)
+                stall = None
+                if stall_id:
+                    stall = Stall.objects.filter(id=stall_id).first()
+                
+                item.name = name
+                item.price = price_val
+                item.category = category or "All Items"
+                item.location = location or "Campus Center"
+                item.stall = stall
+                item.stall_name = stall.name if stall else (location or "Main Canteen")
+                item.description = description
+                item.is_active = is_active
+                item.save()
+                
+                messages.success(request, f"Food item '{name}' updated successfully.")
+                return redirect("food:food_admin_dashboard")
+            except ValueError:
+                messages.error(request, "Invalid price value.")
+    
+    stalls = Stall.objects.filter(is_active=True).order_by('name')
+    return render(request, 'food/admin_item_form.html', {
+        'title': 'Edit Food Item',
+        'item': item,
+        'stalls': stalls,
+    })
+
+
+@login_required
+def food_admin_item_delete(request: HttpRequest, item_id: int) -> HttpResponse:
+    if not _require_admin(request):
+        return redirect("home")
+    
+    item = get_object_or_404(FoodItem, id=item_id)
+    name = item.name
+    item.delete()
+    messages.success(request, f"Food item '{name}' deleted successfully.")
+    return redirect("food:food_admin_dashboard")

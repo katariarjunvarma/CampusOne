@@ -1,223 +1,424 @@
 {% extends "base.html" %}
 
-{% block title %}Food Dashboard{% endblock %}
+{% block title %}Smart LPU - Food Demand Dashboard{% endblock %}
 
 {% block content %}
-<div class="container">
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h1 class="mb-1">Food Demand Dashboard</h1>
-      <div class="text-muted">Track demand and peak slots to reduce congestion.</div>
-      {% if loyalty %}
-        <div class="text-muted small">Reward Points: <span class="fw-semibold">{{ loyalty.total_points }}</span></div>
-      {% endif %}
-    </div>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-smart" href="{% url 'food:create_order' %}">Back to Order</a>
-      <a class="btn btn-outline-smart" href="{% url 'food:create_order' %}">Place Order</a>
-      <a class="btn btn-outline-smart" href="{% url 'food:my_orders' %}">Orders</a>
-    </div>
-  </div>
-
-  <!-- Summary Cards -->
-  <div class="row g-3 mb-4">
-    <div class="col-md-3">
-      <div class="card border-primary">
-        <div class="card-body text-center">
-          <div class="h2 text-primary mb-1" id="totalOrders">{{ total_orders|default:0 }}</div>
-          <div class="text-muted small">Total Orders</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card border-success">
-        <div class="card-body text-center">
-          <div class="h2 text-success mb-1" id="totalQuantity">{{ total_quantity|default:0 }}</div>
-          <div class="text-muted small">Items Ordered</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card border-info">
-        <div class="card-body text-center">
-          <div class="h2 text-info mb-1">{% if peak_slot %}{{ peak_slot.total_qty }}{% else %}0{% endif %}</div>
-          <div class="text-muted small">Peak Slot Orders</div>
-          <div class="small text-info">{% if peak_slot %}{{ peak_slot.slot__name }}{% endif %}</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card border-danger">
-        <div class="card-body text-center">
-          <div class="h2 text-danger mb-1" id="missedOrders">{{ missed_orders|default:0 }}</div>
-          <div class="text-muted small">Missed Orders</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Date Filter -->
-  <div class="card shadow-sm mb-3">
-    <div class="card-body">
-      <form method="get" class="row g-2 align-items-end">
-        <div class="col-sm-4">
-          <label class="form-label">Date</label>
-          <input class="form-control" type="date" name="date" value="{{ day|date:'Y-m-d' }}" />
-        </div>
-        <div class="col-sm-3">
-          <button class="btn btn-outline-smart" type="submit">Refresh</button>
-        </div>
-        <div class="col-sm-5 text-sm-end">
-          <small class="text-muted">Auto-refreshes every 5 minutes</small>
-          <div id="lastUpdated">Last updated: {% now "H:i" %}</div>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Visualizations Row -->
-  <div class="row g-3 mb-4">
-    <!-- Item Popularity -->
-    <div class="col-lg-4">
-      <div class="card shadow-sm h-100">
-        <div class="card-header bg-white fw-semibold">
-          Item Popularity
-        </div>
-        <div class="card-body">
-          {% if by_item %}
-            {% for item in by_item|slice:":10" %}
-              <div class="mb-2">
-                <div class="d-flex justify-content-between small mb-1">
-                  <span>{{ item.food_item__name }}</span>
-                  <span class="text-muted">{{ item.total_qty }}</span>
-                </div>
-                <div class="progress" style="height: 8px;">
-                  <div class="progress-bar bg-primary" role="progressbar" 
-                       style="width: {% widthratio item.total_qty 1 100 %}%" 
-                       aria-valuenow="{{ item.total_qty }}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-              </div>
-            {% endfor %}
-          {% else %}
-            <div class="text-muted text-center py-4">No data available</div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <!-- Stall-wise Breakdown -->
-    <div class="col-lg-4">
-      <div class="card shadow-sm h-100">
-        <div class="card-header bg-white fw-semibold">
-          Stall-wise Demand
-        </div>
-        <div class="card-body">
-          {% if by_stall %}
-            {% for stall in by_stall|slice:":8" %}
-              <div class="d-flex align-items-center mb-2 p-2 bg-light rounded">
-                <div class="flex-grow-1">
-                  <div class="fw-semibold small">{{ stall.food_item__stall_name }}</div>
-                  <div class="text-muted smaller">{{ stall.food_item__location }}</div>
-                </div>
-                <div class="badge bg-primary">{{ stall.total_qty }}</div>
-              </div>
-            {% endfor %}
-          {% else %}
-            <div class="text-muted text-center py-4">No data available</div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <!-- Demand by Slot -->
-    <div class="col-lg-4">
-      <div class="card shadow-sm h-100">
-        <div class="card-header bg-white fw-semibold">
-          Peak Time Slots
-        </div>
-        <div class="card-body">
-          {% if by_slot %}
-            {% for slot in by_slot|slice:":8" %}
-              <div class="d-flex justify-content-between align-items-center mb-2 p-2 {% if peak_slot and slot.slot__name == peak_slot.slot__name %}bg-info bg-opacity-25{% else %}bg-light{% endif %} rounded">
-                <span class="fw-semibold small">{{ slot.slot__name }}</span>
-                <span class="badge {% if peak_slot and slot.slot__name == peak_slot.slot__name %}bg-info text-dark{% else %}bg-secondary{% endif %}">
-                  {{ slot.total_qty }} orders
-                </span>
-              </div>
-            {% endfor %}
-          {% else %}
-            <div class="text-muted text-center py-4">No data available</div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- New Order Notification Toast -->
-<div class="toast-container position-fixed top-0 end-0 p-3">
-  <div id="orderToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header bg-success text-white">
-      <strong class="me-auto">New Order!</strong>
-      <small>Just now</small>
-      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body" id="orderToastBody">
-      A new order has been placed.
-    </div>
-  </div>
-</div>
-
-{% block scripts %}
-<script>
-  // Auto-refresh every 5 minutes
-  setInterval(function() {
-    window.location.reload();
-  }, 300000);
-
-  // Update last updated time
-  function updateTime() {
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-    const lastUpdatedEl = document.getElementById('lastUpdated');
-    if (lastUpdatedEl) {
-      lastUpdatedEl.innerHTML = 'Last updated: ' + timeStr;
+<style>
+  .dashboard-page {
+    padding: 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+  
+  .header-title h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .header-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .btn-outline {
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-outline:hover {
+    background: #eff6ff;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .stat-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+  }
+  
+  .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  
+  .stat-value.blue { color: #3b82f6; }
+  .stat-value.green { color: #22c55e; }
+  .stat-value.cyan { color: #06b6d4; }
+  .stat-value.red { color: #ef4444; }
+  
+  .stat-label {
+    font-size: 13px;
+    color: #64748b;
+  }
+  
+  .filter-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .filter-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+  }
+  
+  .filter-group {
+    flex: 1;
+  }
+  
+  .filter-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+  
+  .filter-group input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1e293b;
+  }
+  
+  .btn-primary {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+  
+  .auto-refresh-info {
+    text-align: right;
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 8px;
+  }
+  
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  
+  .chart-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .chart-header {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .chart-item {
+    margin-bottom: 12px;
+  }
+  
+  .chart-item-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  
+  .chart-item-name {
+    color: #374151;
+  }
+  
+  .chart-item-value {
+    color: #64748b;
+  }
+  
+  .progress-bar {
+    height: 6px;
+    background: #f1f5f9;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background: #3b82f6;
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+  
+  .stall-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .stall-info {
+    flex: 1;
+  }
+  
+  .stall-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+  }
+  
+  .stall-location {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  
+  .stall-badge {
+    padding: 4px 10px;
+    background: #dbeafe;
+    color: #3b82f6;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .slot-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .slot-item.peak {
+    background: #cffafe;
+  }
+  
+  .slot-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+  }
+  
+  .slot-badge {
+    padding: 4px 10px;
+    background: #94a3b8;
+    color: #ffffff;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .slot-badge.peak {
+    background: #06b6d4;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-size: 14px;
+  }
+  
+  @media (max-width: 900px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .charts-grid {
+      grid-template-columns: 1fr;
     }
   }
-  setInterval(updateTime, 60000);
+</style>
 
-  // Check for new orders every 30 seconds
-  let lastOrderCount = {{ total_orders|default:0 }};
+<div class="dashboard-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-title">
+      <h1>Food Demand Dashboard</h1>
+      <div class="header-subtitle">Track demand and peak slots to reduce congestion.</div>
+    </div>
+    <div class="header-actions">
+      <a href="{% url 'food:create_order' %}" class="btn-outline">Back to Order</a>
+      <a href="{% url 'food:create_order' %}" class="btn-outline">Place Order</a>
+      <a href="{% url 'food:my_orders' %}" class="btn-outline">Orders</a>
+    </div>
+  </div>
   
-  function checkNewOrders() {
-    fetch(window.location.href, {
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-    .then(response => response.text())
-    .then(html => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const newCount = parseInt(doc.getElementById('totalOrders')?.textContent || '0');
-      
-      if (newCount > lastOrderCount) {
-        const toast = new bootstrap.Toast(document.getElementById('orderToast'));
-        const diff = newCount - lastOrderCount;
-        document.getElementById('orderToastBody').textContent = 
-          diff + ' new order' + (diff > 1 ? 's' : '') + ' placed!';
-        toast.show();
-        
-        lastOrderCount = newCount;
-        document.getElementById('totalOrders').textContent = newCount;
-      }
-    })
-    .catch(err => console.log('Refresh check failed'));
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value blue" id="totalOrders">{{ total_orders|default:0 }}</div>
+      <div class="stat-label">Total Orders</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value green" id="totalQuantity">{{ total_quantity|default:0 }}</div>
+      <div class="stat-label">Items Ordered</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value cyan">{% if peak_slot %}{{ peak_slot.total_qty }}{% else %}0{% endif %}</div>
+      <div class="stat-label">Peak Slot Orders</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value red" id="missedOrders">{{ missed_orders|default:0 }}</div>
+      <div class="stat-label">Missed Orders</div>
+    </div>
+  </div>
+  
+  <!-- Filter -->
+  <div class="filter-card">
+    <form method="get" class="filter-row">
+      <div class="filter-group">
+        <label>Date</label>
+        <input type="date" name="date" value="{{ day|date:'Y-m-d' }}">
+      </div>
+      <button type="submit" class="btn-primary">Refresh</button>
+    </form>
+    <div class="auto-refresh-info">
+      Auto-refreshes every 5 minutes | Last updated: {% now "H:i" %}
+    </div>
+  </div>
+  
+  <!-- Charts -->
+  <div class="charts-grid">
+    <!-- Item Popularity -->
+    <div class="chart-card">
+      <div class="chart-header">Item Popularity</div>
+      {% if by_item %}
+        {% for item in by_item|slice:":10" %}
+          <div class="chart-item">
+            <div class="chart-item-header">
+              <span class="chart-item-name">{{ item.food_item__name }}</span>
+              <span class="chart-item-value">{{ item.total_qty }}</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: {% widthratio item.total_qty max_qty 100 %}%"></div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">No data available</div>
+      {% endif %}
+    </div>
+    
+    <!-- Stall-wise Demand -->
+    <div class="chart-card">
+      <div class="chart-header">Stall-wise Demand</div>
+      {% if by_stall %}
+        {% for stall in by_stall|slice:":8" %}
+          <div class="stall-item">
+            <div class="stall-info">
+              <div class="stall-name">{{ stall.food_item__stall_name }}</div>
+              <div class="stall-location">{{ stall.food_item__location }}</div>
+            </div>
+            <span class="stall-badge">{{ stall.total_qty }}</span>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">No data available</div>
+      {% endif %}
+    </div>
+    
+    <!-- Peak Time Slots -->
+    <div class="chart-card">
+      <div class="chart-header">Peak Time Slots</div>
+      {% if by_slot %}
+        {% for slot in by_slot|slice:":8" %}
+          <div class="slot-item {% if peak_slot and slot.slot__name == peak_slot.slot__name %}peak{% endif %}">
+            <span class="slot-name">{{ slot.slot__name }}</span>
+            <span class="slot-badge {% if peak_slot and slot.slot__name == peak_slot.slot__name %}peak{% endif %}">{{ slot.total_qty }} orders</span>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">No data available</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <div id="orderToast" class="toast" role="alert">
+    <div class="toast-header bg-success text-white">
+      <strong>New Order!</strong>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+    </div>
+    <div class="toast-body" id="orderToastBody">A new order has been placed.</div>
+  </div>
+</div>
+
+<script>
+  setInterval(() => window.location.reload(), 300000);
+  
+  function updateTime() {
+    const now = new Date();
+    document.getElementById('lastUpdated')?.textContent = 'Last updated: ' + now.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
   }
-
-  setInterval(checkNewOrders, 30000);
+  setInterval(updateTime, 60000);
+  
+  let lastOrderCount = {{ total_orders|default:0 }};
+  setInterval(() => {
+    fetch(window.location.href, {headers:{'X-Requested-With':'XMLHttpRequest'}})
+      .then(r => r.text())
+      .then(html => {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const newCount = parseInt(doc.getElementById('totalOrders')?.textContent || '0');
+        if (newCount > lastOrderCount) {
+          bootstrap.Toast.getOrCreateInstance(document.getElementById('orderToast')).show();
+          document.getElementById('orderToastBody').textContent = (newCount - lastOrderCount) + ' new order(s) placed!';
+          lastOrderCount = newCount;
+          document.getElementById('totalOrders').textContent = newCount;
+        }
+      });
+  }, 30000);
 </script>
-{% endblock %}
-
 {% endblock %}

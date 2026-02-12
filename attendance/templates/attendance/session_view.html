@@ -1,82 +1,239 @@
 {% extends 'base.html' %}
-{% block title %}Smart LPU - Session View{% endblock %}
+{% block title %}Smart LPU - {{ session.course.code }} Attendance Summary{% endblock %}
 
 {% block content %}
-  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-    <div>
-      <h1 class="h4 mb-1">{{ session.course.code }} Attendance Summary</h1>
-      <div class="smart-muted small">{{ session.course.name }} · {{ session.session_date }}{% if session.time_slot %} · {{ session.time_slot }}{% endif %}</div>
-    </div>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-smart btn-sm" href="{% url 'attendance_home' %}">Back</a>
-    </div>
-  </div>
+<style>
+  .summary-container {
+    padding: 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+  
+  .summary-title h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .summary-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #3b82f6;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  
+  .btn-back:hover {
+    background: #eff6ff;
+  }
+  
+  .summary-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+  
+  .summary-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .card-title.present {
+    color: #16a34a;
+  }
+  
+  .card-title.absent {
+    color: #dc2626;
+  }
+  
+  .count-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  
+  .count-badge.present {
+    background: #16a34a;
+  }
+  
+  .count-badge.absent {
+    background: #dc2626;
+  }
+  
+  .student-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .student-table th {
+    text-align: left;
+    padding: 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .student-table td {
+    padding: 12px 0;
+    font-size: 14px;
+    color: #1e293b;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .student-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .roll-cell {
+    font-weight: 500;
+    width: 80px;
+  }
+  
+  .empty-state {
+    color: #94a3b8;
+    font-size: 14px;
+    padding: 16px 0;
+  }
+  
+  .btn-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background: #60a5fa;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
+  }
+  
+  .btn-edit:hover {
+    background: #3b82f6;
+  }
+  
+  @media (max-width: 768px) {
+    .summary-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
 
-  <div class="row g-3">
-    <div class="col-12 col-md-6">
-      <div class="glass-strong p-3 p-md-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="fw-semibold text-success">Present ({{ present_count }})</span>
-          <span class="badge bg-success">{{ present_count }}/{{ total_count }}</span>
-        </div>
-        {% if present_students %}
-          <div class="table-responsive">
-            <table class="table table-sm table-hover align-middle mb-0 table-clean">
-              <thead>
-                <tr>
-                  <th>Roll No</th>
-                  <th>Name</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for student in present_students %}
-                  <tr>
-                    <td class="fw-semibold">{{ student.roll_no }}</td>
-                    <td>{{ student.full_name }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        {% else %}
-          <p class="smart-muted mb-0">No students marked present yet.</p>
-        {% endif %}
+<div class="summary-container">
+  <div class="summary-header">
+    <div class="summary-title">
+      <h1>{{ session.course.code }} Attendance Summary</h1>
+      <div class="summary-subtitle">
+        {{ session.course.name }} · {{ session.session_date|date:"M d, Y" }}
+        {% if session.time_slot %} · {{ session.time_slot }}{% endif %}
       </div>
     </div>
-
-    <div class="col-12 col-md-6">
-      <div class="glass-strong p-3 p-md-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="fw-semibold text-danger">Absent ({{ absent_count }})</span>
-          <span class="badge bg-danger">{{ absent_count }}/{{ total_count }}</span>
-        </div>
-        {% if absent_students %}
-          <div class="table-responsive">
-            <table class="table table-sm table-hover align-middle mb-0 table-clean">
-              <thead>
-                <tr>
-                  <th>Roll No</th>
-                  <th>Name</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for student in absent_students %}
-                  <tr>
-                    <td class="fw-semibold">{{ student.roll_no }}</td>
-                    <td>{{ student.full_name }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        {% else %}
-          <p class="smart-muted mb-0">No absentees. Everyone is marked present!</p>
-        {% endif %}
+    <a href="{% url 'attendance_home' %}" class="btn-back">Back</a>
+  </div>
+  
+  <div class="summary-cards">
+    <!-- Present Card -->
+    <div class="summary-card">
+      <div class="card-header">
+        <span class="card-title present">Present ({{ present_count }})</span>
+        <span class="count-badge present">{{ present_count }}/{{ total_count }}</span>
       </div>
+      
+      {% if present_students %}
+        <table class="student-table">
+          <thead>
+            <tr>
+              <th class="roll-cell">Roll No</th>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in present_students %}
+              <tr>
+                <td class="roll-cell">{{ student.roll_no }}</td>
+                <td>{{ student.full_name }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="empty-state">No students marked present yet.</p>
+      {% endif %}
+    </div>
+    
+    <!-- Absent Card -->
+    <div class="summary-card">
+      <div class="card-header">
+        <span class="card-title absent">Absent ({{ absent_count }})</span>
+        <span class="count-badge absent">{{ absent_count }}/{{ total_count }}</span>
+      </div>
+      
+      {% if absent_students %}
+        <table class="student-table">
+          <thead>
+            <tr>
+              <th class="roll-cell">Roll No</th>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in absent_students %}
+              <tr>
+                <td class="roll-cell">{{ student.roll_no }}</td>
+                <td>{{ student.full_name }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="empty-state">No absentees. Everyone is marked present!</p>
+      {% endif %}
     </div>
   </div>
-
-  <div class="mt-3">
-    <a class="btn btn-smart text-white fw-semibold" href="{% url 'session_detail' session_id=session.id %}">Edit Attendance</a>
-  </div>
+  
+  <a href="{% url 'session_detail' session_id=session.id %}" class="btn-edit">Edit Attendance</a>
+</div>
 {% endblock %}

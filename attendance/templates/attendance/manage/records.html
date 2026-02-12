@@ -2,31 +2,250 @@
 {% block title %}Smart LPU - Records{% endblock %}
 
 {% block content %}
-  <div class="glass-strong p-4 p-md-5 mb-3">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-      <div>
-        <h1 class="h5 mb-1">Attendance Records</h1>
-        <div class="smart-muted">View per-student attendance status. Use filter to pick a session.</div>
+<style>
+  .manage-page {
+    padding: 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .page-header {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  
+  .header-title h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .header-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  
+  .btn-secondary {
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-secondary:hover {
+    background: #eff6ff;
+  }
+  
+  .nav-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  
+  .nav-tab {
+    padding: 6px 12px;
+    background: #f1f5f9;
+    color: #64748b;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  
+  .nav-tab:hover {
+    background: #e2e8f0;
+    color: #374151;
+  }
+  
+  .nav-tab.active {
+    background: #3b82f6;
+    color: #ffffff;
+  }
+  
+  .filter-section {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+  
+  .filter-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+  
+  .filter-group {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .filter-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+  
+  .filter-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1e293b;
+    background: #ffffff;
+  }
+  
+  .btn-primary {
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+  
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+  
+  .btn-outline {
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-outline:hover {
+    background: #f8fafc;
+  }
+  
+  .data-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .data-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .data-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #1e293b;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .data-table tr:hover td {
+    background: #f9fafb;
+  }
+  
+  .session-cell {
+    font-weight: 500;
+    color: #1e293b;
+  }
+  
+  .muted-cell {
+    color: #6b7280;
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .status-present {
+    background: #d1fae5;
+    color: #059669;
+  }
+  
+  .status-absent {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-size: 14px;
+  }
+</style>
+
+<div class="manage-page">
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-title">
+        <h1>Attendance Records</h1>
+        <div class="header-subtitle">View per-student attendance status. Use filter to pick a session.</div>
       </div>
-      <div class="d-flex gap-2 align-items-center">
-        <a class="btn btn-outline-smart" href="{% url 'manage_dashboard' %}">Back</a>
-      </div>
+      <a href="{% url 'manage_dashboard' %}" class="btn-secondary">Back</a>
     </div>
-    <div class="top-tabs mt-3">
-      <a href="{% url 'manage_students' %}">Students</a>
-      <a href="{% url 'manage_courses' %}">Courses</a>
-      <a href="{% url 'manage_enrollments' %}">Enrollments</a>
-      <a href="{% url 'manage_face_samples' %}">Face Samples</a>
-      <a href="{% url 'manage_sessions' %}">Sessions</a>
-      <a href="{% url 'manage_records' %}">Records</a>
-      <a href="{% url 'manage_notifications' %}">Notifications</a>
+    
+    <div class="nav-tabs">
+      <a href="{% url 'manage_students' %}" class="nav-tab">Students</a>
+      <a href="{% url 'manage_courses' %}" class="nav-tab">Courses</a>
+      <a href="{% url 'manage_enrollments' %}" class="nav-tab">Enrollments</a>
+      <a href="{% url 'manage_face_samples' %}" class="nav-tab">Face Samples</a>
+      <a href="{% url 'manage_sessions' %}" class="nav-tab">Sessions</a>
+      <a href="{% url 'manage_records' %}" class="nav-tab active">Records</a>
+      <a href="{% url 'manage_notifications' %}" class="nav-tab">Notifications</a>
     </div>
 
-    <div class="mt-3">
-      <form method="get" class="row g-2 align-items-end">
-        <div class="col-12 col-md-6">
-          <label class="form-label">Filter by Session</label>
-          <select name="session" class="form-select">
+    <div class="filter-section">
+      <form method="get" class="filter-row">
+        <div class="filter-group">
+          <label>Filter by Session</label>
+          <select name="session">
             <option value="">All sessions</option>
             {% for s in sessions %}
               <option value="{{ s.id }}" {% if selected_session and selected_session.id == s.id %}selected{% endif %}>
@@ -35,46 +254,43 @@
             {% endfor %}
           </select>
         </div>
-        <div class="col-12 col-md-6 d-flex gap-2">
-          <button class="btn btn-smart text-white" type="submit">Apply</button>
-          <a class="btn btn-outline-smart" href="{% url 'manage_records' %}">Reset</a>
-        </div>
+        <button type="submit" class="btn-primary">Apply</button>
+        <a href="{% url 'manage_records' %}" class="btn-outline">Reset</a>
       </form>
     </div>
   </div>
 
-  <div class="glass-strong p-3 p-md-4">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0 table-clean">
-        <thead>
+  <div class="data-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Session</th>
+          <th>Student</th>
+          <th>Status</th>
+          <th>Source</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
           <tr>
-            <th>Session</th>
-            <th>Student</th>
-            <th>Status</th>
-            <th>Source</th>
-            <th>Updated</th>
+            <td class="session-cell">{{ r.session.course.code }} | {{ r.session.session_date|date:"M d, Y" }}</td>
+            <td>{{ r.student.roll_no }} - {{ r.student.full_name }}</td>
+            <td>
+              {% if r.status == 'present' %}
+                <span class="status-badge status-present">Present</span>
+              {% else %}
+                <span class="status-badge status-absent">Absent</span>
+              {% endif %}
+            </td>
+            <td class="muted-cell">{{ r.source }}</td>
+            <td class="muted-cell">{{ r.updated_at|date:"M d, Y, g:i a" }}</td>
           </tr>
-        </thead>
-        <tbody>
-          {% for r in records %}
-            <tr>
-              <td class="fw-semibold">{{ r.session.course.code }} | {{ r.session.session_date }}</td>
-              <td>{{ r.student.roll_no }} - {{ r.student.full_name }}</td>
-              <td>
-                {% if r.status == 'present' %}
-                  <span class="badge badge-soft">Present</span>
-                {% else %}
-                  <span class="badge badge-soft">Absent</span>
-                {% endif %}
-              </td>
-              <td class="smart-muted">{{ r.source }}</td>
-              <td class="smart-muted">{{ r.updated_at }}</td>
-            </tr>
-          {% empty %}
-            <tr><td colspan="5" class="smart-muted">No records found.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+        {% empty %}
+          <tr><td colspan="5" class="empty-state">No records found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
+</div>
 {% endblock %}

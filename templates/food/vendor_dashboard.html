@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Vendor Dashboard - {{ stall_owner.stall_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="h3 mb-1">{{ stall_owner.stall_name }} - Vendor Dashboard</h1>
+          <p class="text-muted mb-0">Manage orders for {{ today|date:"d M Y" }}</p>
+        </div>
+        <div>
+          <a href="{% url 'food:food_dashboard' %}" class="btn btn-outline-secondary btn-sm">Admin Dashboard</a>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="card bg-primary text-white">
+            <div class="card-body">
+              <h5 class="card-title">{{ total_orders }}</h5>
+              <p class="card-text">Total Orders</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-info text-white">
+            <div class="card-body">
+              <h5 class="card-title">{{ total_quantity }}</h5>
+              <p class="card-text">Total Quantity</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-warning text-white">
+            <div class="card-body">
+              <h5 class="card-title">{{ pending + ready }}</h5>
+              <p class="card-text">Pending + Ready</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-success text-white">
+            <div class="card-body">
+              <h5 class="card-title">{{ completed }}</h5>
+              <p class="card-text">Completed</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders by Status -->
+      <div class="row">
+        <!-- Pending Orders -->
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            <div class="card-header bg-warning text-white">
+              <h6 class="mb-0">Pending Orders ({{ pending }})</h6>
+            </div>
+            <div class="card-body p-2">
+              {% if orders_by_status.pending %}
+                {% for order in orders_by_status.pending %}
+                  <div class="border-bottom pb-2 mb-2" data-order-id="{{ order.id }}">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div class="flex-grow-1">
+                        <strong>{{ order.food_item.name }}</strong>
+                        <small class="d-block text-muted">
+                          {{ order.quantity }} × ₹{{ order.food_item.price }} 
+                          | {{ order.ordered_by.get_full_name|default:order.ordered_by.username }}
+                        </small>
+                      </div>
+                      <div class="text-end">
+                        <div class="btn-group btn-group-sm" role="group">
+                          <button type="button" class="btn btn-success btn-sm" onclick="updateStatus('{{ order.id }}', 'ready')">
+                            Mark Ready
+                          </button>
+                          <button type="button" class="btn btn-danger btn-sm" onclick="updateStatus('{{ order.id }}', 'missed')">
+                            Mark Missed
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+              {% else %}
+                <p class="text-muted text-center py-3">No pending orders</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Ready Orders -->
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            <div class="card-header bg-info text-white">
+              <h6 class="mb-0">Ready Orders ({{ ready }})</h6>
+            </div>
+            <div class="card-body p-2">
+              {% if orders_by_status.ready %}
+                {% for order in orders_by_status.ready %}
+                  <div class="border-bottom pb-2 mb-2" data-order-id="{{ order.id }}">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div class="flex-grow-1">
+                        <strong>{{ order.food_item.name }}</strong>
+                        <small class="d-block text-muted">
+                          {{ order.quantity }} × ₹{{ order.food_item.price }} 
+                          | {{ order.ordered_by.get_full_name|default:order.ordered_by.username }}
+                        </small>
+                      </div>
+                      <div class="text-end">
+                        <div class="btn-group btn-group-sm" role="group">
+                          <button type="button" class="btn btn-success btn-sm" onclick="updateStatus('{{ order.id }}', 'collected')">
+                            Mark Collected
+                          </button>
+                          <button type="button" class="btn btn-danger btn-sm" onclick="updateStatus('{{ order.id }}', 'missed')">
+                            Mark Missed
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+              {% else %}
+                <p class="text-muted text-center py-3">No ready orders</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Completed & Missed -->
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            <div class="card-header bg-success text-white">
+              <h6 class="mb-0">Completed Orders ({{ completed }})</h6>
+            </div>
+            <div class="card-body p-2">
+              {% if orders_by_status.completed %}
+                {% for order in orders_by_status.completed %}
+                  <div class="border-bottom pb-2 mb-2">
+                    <strong>{{ order.food_item.name }}</strong>
+                    <small class="d-block text-muted">
+                      {{ order.quantity }} × ₹{{ order.food_item.price }} 
+                      | {{ order.ordered_by.get_full_name|default:order.ordered_by.username }}
+                    </small>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p class="text-muted text-center py-3">No completed orders</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            <div class="card-header bg-danger text-white">
+              <h6 class="mb-0">Missed Orders ({{ missed }})</h6>
+            </div>
+            <div class="card-body p-2">
+              {% if orders_by_status.missed %}
+                {% for order in orders_by_status.missed %}
+                  <div class="border-bottom pb-2 mb-2">
+                    <strong>{{ order.food_item.name }}</strong>
+                    <small class="d-block text-muted">
+                      {{ order.quantity }} × ₹{{ order.food_item.price }} 
+                      | {{ order.ordered_by.get_full_name|default:order.ordered_by.username }}
+                    </small>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p class="text-muted text-center py-3">No missed orders</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return '';
+}
+
+function updateStatus(orderId, newStatus) {
+  fetch(`/food/vendor/update/${orderId}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: `status=${newStatus}`
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.ok) {
+      // Remove the order row from current section
+      const orderRow = document.querySelector(`[data-order-id="${orderId}"]`);
+      if (orderRow) {
+        orderRow.style.opacity = '0.5';
+        setTimeout(() => orderRow.remove(), 500);
+      }
+      
+      // Show success message
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+      alertDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+      alertDiv.innerHTML = 'Order #' + orderId + ' marked as ' + data.new_status + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+      document.body.appendChild(alertDiv);
+      
+      // Auto-hide after 3 seconds
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 3000);
+    } else {
+      alert('Error updating order status: ' + (data.error || 'unknown'));
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Network error while updating order status');
+  });
+}
+</script>
+{% endblock %}
