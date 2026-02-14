@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% block title %}Smart LPU - Manage Food Items{% endblock %}
+
+{% block content %}
+<style>
+  .manage-container {
+    padding: 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .page-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  .btn-primary {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+  .btn-secondary {
+    padding: 8px 14px;
+    background: #f3f4f6;
+    color: #374151;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover {
+    background: #e5e7eb;
+  }
+  .btn-danger {
+    padding: 8px 14px;
+    background: #ef4444;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-danger:hover {
+    background: #dc2626;
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  .data-table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+  }
+  .data-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #1e293b;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .data-table tr:hover td {
+    background: #f9fafb;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .badge-active {
+    background: #d1fae5;
+    color: #059669;
+  }
+  .badge-inactive {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+  .badge-category {
+    background: #dbeafe;
+    color: #3b82f6;
+  }
+  .actions {
+    display: flex;
+    gap: 8px;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 60px;
+    color: #94a3b8;
+    font-size: 14px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+</style>
+
+<div class="manage-container">
+  <div class="page-header">
+    <h1>Food Items</h1>
+    <a href="{% url 'manage_food_item_create' %}" class="btn-primary">+ Add Food Item</a>
+  </div>
+
+  {% if items %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Item Name</th>
+        <th>Price</th>
+        <th>Category</th>
+        <th>Stall</th>
+        <th>Location</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td><strong>{{ item.name }}</strong></td>
+        <td>₹{{ item.price }}</td>
+        <td><span class="badge badge-category">{{ item.category|default:"-" }}</span></td>
+        <td>{{ item.stall.name|default:item.stall_name|default:"-" }}</td>
+        <td>{{ item.location|default:"-" }}</td>
+        <td>
+          {% if item.is_active %}
+          <span class="badge badge-active">Active</span>
+          {% else %}
+          <span class="badge badge-inactive">Inactive</span>
+          {% endif %}
+        </td>
+        <td class="actions">
+          <a href="{% url 'manage_food_item_edit' item.id %}" class="btn-secondary">Edit</a>
+          <a href="{% url 'manage_food_item_delete' item.id %}" class="btn-danger">Delete</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">No food items found. Create your first food item to get started.</div>
+  {% endif %}
+</div>
+{% endblock %}

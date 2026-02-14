@@ -1,181 +1,204 @@
 {% load static %}
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% block title %}Smart LPU{% endblock %}</title>
 
-    <link rel="icon" type="image/png" href="{% static 'img/lpu-logo.png' %}" />
-    <link rel="apple-touch-icon" href="{% static 'img/lpu-logo.png' %}" />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Smart LPU{% endblock %}</title>
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin="anonymous"
-    />
-    <link rel="stylesheet" href="{% static 'css/app.css' %}" />
-    
-    {% block head %}{% endblock %}
-  </head>
-  <body class="bg-surface bg-blobs">
-    <div class="app-shell {% block shell_class %}{% endblock %}">
-      {% block sidebar %}
-      <aside class="sidebar">
-        <div class="sidebar-card p-3 mb-3">
-          <div class="brand-pill">
-            <img src="{% static 'img/lpu-logo.png' %}" alt="LPU" />
-            <div>
-              <div class="title">Smart LPU</div>
-              <div class="subtitle">Campus Management System</div>
-            </div>
+  <link rel="icon" type="image/png" href="{% static 'img/lpu-logo.png' %}" />
+  <link rel="apple-touch-icon" href="{% static 'img/lpu-logo.png' %}" />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link rel="stylesheet" href="{% static 'css/app.css' %}" />
+
+  {% block head %}{% endblock %}
+</head>
+
+<body class="bg-surface bg-blobs">
+  <div class="app-shell {% block shell_class %}{% endblock %}">
+    {% block sidebar %}
+    <aside class="sidebar">
+      <div class="sidebar-card p-3 mb-3">
+        <div class="brand-pill">
+          <img src="{% static 'img/lpu-logo.png' %}" alt="LPU" />
+          <div>
+            {% if is_stall_owner and stall_name %}
+            <div class="title">{{ stall_name }}</div>
+            <div class="subtitle">Vendor Dashboard</div>
+            {% else %}
+            <div class="title">Smart LPU</div>
+            <div class="subtitle">Campus Management System</div>
+            {% endif %}
           </div>
         </div>
+      </div>
 
-        <div class="sidebar-card p-3 mb-3">
-          <div class="fw-semibold mb-2">Navigation</div>
-          <div class="nav-soft d-grid gap-1">
-            {% if not is_stall_owner_only %}
-            <a href="{% url 'home' %}">
-              <div class="nav-text">
-                <div class="nav-title">Dashboard</div>
-                <div class="hint">Sessions</div>
-              </div>
-            </a>
-            <a href="{% url 'attendance_home' %}">
-              <div class="nav-text">
-                <div class="nav-title">Attendance</div>
-                <div class="hint">Create / Mark</div>
-              </div>
-            </a>
-            <a href="{% url 'food:create_order' %}">
-              <div class="nav-text">
-                <div class="nav-title">Food Order</div>
-                <div class="hint">Pre-Order Meals</div>
-              </div>
-            </a>
-            {% endif %}
-            {% if user.is_authenticated and user.is_superuser %}
-            <a href="{% url 'manage_dashboard' %}">
-              <div class="nav-text">
-                <div class="nav-title">Manage Data</div>
-                <div class="hint">Students / Courses</div>
-              </div>
-            </a>
-            {% endif %}
+      <div class="sidebar-card p-3 mb-3">
+        <div class="fw-semibold mb-2">Navigation</div>
+        <div class="nav-soft d-grid gap-1">
+          {% if not is_stall_owner_only %}
+          <a href="{% url 'home' %}">
+            <div class="nav-text">
+              <div class="nav-title">Dashboard</div>
+              <div class="hint">Sessions</div>
+            </div>
+          </a>
+          {% if not user.is_superuser %}
+          <a href="{% url 'attendance_home' %}">
+            <div class="nav-text">
+              <div class="nav-title">Student Attendance</div>
+              <div class="hint">Create / Mark</div>
+            </div>
+          </a>
+          {% endif %}
+          <a href="{% url 'food:create_order' %}">
+            <div class="nav-text">
+              <div class="nav-title">Food Order</div>
+              <div class="hint">Pre-Order Meals</div>
+            </div>
+          </a>
+          {% endif %}
+          {% if user.is_authenticated and user.is_superuser %}
+          <a href="{% url 'manage_dashboard' %}">
+            <div class="nav-text">
+              <div class="nav-title">Manage Data</div>
+              <div class="hint">Admin Console</div>
+            </div>
+          </a>
+          <a href="{% url 'super_admin_view_attendance' %}">
+            <div class="nav-text">
+              <div class="nav-title">View Attendance</div>
+              <div class="hint">Student History</div>
+            </div>
+          </a>
+          {% endif %}
 
-            {% if user.is_authenticated and is_stall_owner %}
+          {% if user.is_authenticated and is_stall_owner %}
+          <!-- Vendor Dashboard link removed as per request -->
+          <!--
             <a href="{% url 'food:vendor_dashboard' %}">
               <div class="nav-text">
                 <div class="nav-title">Vendor Dashboard</div>
                 <div class="hint">Overview</div>
               </div>
             </a>
-            <a href="{% url 'food:vendor_dashboard' %}#pending" onclick="localStorage.setItem('showSection', 'pending')">
-              <div class="nav-text">
-                <div class="nav-title">Orders Pending</div>
-                <div class="hint">View Pending</div>
-              </div>
-            </a>
-            <a href="{% url 'food:vendor_dashboard' %}#ready" onclick="localStorage.setItem('showSection', 'ready')">
-              <div class="nav-text">
-                <div class="nav-title">Orders Pickup</div>
-                <div class="hint">Ready for Pickup</div>
-              </div>
-            </a>
-            <a href="{% url 'food:vendor_dashboard' %}#completed" onclick="localStorage.setItem('showSection', 'completed')">
-              <div class="nav-text">
-                <div class="nav-title">Orders Completed</div>
-                <div class="hint">Collected Orders</div>
-              </div>
-            </a>
-            <a href="{% url 'food:vendor_dashboard' %}#missed" onclick="localStorage.setItem('showSection', 'missed')">
-              <div class="nav-text">
-                <div class="nav-title">Orders Missed</div>
-                <div class="hint">Missed Orders</div>
-              </div>
-            </a>
-            <a href="{% url 'food:vendor_menu' %}">
-              <div class="nav-text">
-                <div class="nav-title">My Menu</div>
-                <div class="hint">View Menu Items</div>
-              </div>
-            </a>
+            -->
+          <a href="{% url 'food:vendor_dashboard' %}#pending" onclick="localStorage.setItem('showSection', 'pending')">
+            <div class="nav-text">
+              <div class="nav-title">Orders Pending</div>
+              <div class="hint">View Pending</div>
+            </div>
+          </a>
+          <a href="{% url 'food:vendor_dashboard' %}#ready" onclick="localStorage.setItem('showSection', 'ready')">
+            <div class="nav-text">
+              <div class="nav-title">Orders Pickup</div>
+              <div class="hint">Ready for Pickup</div>
+            </div>
+          </a>
+          <a href="{% url 'food:vendor_dashboard' %}#completed"
+            onclick="localStorage.setItem('showSection', 'completed')">
+            <div class="nav-text">
+              <div class="nav-title">Orders Completed</div>
+              <div class="hint">Collected Orders</div>
+            </div>
+          </a>
+          <a href="{% url 'food:vendor_dashboard' %}#missed" onclick="localStorage.setItem('showSection', 'missed')">
+            <div class="nav-text">
+              <div class="nav-title">Orders Missed</div>
+              <div class="hint">Missed Orders</div>
+            </div>
+          </a>
+          <a href="{% url 'food:vendor_menu' %}">
+            <div class="nav-text">
+              <div class="nav-title">My Menu</div>
+              <div class="hint">View Menu Items</div>
+            </div>
+          </a>
+          <a href="{% url 'food:vendor_bulk_orders' %}">
+            <div class="nav-text">
+              <div class="nav-title">Bulk Orders</div>
+              <div class="hint">View Bulk Orders</div>
+            </div>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="sidebar-card p-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fw-semibold">Account</div>
+            {% if user.is_authenticated %}
+            <div class="subtitle">{{ user.username }}</div>
+            {% else %}
+            <div class="subtitle">Not signed in</div>
+            {% endif %}
+          </div>
+          <div>
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button class="btn btn-outline-smart btn-sm" type="submit">Logout</button>
+            </form>
+            {% else %}
+            <a class="btn btn-smart text-white btn-sm" href="{% url 'login' %}">Login</a>
             {% endif %}
           </div>
         </div>
+      </div>
+    </aside>
+    {% endblock %}
 
-        <div class="sidebar-card p-3">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <div class="fw-semibold">Account</div>
-              {% if user.is_authenticated %}
-                <div class="subtitle">{{ user.username }}</div>
-              {% else %}
-                <div class="subtitle">Not signed in</div>
-              {% endif %}
-            </div>
-            <div>
-              {% if user.is_authenticated %}
-                <form method="post" action="{% url 'logout' %}">
-                  {% csrf_token %}
-                  <button class="btn btn-outline-smart btn-sm" type="submit">Logout</button>
-                </form>
-              {% else %}
-                <a class="btn btn-smart text-white btn-sm" href="{% url 'login' %}">Login</a>
-              {% endif %}
-            </div>
+    <main class="content">
+      <div class="content-inner">
+        {% if emergency_alerts %}
+        <div class="mb-3">
+          {% for a in emergency_alerts %}
+          <div
+            class="alert {% if a.severity == 'critical' %}alert-danger{% elif a.severity == 'high' %}alert-warning{% elif a.severity == 'medium' %}alert-info{% else %}alert-secondary{% endif %} shadow-sm"
+            role="alert">
+            <div class="fw-semibold">{{ a.title }}</div>
+            <div class="small">{{ a.message }}</div>
           </div>
+          {% endfor %}
         </div>
-      </aside>
-      {% endblock %}
+        {% endif %}
 
-      <main class="content">
-        <div class="content-inner">
-          {% if emergency_alerts %}
-            <div class="mb-3">
-              {% for a in emergency_alerts %}
-                <div class="alert {% if a.severity == 'critical' %}alert-danger{% elif a.severity == 'high' %}alert-warning{% elif a.severity == 'medium' %}alert-info{% else %}alert-secondary{% endif %} shadow-sm" role="alert">
-                  <div class="fw-semibold">{{ a.title }}</div>
-                  <div class="small">{{ a.message }}</div>
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-
-          {% if messages %}
-            <div class="mb-3">
-              {% for message in messages %}
-                <div class="alert alert-{{ message.tags|default:'info' }} shadow-sm" role="alert">{{ message }}</div>
-              {% endfor %}
-            </div>
-          {% endif %}
-
-          {% block content %}{% endblock %}
+        {% if messages %}
+        <div class="mb-3">
+          {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'info' }} shadow-sm" role="alert">{{ message }}</div>
+          {% endfor %}
         </div>
-      </main>
-    </div>
+        {% endif %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-      crossorigin="anonymous">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
-    <script>
-      window.setTimeout(() => {
-        document.querySelectorAll('.content-inner .alert').forEach((el) => {
-          try {
-            if (window.bootstrap && window.bootstrap.Alert) {
-              window.bootstrap.Alert.getOrCreateInstance(el).close();
-            } else {
-              el.remove();
-            }
-          } catch (_e) {
-            try { el.remove(); } catch (__e) {}
+  <script>
+    window.setTimeout(() => {
+      document.querySelectorAll('.content-inner .alert').forEach((el) => {
+        try {
+          if (window.bootstrap && window.bootstrap.Alert) {
+            window.bootstrap.Alert.getOrCreateInstance(el).close();
+          } else {
+            el.remove();
           }
-        });
-      }, 3000);
-    </script>
-    {% block scripts %}{% endblock %}
-  </body>
+        } catch (_e) {
+          try { el.remove(); } catch (__e) { }
+        }
+      });
+    }, 3000);
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+
 </html>

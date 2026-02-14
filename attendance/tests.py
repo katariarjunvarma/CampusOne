@@ -17,10 +17,10 @@ class AttendanceActionsTests(TestCase):
 
         self.course = Course.objects.create(code="CSE111", name="computer programming")
         self.s1 = Student.objects.create(
-            roll_no="23", full_name="satish", email="satish@example.com", parent_email="p1@example.com"
+            registration_number="123456", full_name="satish", email="satish@example.com", parent_email="p1@example.com"
         )
         self.s2 = Student.objects.create(
-            roll_no="29",
+            registration_number="654321",
             full_name="Katari Arjun Varma",
             email="arjun@example.com",
             parent_email="p2@example.com",

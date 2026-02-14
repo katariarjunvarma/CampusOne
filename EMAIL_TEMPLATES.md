@@ -39,7 +39,7 @@ This document describes the email templates available in the Smart LPU attendanc
 All templates use Django template variables. Common variables include:
 
 - `{{ student_name }}` - Full name of the student
-- `{{ roll_number }}` - Student's roll number
+- `{{ roll_number }}` - Student's registration number (6 digits)
 - `{{ course_name }}` - Course name
 - `{{ course_code }}` - Course code
 - `{{ date }}` - Formatted date (e.g., "09 February 2026")

@@ -1,5 +1,8 @@
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.views import LoginView
 from django.db import transaction
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -35,8 +38,14 @@ from .forms import (
     FaceSampleMultiForm,
     FaceSampleForm,
     StudentForm,
+    UserPermissionsForm,
 )
 from .models import AttendanceRecord, AttendanceSession, Course, Enrollment, FaceSample, Notification, Student
+
+from food.models import BulkOrder, BreakSlot, EmergencyAlert, FoodItem, LoyaltyPoints, PreOrder, Stall
+
+
+User = get_user_model()
 
 
 _live_state: dict[tuple[int, int], dict[str, object]] = {}
@@ -71,6 +80,37 @@ def _blink_seen(state: dict[str, object]) -> bool:
     return bool(hi1 and low and hi2)
 
 
+class StaffLoginView(LoginView):
+    """Custom login view that prevents superusers from logging in through regular login."""
+
+    def form_valid(self, form):
+        user = form.get_user()
+        if user.is_superuser:
+            form.add_error(None, "Admins must login through the Admin Login session.")
+            return self.form_invalid(form)
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["admin_error"] = any(
+            "Admins must login" in str(error) for error in context.get("form", {}).errors.get("__all__", [])
+        )
+        return context
+
+
+class AdminLoginView(LoginView):
+    """Custom admin login that only allows superusers."""
+
+    template_name = 'admin/login.html'
+
+    def form_valid(self, form):
+        user = form.get_user()
+        if not user.is_superuser:
+            form.add_error(None, "Only superusers can access the admin site. Please use the regular login page.")
+            return self.form_invalid(form)
+        return super().form_valid(form)
+
+
 @login_required
 def home(request: HttpRequest) -> HttpResponse:
     try:
@@ -84,10 +124,19 @@ def home(request: HttpRequest) -> HttpResponse:
         pass
     # Import here to avoid circular imports
     from food.models import PreOrder
+    from django.utils import timezone
+
+    today = timezone.localdate()
+
+    # Show only orders that are ready for pickup today
     recent_food_orders = (
-        PreOrder.objects.filter(ordered_by=request.user)
+        PreOrder.objects.filter(
+            ordered_by=request.user,
+            order_date=today,
+            status="ready"
+        )
         .select_related("food_item", "slot")
-        .order_by("-created_at")[:5]
+        .order_by("-created_at")
     )
     return render(request, "attendance/dashboard.html", {"recent_food_orders": recent_food_orders})
 
@@ -155,7 +204,7 @@ def manage_dashboard(request: HttpRequest) -> HttpResponse:
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_students(request: HttpRequest) -> HttpResponse:
-    students = Student.objects.order_by("roll_no")
+    students = Student.objects.order_by("registration_number")
     return render(request, "attendance/manage/students.html", {"students": students})
 
 
@@ -234,7 +283,7 @@ def manage_course_delete(request: HttpRequest, course_id: int) -> HttpResponse:
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_enrollments(request: HttpRequest) -> HttpResponse:
-    enrollments = Enrollment.objects.select_related("student", "course").order_by("course__code", "student__roll_no")
+    enrollments = Enrollment.objects.select_related("student", "course").order_by("course__code", "student__registration_number")
     return render(request, "attendance/manage/enrollments.html", {"enrollments": enrollments})
 
 
@@ -398,7 +447,7 @@ def session_detail(request: HttpRequest, session_id: int) -> HttpResponse:
     session = get_object_or_404(AttendanceSession.objects.select_related("course"), id=session_id)
     students = (
         Student.objects.filter(enrollments__course=session.course)
-        .order_by("roll_no")
+        .order_by("registration_number")
         .distinct()
     )
 
@@ -429,7 +478,7 @@ def session_view(request: HttpRequest, session_id: int) -> HttpResponse:
     session = get_object_or_404(AttendanceSession.objects.select_related("course"), id=session_id)
     students = (
         Student.objects.filter(enrollments__course=session.course)
-        .order_by("roll_no")
+        .order_by("registration_number")
         .distinct()
     )
 
@@ -468,7 +517,7 @@ def mark_attendance_by_photo(request: HttpRequest, session_id: int) -> HttpRespo
     session = get_object_or_404(AttendanceSession.objects.select_related("course"), id=session_id)
     students = (
         Student.objects.filter(enrollments__course=session.course)
-        .order_by("roll_no")
+        .order_by("registration_number")
         .distinct()
     )
 
@@ -571,7 +620,6 @@ def mark_attendance_by_photo(request: HttpRequest, session_id: int) -> HttpRespo
 
         recognized = recognize_faces_in_image(recognizer, bgr)
 
-        # Debug info: show detected faces and match details
         faces_detected_in_image = len(recognized)
 
         # If no faces detected in the uploaded image, show helpful error
@@ -602,7 +650,6 @@ def mark_attendance_by_photo(request: HttpRequest, session_id: int) -> HttpRespo
             if prev is None or conf < prev:
                 best_by_id[r.label] = conf
 
-        # Debug: show match info
         match_info = ", ".join([f"ID:{sid}={conf:.1f}" for sid, conf in best_by_id.items()])
         messages.info(
             request,
@@ -670,7 +717,7 @@ def mark_attendance(request: HttpRequest, session_id: int) -> HttpResponse:
         session = get_object_or_404(AttendanceSession.objects.select_related("course"), id=session_id)
         students = (
             Student.objects.filter(enrollments__course=session.course)
-            .order_by("roll_no")
+            .order_by("registration_number")
             .distinct()
         )
 
@@ -762,7 +809,7 @@ def mark_attendance(request: HttpRequest, session_id: int) -> HttpResponse:
             if became_absent and (s.email or s.parent_email):
                 # Create notification record
                 msg = (
-                    f"Absent detected: {s.full_name} ({s.roll_no}) was marked ABSENT for "
+                    f"Absent detected: {s.full_name} ({s.registration_number}) was marked ABSENT for "
                     f"{session.course.code} on {session.session_date}."
                 )
                 Notification.objects.create(recipient_student=s, channel="email", message=msg)
@@ -775,7 +822,7 @@ def mark_attendance(request: HttpRequest, session_id: int) -> HttpResponse:
                     # Prepare template context
                     context = {
                         'student_name': s.full_name,
-                        'roll_number': s.roll_no,
+                        'roll_number': s.registration_number,
                         'course_name': session.course.name,
                         'course_code': session.course.code,
                         'date': session.session_date.strftime('%d %B %Y'),
@@ -863,7 +910,7 @@ def live_attendance_frame(request: HttpRequest, session_id: int) -> JsonResponse
     session = get_object_or_404(AttendanceSession.objects.select_related("course"), id=session_id)
     students = (
         Student.objects.filter(enrollments__course=session.course)
-        .order_by("roll_no")
+        .order_by("registration_number")
         .distinct()
     )
     allowed_ids = {s.id for s in students}
@@ -1066,3 +1113,365 @@ def live_attendance_frame(request: HttpRequest, session_id: int) -> JsonResponse
     )
 
 
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def super_admin_view_attendance(request: HttpRequest) -> HttpResponse:
+    query = request.GET.get("q", "").strip()
+    course_id = request.GET.get("course_id")
+    student = None
+    records = []
+    stats = {}
+    course_summaries = []
+    selected_course = None
+
+    if query:
+        # Search for student by registration number or name
+        student = Student.objects.filter(registration_number__iexact=query).first()
+        if not student:
+            # Try partial name match
+            possible_students = Student.objects.filter(full_name__icontains=query)
+            if possible_students.count() == 1:
+                student = possible_students.first()
+            elif possible_students.count() > 1:
+                messages.warning(request, f"Multiple students found matching '{query}'. Please use the exact Registration Number.")
+            else:
+                pass # Just show not found message in template
+
+    if student:
+        # Get all records for calculating overall stats
+        all_records = AttendanceRecord.objects.select_related("session", "session__course").filter(student=student)
+        
+        # Overall Stats
+        total_sessions = all_records.count()
+        present = all_records.filter(status=AttendanceRecord.STATUS_PRESENT).count()
+        absent = all_records.filter(status=AttendanceRecord.STATUS_ABSENT).count()
+        percentage = (present / total_sessions * 100) if total_sessions > 0 else 0
+
+        stats = {
+            "total": total_sessions,
+            "present": present,
+            "absent": absent,
+            "percentage": round(percentage, 1),
+        }
+
+        if course_id:
+            # Course Detail View
+            records = all_records.filter(session__course_id=course_id).order_by("-session__session_date", "-session__created_at")
+            if records.exists():
+                selected_course = records.first().session.course
+            else:
+                # Handle case where ID is valid but no records exist (e.g. wiped)
+                selected_course = Course.objects.filter(id=course_id).first()
+        else:
+            # Course Summary View
+            # Group by course
+            courses = {}
+            for record in all_records:
+                c = record.session.course
+                if c.id not in courses:
+                    courses[c.id] = {
+                        "course": c,
+                        "total": 0,
+                        "present": 0,
+                        "absent": 0,
+                    }
+                courses[c.id]["total"] += 1
+                if record.status == AttendanceRecord.STATUS_PRESENT:
+                    courses[c.id]["present"] += 1
+                else:
+                    courses[c.id]["absent"] += 1
+            
+            for cid, data in courses.items():
+                pct = (data["present"] / data["total"] * 100) if data["total"] > 0 else 0
+                data["percentage"] = round(pct, 1)
+                course_summaries.append(data)
+            
+            course_summaries.sort(key=lambda x: x["course"].code)
+
+    return render(
+        request,
+        "attendance/super_admin_attendance.html",
+        {
+            "student": student, 
+            "records": records, 
+            "stats": stats, 
+            "query": query, 
+            "course_summaries": course_summaries, 
+            "selected_course": selected_course
+        },
+    )
+
+
+# ==================== ADMIN MANAGEMENT VIEWS ====================
+
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_users(request: HttpRequest) -> HttpResponse:
+    users = User.objects.order_by("-date_joined")
+    return render(request, "attendance/manage/users.html", {"users": users})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_user_create(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "User created.")
+            return redirect("manage_users")
+    else:
+        form = UserCreationForm()
+    return render(request, "attendance/manage/form.html", {"form": form, "title": "Add User"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_user_edit(request: HttpRequest, user_id: int) -> HttpResponse:
+    user_obj = get_object_or_404(User, id=user_id)
+    if request.method == "POST":
+        form = UserPermissionsForm(request.POST, instance=user_obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "User permissions updated.")
+            return redirect("manage_users")
+    else:
+        form = UserPermissionsForm(instance=user_obj)
+    return render(
+        request,
+        "attendance/manage/user_edit.html",
+        {"form": form, "user_obj": user_obj, "title": f"Edit User: {user_obj.username}"},
+    )
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_stalls(request: HttpRequest) -> HttpResponse:
+    stalls = Stall.objects.order_by("name")
+    return render(request, "attendance/manage/stalls.html", {"stalls": stalls})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_stall_create(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        name = request.POST.get("name")
+        location = request.POST.get("location")
+        if name and location:
+            Stall.objects.create(name=name, location=location)
+            messages.success(request, "Stall created.")
+            return redirect("manage_stalls")
+        messages.error(request, "Name and location are required.")
+    return render(request, "attendance/manage/stall_form.html", {"title": "Add Stall"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_stall_edit(request: HttpRequest, stall_id: int) -> HttpResponse:
+    stall = get_object_or_404(Stall, id=stall_id)
+    if request.method == "POST":
+        stall.name = request.POST.get("name", stall.name)
+        stall.location = request.POST.get("location", stall.location)
+        stall.is_active = request.POST.get("is_active") == "on"
+        stall.save()
+        messages.success(request, "Stall updated.")
+        return redirect("manage_stalls")
+    return render(request, "attendance/manage/stall_form.html", {"stall": stall, "title": "Edit Stall"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_stall_delete(request: HttpRequest, stall_id: int) -> HttpResponse:
+    stall = get_object_or_404(Stall, id=stall_id)
+    if request.method == "POST":
+        stall.delete()
+        messages.success(request, "Stall deleted.")
+        return redirect("manage_stalls")
+    return render(request, "attendance/manage/confirm_delete.html", {"object": stall, "type": "Stall"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_break_slots(request: HttpRequest) -> HttpResponse:
+    slots = BreakSlot.objects.order_by("start_time")
+    return render(request, "attendance/manage/break_slots.html", {"slots": slots})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_break_slot_create(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        name = request.POST.get("name")
+        start_time = request.POST.get("start_time")
+        end_time = request.POST.get("end_time")
+        if name and start_time and end_time:
+            BreakSlot.objects.create(name=name, start_time=start_time, end_time=end_time)
+            messages.success(request, "Break slot created.")
+            return redirect("manage_break_slots")
+        messages.error(request, "All fields are required.")
+    return render(request, "attendance/manage/break_slot_form.html", {"title": "Add Break Slot"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_break_slot_edit(request: HttpRequest, slot_id: int) -> HttpResponse:
+    slot = get_object_or_404(BreakSlot, id=slot_id)
+    if request.method == "POST":
+        slot.name = request.POST.get("name", slot.name)
+        slot.start_time = request.POST.get("start_time", slot.start_time)
+        slot.end_time = request.POST.get("end_time", slot.end_time)
+        slot.save()
+        messages.success(request, "Break slot updated.")
+        return redirect("manage_break_slots")
+    return render(request, "attendance/manage/break_slot_form.html", {"slot": slot, "title": "Edit Break Slot"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_break_slot_delete(request: HttpRequest, slot_id: int) -> HttpResponse:
+    slot = get_object_or_404(BreakSlot, id=slot_id)
+    if request.method == "POST":
+        slot.delete()
+        messages.success(request, "Break slot deleted.")
+        return redirect("manage_break_slots")
+    return render(request, "attendance/manage/confirm_delete.html", {"object": slot, "type": "Break Slot"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_food_items(request: HttpRequest) -> HttpResponse:
+    items = FoodItem.objects.select_related("stall").order_by("name")
+    return render(request, "attendance/manage/food_items.html", {"items": items})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_food_item_create(request: HttpRequest) -> HttpResponse:
+    stalls = Stall.objects.filter(is_active=True)
+    if request.method == "POST":
+        name = request.POST.get("name")
+        price = request.POST.get("price")
+        category = request.POST.get("category")
+        stall_id = request.POST.get("stall")
+        if name and price and stall_id:
+            stall = get_object_or_404(Stall, id=stall_id)
+            FoodItem.objects.create(
+                name=name,
+                price=price,
+                category=category or "",
+                stall=stall,
+                stall_name=stall.name,
+                location=stall.location
+            )
+            messages.success(request, "Food item created.")
+            return redirect("manage_food_items")
+        messages.error(request, "Name, price, and stall are required.")
+    return render(request, "attendance/manage/food_item_form.html", {"stalls": stalls, "title": "Add Food Item"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_food_item_edit(request: HttpRequest, item_id: int) -> HttpResponse:
+    item = get_object_or_404(FoodItem, id=item_id)
+    stalls = Stall.objects.filter(is_active=True)
+    if request.method == "POST":
+        item.name = request.POST.get("name", item.name)
+        item.price = request.POST.get("price", item.price)
+        item.category = request.POST.get("category", item.category)
+        stall_id = request.POST.get("stall")
+        if stall_id:
+            stall = get_object_or_404(Stall, id=stall_id)
+            item.stall = stall
+            item.stall_name = stall.name
+            item.location = stall.location
+        item.is_active = request.POST.get("is_active") == "on"
+        item.save()
+        messages.success(request, "Food item updated.")
+        return redirect("manage_food_items")
+    return render(request, "attendance/manage/food_item_form.html", {"item": item, "stalls": stalls, "title": "Edit Food Item"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_food_item_delete(request: HttpRequest, item_id: int) -> HttpResponse:
+    item = get_object_or_404(FoodItem, id=item_id)
+    if request.method == "POST":
+        item.delete()
+        messages.success(request, "Food item deleted.")
+        return redirect("manage_food_items")
+    return render(request, "attendance/manage/confirm_delete.html", {"object": item, "type": "Food Item"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_preorders(request: HttpRequest) -> HttpResponse:
+    orders = PreOrder.objects.select_related("food_item", "slot", "ordered_by").order_by("-order_date", "-created_at")
+    return render(request, "attendance/manage/preorders.html", {"orders": orders})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_bulk_orders(request: HttpRequest) -> HttpResponse:
+    orders = BulkOrder.objects.select_related("slot").order_by("-created_at")
+    return render(request, "attendance/manage/bulk_orders.html", {"orders": orders})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_loyalty_points(request: HttpRequest) -> HttpResponse:
+    points = LoyaltyPoints.objects.select_related("user").order_by("-total_points")
+    return render(request, "attendance/manage/loyalty_points.html", {"points": points})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_emergency_alerts(request: HttpRequest) -> HttpResponse:
+    alerts = EmergencyAlert.objects.order_by("-created_at")
+    return render(request, "attendance/manage/emergency_alerts.html", {"alerts": alerts})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_emergency_alert_create(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        title = request.POST.get("title")
+        message = request.POST.get("message")
+        severity = request.POST.get("severity", "medium")
+        alert_type = request.POST.get("alert_type", "general")
+        if title and message:
+            EmergencyAlert.objects.create(
+                title=title,
+                message=message,
+                severity=severity,
+                alert_type=alert_type,
+                is_active=True
+            )
+            messages.success(request, "Emergency alert created.")
+            return redirect("manage_emergency_alerts")
+        messages.error(request, "Title and message are required.")
+    return render(request, "attendance/manage/emergency_alert_form.html", {"title": "Create Alert"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_emergency_alert_toggle(request: HttpRequest, alert_id: int) -> HttpResponse:
+    alert = get_object_or_404(EmergencyAlert, id=alert_id)
+    alert.is_active = not alert.is_active
+    alert.save()
+    status = "activated" if alert.is_active else "deactivated"
+    messages.success(request, f"Alert {status}.")
+    return redirect("manage_emergency_alerts")
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_emergency_alert_delete(request: HttpRequest, alert_id: int) -> HttpResponse:
+    alert = get_object_or_404(EmergencyAlert, id=alert_id)
+    if request.method == "POST":
+        alert.delete()
+        messages.success(request, "Alert deleted.")
+        return redirect("manage_emergency_alerts")
+    return render(request, "attendance/manage/confirm_delete.html", {"object": alert, "type": "Emergency Alert"})

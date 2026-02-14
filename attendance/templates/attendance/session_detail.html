@@ -8,7 +8,7 @@
     max-width: 1200px;
     margin: 0 auto;
   }
-  
+
   .back-btn {
     display: inline-flex;
     align-items: center;
@@ -23,31 +23,31 @@
     text-decoration: none;
     margin-bottom: 16px;
   }
-  
+
   .back-btn:hover {
     background: #e2e8f0;
   }
-  
+
   .session-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 24px;
   }
-  
+
   .session-title h1 {
     font-size: 24px;
     font-weight: 600;
     color: #1e293b;
     margin: 0;
   }
-  
+
   .session-subtitle {
     font-size: 14px;
     color: #64748b;
     margin-top: 4px;
   }
-  
+
   .btn-close-session {
     display: inline-flex;
     align-items: center;
@@ -61,33 +61,33 @@
     font-weight: 500;
     text-decoration: none;
   }
-  
+
   .session-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
   }
-  
+
   /* Camera Card */
   .camera-card {
     background: #f8fafc;
     border-radius: 16px;
     padding: 24px;
   }
-  
+
   .camera-title {
     font-size: 16px;
     font-weight: 600;
     color: #1e293b;
     margin: 0 0 16px 0;
   }
-  
+
   .mode-toggle {
     display: flex;
     gap: 8px;
     margin-bottom: 16px;
   }
-  
+
   .mode-btn {
     flex: 1;
     padding: 10px 16px;
@@ -100,14 +100,14 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  
+
   .mode-btn.active {
     background: #60a5fa;
     color: #ffffff;
     border-color: #60a5fa;
     box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
   }
-  
+
   .camera-feed {
     background: #64748b;
     border-radius: 12px;
@@ -119,13 +119,13 @@
     overflow: hidden;
     position: relative;
   }
-  
+
   .camera-feed video {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  
+
   .camera-placeholder {
     display: flex;
     flex-direction: column;
@@ -133,19 +133,19 @@
     gap: 8px;
     color: #ffffff;
   }
-  
+
   .camera-icon {
     width: 48px;
     height: 48px;
     opacity: 0.5;
   }
-  
+
   .camera-controls {
     display: flex;
     gap: 8px;
     margin-bottom: 16px;
   }
-  
+
   .camera-controls button {
     padding: 8px 16px;
     border: 1px solid #e2e8f0;
@@ -157,33 +157,33 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  
+
   .camera-controls button.primary {
     background: #60a5fa;
     color: #ffffff;
     border-color: #60a5fa;
   }
-  
+
   .camera-controls button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  
+
   .camera-status {
     font-size: 12px;
     color: #64748b;
     margin-bottom: 8px;
     min-height: 16px;
   }
-  
+
   .camera-status.success {
     color: #16a34a;
   }
-  
+
   .upload-section {
     margin-top: 8px;
   }
-  
+
   .upload-header {
     display: flex;
     align-items: center;
@@ -194,14 +194,14 @@
     margin-bottom: 8px;
     cursor: pointer;
   }
-  
+
   .upload-input-wrapper {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 12px;
   }
-  
+
   .file-input {
     flex: 1;
     padding: 8px 12px;
@@ -211,7 +211,7 @@
     font-size: 13px;
     color: #64748b;
   }
-  
+
   .btn-upload {
     width: 100%;
     padding: 10px;
@@ -225,63 +225,63 @@
     transition: all 0.2s;
     box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
   }
-  
+
   .camera-tip {
     font-size: 12px;
     color: #94a3b8;
     margin-top: 12px;
     line-height: 1.5;
   }
-  
+
   /* Manual Attendance Card */
   .attendance-card {
     background: #f8fafc;
     border-radius: 16px;
     padding: 24px;
   }
-  
+
   .attendance-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
   }
-  
+
   .attendance-title {
     font-size: 16px;
     font-weight: 600;
     color: #1e293b;
     margin: 0;
   }
-  
+
   .stats-badges {
     display: flex;
     gap: 8px;
   }
-  
+
   .stat-badge {
     padding: 4px 10px;
     border-radius: 4px;
     font-size: 12px;
     font-weight: 500;
   }
-  
+
   .stat-badge.present {
     background: #f0fdf4;
     color: #16a34a;
   }
-  
+
   .stat-badge.absent {
     background: #fef2f2;
     color: #dc2626;
   }
-  
+
   .attendance-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
   }
-  
+
   .attendance-table th {
     text-align: left;
     padding: 12px 8px;
@@ -290,7 +290,7 @@
     color: #64748b;
     border-bottom: 1px solid #e2e8f0;
   }
-  
+
   .attendance-table td {
     padding: 12px 8px;
     font-size: 14px;
@@ -298,16 +298,16 @@
     border-bottom: 1px solid #f1f5f9;
     vertical-align: middle;
   }
-  
+
   .attendance-table tr:hover td {
     background: #f1f5f9;
   }
-  
+
   .checkbox-cell {
     width: 40px;
     text-align: center;
   }
-  
+
   .checkbox-cell input[type="checkbox"] {
     width: 18px;
     height: 18px;
@@ -316,22 +316,22 @@
     cursor: pointer;
     accent-color: #3b82f6;
   }
-  
+
   .roll-cell {
     width: 60px;
     font-weight: 500;
     color: #1e293b;
   }
-  
+
   .name-cell {
     flex: 1;
   }
-  
+
   .status-cell {
     width: 100px;
     text-align: right;
   }
-  
+
   .toggle-switch {
     display: inline-flex;
     align-items: center;
@@ -343,30 +343,30 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  
+
   .toggle-switch.present {
     background: #dbeafe;
     color: #3b82f6;
   }
-  
+
   .toggle-switch.absent {
     background: #f3f4f6;
     color: #6b7280;
   }
-  
+
   .toggle-dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
     background: currentColor;
   }
-  
+
   .attendance-actions {
     display: flex;
     gap: 8px;
     margin-bottom: 16px;
   }
-  
+
   .attendance-actions button {
     padding: 6px 12px;
     border: 1px solid #e2e8f0;
@@ -378,17 +378,17 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  
+
   .attendance-actions button:hover {
     background: #f1f5f9;
   }
-  
+
   .submit-section {
     display: flex;
     justify-content: flex-end;
     margin-top: 16px;
   }
-  
+
   .btn-submit {
     padding: 10px 24px;
     background: #60a5fa;
@@ -401,11 +401,11 @@
     transition: all 0.2s;
     box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
   }
-  
+
   .btn-submit:hover {
     background: #3b82f6;
   }
-  
+
   /* Modal Styles */
   .modal-overlay {
     position: fixed;
@@ -419,11 +419,11 @@
     justify-content: center;
     z-index: 1000;
   }
-  
+
   .modal-overlay.show {
     display: flex;
   }
-  
+
   .modal-content {
     background: #ffffff;
     border-radius: 16px;
@@ -432,24 +432,24 @@
     max-width: 480px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
   }
-  
+
   .modal-header {
     font-size: 18px;
     font-weight: 600;
     color: #1e293b;
     margin: 0 0 16px 0;
   }
-  
+
   .modal-body {
     margin-bottom: 24px;
   }
-  
+
   .absentees-summary {
     font-size: 13px;
     color: #64748b;
     margin-bottom: 12px;
   }
-  
+
   .absentees-list {
     background: #f8fafc;
     border-radius: 8px;
@@ -458,7 +458,7 @@
     overflow-y: auto;
     margin-bottom: 16px;
   }
-  
+
   .absentees-list-header {
     display: flex;
     justify-content: space-between;
@@ -469,18 +469,18 @@
     border-bottom: 1px solid #e2e8f0;
     margin-bottom: 8px;
   }
-  
+
   .absentee-row {
     display: flex;
     justify-content: space-between;
     font-size: 13px;
     padding: 4px 0;
   }
-  
+
   .confirm-input-group {
     margin-top: 16px;
   }
-  
+
   .confirm-input-group label {
     display: block;
     font-size: 14px;
@@ -488,7 +488,7 @@
     color: #374151;
     margin-bottom: 8px;
   }
-  
+
   .confirm-input {
     width: 100%;
     padding: 10px 14px;
@@ -497,19 +497,19 @@
     font-size: 14px;
     text-align: center;
   }
-  
+
   .confirm-input:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
-  
+
   .modal-footer {
     display: flex;
     gap: 12px;
     justify-content: flex-end;
   }
-  
+
   .modal-btn {
     padding: 10px 20px;
     border-radius: 8px;
@@ -518,33 +518,33 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  
+
   .modal-btn-secondary {
     background: #ffffff;
     color: #64748b;
     border: 1px solid #e2e8f0;
   }
-  
+
   .modal-btn-secondary:hover {
     background: #f1f5f9;
   }
-  
+
   .modal-btn-primary {
     background: #60a5fa;
     color: #ffffff;
     border: none;
     box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
   }
-  
+
   .modal-btn-primary:hover:not(:disabled) {
     background: #3b82f6;
   }
-  
+
   .modal-btn-primary:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  
+
   @media (max-width: 900px) {
     .session-content {
       grid-template-columns: 1fr;
@@ -559,7 +559,7 @@
     </svg>
     Back
   </a>
-  
+
   <div class="session-header">
     <div class="session-title">
       <h1>{{ session.course.code }} - {{ session.course.name }}</h1>
@@ -578,17 +578,17 @@
       End Session
     </a>
   </div>
-  
+
   <div class="session-content">
     <!-- Smart Camera Attendance -->
     <div class="camera-card">
       <h3 class="camera-title">Smart Camera Attendance</h3>
-      
+
       <div class="mode-toggle">
         <button type="button" class="mode-btn active" id="snapshotMode">Snapshot Mode</button>
         <button type="button" class="mode-btn" id="liveMode">Live Mode</button>
       </div>
-      
+
       <div class="camera-feed" id="cameraFeed">
         <div class="camera-placeholder" id="cameraPlaceholder">
           <svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -601,24 +601,26 @@
         <video id="videoElement" style="display: none;" autoplay playsinline></video>
         <canvas id="liveCanvas" style="display: none;"></canvas>
       </div>
-      
+
       <div class="camera-status" id="cameraStatus"></div>
-      
+
       <div class="camera-controls">
         <button type="button" class="primary" id="startCamera">Start Camera</button>
         <button type="button" id="captureBtn" disabled>Capture</button>
         <button type="button" id="stopBtn" disabled>Stop</button>
       </div>
-      
+
       <!-- Live Mode Controls -->
       <div id="liveControls" style="display: none; margin-bottom: 16px;">
         <button type="button" class="btn-upload" id="startLiveBtn" disabled>Start Live Detection</button>
-        <button type="button" class="btn-upload" id="stopLiveBtn" style="display: none; background: #ef4444;">Stop Live Detection</button>
+        <button type="button" class="btn-upload" id="stopLiveBtn" style="display: none; background: #ef4444;">Stop Live
+          Detection</button>
       </div>
-      
+
       <!-- Snapshot Mode Upload -->
       <div class="upload-section" id="snapshotControls">
-        <form method="post" enctype="multipart/form-data" action="{% url 'mark_attendance_by_photo' session_id=session.id %}">
+        <form method="post" enctype="multipart/form-data"
+          action="{% url 'mark_attendance_by_photo' session_id=session.id %}">
           {% csrf_token %}
           <div class="upload-header">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -627,17 +629,18 @@
             Upload Photo from PC
           </div>
           <div class="upload-input-wrapper">
-            <input type="file" name="photo" accept="image/*" class="file-input" id="photoInput" onchange="updateFileName(this)">
+            <input type="file" name="photo" accept="image/*" class="file-input" id="photoInput"
+              onchange="updateFileName(this)">
           </div>
           <button type="submit" class="btn-upload">Upload Photo + Auto Mark</button>
         </form>
       </div>
-      
+
       <div class="camera-tip">
         Tip: For better results, upload 6-10 Face Data photos per student in Manage Data.
       </div>
     </div>
-    
+
     <!-- Manual Attendance -->
     <div class="attendance-card">
       <div class="attendance-header">
@@ -647,47 +650,46 @@
           <span class="stat-badge absent" id="absentCount">0 Absent</span>
         </div>
       </div>
-      
+
       <div class="attendance-actions">
         <button type="button" onclick="markAllPresent()">Present All</button>
         <button type="button" onclick="markAllAbsent()">Absent All</button>
         <button type="button" onclick="markRemainingAbsent()">Absent Remaining</button>
       </div>
-      
+
       <form method="post" action="{% url 'mark_attendance' session_id=session.id %}" id="attendanceForm">
         {% csrf_token %}
         <input type="hidden" name="action" value="submit_manual">
-        
+
         <table class="attendance-table">
           <thead>
             <tr>
               <th class="checkbox-cell"></th>
-              <th class="roll-cell">Roll No.</th>
+              <th class="roll-cell">Registration Number</th>
               <th class="name-cell">Name</th>
               <th class="status-cell">Status</th>
             </tr>
           </thead>
           <tbody>
             {% for row in student_rows %}
-              <tr data-student-id="{{ row.student.id }}">
-                <td class="checkbox-cell">
-                  <input type="checkbox" name="present" value="{{ row.student.id }}" 
-                         {% if row.status == 'present' %}checked{% endif %}
-                         onchange="updateStudentStatus(this)">
-                </td>
-                <td class="roll-cell">{{ row.student.roll_no }}</td>
-                <td class="name-cell">{{ row.student.full_name }}</td>
-                <td class="status-cell">
-                  <span class="toggle-switch {% if row.status == 'present' %}present{% else %}absent{% endif %}">
-                    <span class="toggle-dot"></span>
-                    {% if row.status == 'present' %}Present{% else %}Absent{% endif %}
-                  </span>
-                </td>
-              </tr>
+            <tr data-student-id="{{ row.student.id }}">
+              <td class="checkbox-cell">
+                <input type="checkbox" name="present" value="{{ row.student.id }}" {% if row.status=='present'
+                  %}checked{% endif %} onchange="updateStudentStatus(this)">
+              </td>
+              <td class="roll-cell">{{ row.student.registration_number }}</td>
+              <td class="name-cell">{{ row.student.full_name }}</td>
+              <td class="status-cell">
+                <span class="toggle-switch {% if row.status == 'present' %}present{% else %}absent{% endif %}">
+                  <span class="toggle-dot"></span>
+                  {% if row.status == 'present' %}Present{% else %}Absent{% endif %}
+                </span>
+              </td>
+            </tr>
             {% endfor %}
           </tbody>
         </table>
-        
+
         <div class="submit-section">
           <button type="button" class="btn-submit" onclick="openConfirmModal()">Submit</button>
         </div>
@@ -704,7 +706,7 @@
       <div class="absentees-summary" id="absenteesSummary"></div>
       <div class="absentees-list" id="absenteesList">
         <div class="absentees-list-header">
-          <span>Roll No</span>
+          <span>Registration Number</span>
           <span>Name</span>
         </div>
       </div>
@@ -715,7 +717,8 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="modal-btn modal-btn-secondary" onclick="closeConfirmModal()">Cancel</button>
-      <button type="button" class="modal-btn modal-btn-primary" id="finalSubmitBtn" disabled onclick="submitAttendance()">Submit and Send Mail</button>
+      <button type="button" class="modal-btn modal-btn-primary" id="finalSubmitBtn" disabled
+        onclick="submitAttendance()">Submit and Send Mail</button>
     </div>
   </div>
 </div>
@@ -725,12 +728,12 @@
   function updateFileName(input) {
     const fileName = input.files[0]?.name || 'No file chosen';
   }
-  
+
   // Update student status visual
   function updateStudentStatus(checkbox) {
     const row = checkbox.closest('tr');
     const statusCell = row.querySelector('.status-cell .toggle-switch');
-    
+
     if (checkbox.checked) {
       statusCell.classList.remove('absent');
       statusCell.classList.add('present');
@@ -740,20 +743,20 @@
       statusCell.classList.add('absent');
       statusCell.innerHTML = '<span class="toggle-dot"></span>Absent';
     }
-    
+
     updateCounts();
   }
-  
+
   // Update present/absent counts
   function updateCounts() {
     const checkboxes = document.querySelectorAll('input[name="present"]');
     const present = Array.from(checkboxes).filter(cb => cb.checked).length;
     const absent = checkboxes.length - present;
-    
+
     document.getElementById('presentCount').textContent = present + ' Present';
     document.getElementById('absentCount').textContent = absent + ' Absent';
   }
-  
+
   // Mark all present
   function markAllPresent() {
     document.querySelectorAll('input[name="present"]').forEach(cb => {
@@ -761,7 +764,7 @@
       updateStudentStatus(cb);
     });
   }
-  
+
   // Mark all absent
   function markAllAbsent() {
     document.querySelectorAll('input[name="present"]').forEach(cb => {
@@ -769,7 +772,7 @@
       updateStudentStatus(cb);
     });
   }
-  
+
   // Mark remaining absent
   function markRemainingAbsent() {
     document.querySelectorAll('input[name="present"]').forEach(cb => {
@@ -782,36 +785,36 @@
     actionInput.value = 'mark_remaining_absent';
     form.submit();
   }
-  
+
   // Initialize counts
   updateCounts();
-  
+
   // Modal functions
   let expectedPresentCount = 0;
-  
+
   function openConfirmModal() {
     const rows = document.querySelectorAll('.attendance-table tbody tr');
     const absentees = [];
     let presentCount = 0;
-    
+
     rows.forEach(row => {
       const checkbox = row.querySelector('input[type="checkbox"]');
       const roll = row.querySelector('.roll-cell').textContent;
       const name = row.querySelector('.name-cell').textContent;
-      
+
       if (checkbox.checked) {
         presentCount++;
       } else {
         absentees.push({ roll, name });
       }
     });
-    
+
     expectedPresentCount = presentCount;
-    
+
     // Update summary
-    document.getElementById('absenteesSummary').textContent = 
+    document.getElementById('absenteesSummary').textContent =
       `Total students: ${rows.length} | Present: ${presentCount} | Absent: ${absentees.length}`;
-    
+
     // Update absentees list
     const listContainer = document.getElementById('absenteesList');
     listContainer.innerHTML = `
@@ -820,7 +823,7 @@
         <span>Name</span>
       </div>
     `;
-    
+
     if (absentees.length === 0) {
       listContainer.innerHTML += '<div style="text-align: center; color: #94a3b8; padding: 12px;">No absentees. Everyone is present.</div>';
     } else {
@@ -833,42 +836,42 @@
         `;
       });
     }
-    
+
     // Reset input and button
     document.getElementById('presentConfirm').value = '';
     document.getElementById('finalSubmitBtn').disabled = true;
-    
+
     // Show modal
     document.getElementById('confirmModal').classList.add('show');
   }
-  
+
   function closeConfirmModal() {
     document.getElementById('confirmModal').classList.remove('show');
   }
-  
+
   function submitAttendance() {
     document.getElementById('attendanceForm').submit();
   }
-  
+
   // Validate present count input
-  document.getElementById('presentConfirm').addEventListener('input', function() {
+  document.getElementById('presentConfirm').addEventListener('input', function () {
     const value = parseInt(this.value, 10);
     document.getElementById('finalSubmitBtn').disabled = (value !== expectedPresentCount);
   });
-  
+
   // Mode switching
   let currentMode = 'snapshot';
   const snapshotModeBtn = document.getElementById('snapshotMode');
   const liveModeBtn = document.getElementById('liveMode');
   const snapshotControls = document.getElementById('snapshotControls');
   const liveControls = document.getElementById('liveControls');
-  
+
   snapshotModeBtn.addEventListener('click', () => setMode('snapshot'));
   liveModeBtn.addEventListener('click', () => setMode('live'));
-  
+
   function setMode(mode) {
     currentMode = mode;
-    
+
     if (mode === 'snapshot') {
       snapshotModeBtn.classList.add('active');
       liveModeBtn.classList.remove('active');
@@ -882,11 +885,11 @@
       liveControls.style.display = 'block';
       document.getElementById('captureBtn').style.display = 'none';
     }
-    
+
     // Update button states based on camera
     updateCameraButtonStates();
   }
-  
+
   // Camera functionality
   let stream = null;
   let liveInterval = null;
@@ -899,10 +902,10 @@
   const cameraStatus = document.getElementById('cameraStatus');
   const startLiveBtn = document.getElementById('startLiveBtn');
   const stopLiveBtn = document.getElementById('stopLiveBtn');
-  
+
   function updateCameraButtonStates() {
     const hasStream = !!stream;
-    
+
     if (currentMode === 'snapshot') {
       captureBtn.disabled = !hasStream;
       startLiveBtn.disabled = true;
@@ -910,11 +913,11 @@
       captureBtn.disabled = true;
       startLiveBtn.disabled = !hasStream;
     }
-    
+
     stopBtn.disabled = !hasStream;
     startBtn.disabled = hasStream;
   }
-  
+
   startBtn.addEventListener('click', async () => {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -922,20 +925,20 @@
       video.style.display = 'block';
       placeholder.style.display = 'none';
       video.play();
-      
+
       updateCameraButtonStates();
       cameraStatus.textContent = '';
     } catch (err) {
       cameraStatus.textContent = 'Camera error: ' + err.message;
     }
   });
-  
+
   stopBtn.addEventListener('click', () => {
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
       stream = null;
     }
-    
+
     // Stop live detection if running
     if (liveInterval) {
       clearInterval(liveInterval);
@@ -943,32 +946,32 @@
       startLiveBtn.style.display = 'inline-block';
       stopLiveBtn.style.display = 'none';
     }
-    
+
     video.style.display = 'none';
     placeholder.style.display = 'flex';
     cameraStatus.textContent = '';
-    
+
     updateCameraButtonStates();
   });
-  
+
   captureBtn.addEventListener('click', () => {
     if (!stream) return;
-    
+
     const canvas = document.createElement('canvas');
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext('2d').drawImage(video, 0, 0);
-    
+
     canvas.toBlob(blob => {
       const file = new File([blob], 'capture.jpg', { type: 'image/jpeg' });
       const dt = new DataTransfer();
       dt.items.add(file);
       document.getElementById('photoInput').files = dt.files;
-      
+
       // Show inline message instead of alert
       cameraStatus.textContent = 'Photo captured! Click "Upload Photo + Auto Mark" to submit.';
       cameraStatus.classList.add('success');
-      
+
       // Clear message after 3 seconds
       setTimeout(() => {
         cameraStatus.textContent = '';
@@ -976,27 +979,27 @@
       }, 3000);
     }, 'image/jpeg');
   });
-  
+
   // Live mode detection
   startLiveBtn.addEventListener('click', () => {
     startLiveBtn.style.display = 'none';
     stopLiveBtn.style.display = 'inline-block';
-    
+
     // Simulate live detection
     cameraStatus.textContent = 'Live detection started...';
-    
+
     // Send frames to server every second
     liveInterval = setInterval(() => {
       if (!stream || !video.videoWidth) return;
-      
+
       const canvas = document.getElementById('liveCanvas');
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       canvas.getContext('2d').drawImage(video, 0, 0);
-      
+
       // Convert to base64 and send
       const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-      
+
       fetch("{% url 'live_attendance_frame' session_id=session.id %}", {
         method: 'POST',
         headers: {
@@ -1005,22 +1008,22 @@
         },
         body: JSON.stringify({ image: dataUrl })
       })
-      .then(r => r.json())
-      .then(data => {
-        if (data.ok) {
-          cameraStatus.textContent = `Faces: ${data.faces_detected} | Marked: ${data.newly_marked}`;
-          // Refresh the page to show updated attendance
-          if (data.newly_marked > 0) {
-            window.location.reload();
+        .then(r => r.json())
+        .then(data => {
+          if (data.ok) {
+            cameraStatus.textContent = `Faces: ${data.faces_detected} | Marked: ${data.newly_marked}`;
+            // Refresh the page to show updated attendance
+            if (data.newly_marked > 0) {
+              window.location.reload();
+            }
           }
-        }
-      })
-      .catch(() => {
-        // Silent fail - don't spam errors
-      });
+        })
+        .catch(() => {
+          // Silent fail - don't spam errors
+        });
     }, 1000);
   });
-  
+
   stopLiveBtn.addEventListener('click', () => {
     if (liveInterval) {
       clearInterval(liveInterval);
@@ -1030,7 +1033,7 @@
     stopLiveBtn.style.display = 'none';
     cameraStatus.textContent = 'Live detection stopped';
   });
-  
+
   // Initialize button states
   updateCameraButtonStates();
 </script>

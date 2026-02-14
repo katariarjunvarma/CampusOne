@@ -2,39 +2,46 @@
 {% block title %}Smart LPU - Dashboard{% endblock %}
 
 {% block content %}
-  <div class="glass-strong p-4 p-md-5 mb-4">
-    <h1 class="h4 mb-2">Dashboard</h1>
-  </div>
+<div class="glass-strong p-4 p-md-5 mb-4">
+  <h1 class="h4 mb-2">Dashboard</h1>
+</div>
 
-  <div class="row g-3">
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="glass-strong p-4 h-100">
-        <div class="fw-semibold mb-1">Mark Attendance</div>
-        <div class="smart-muted small mb-3">Create sessions and mark attendance (manual + face).</div>
-        <a class="btn btn-light-blue" href="{% url 'attendance_home' %}">Open</a>
+<div class="row g-3">
+  <!-- Mark Attendance - Only for regular users/teachers (not stall owners, not superusers) -->
+  {% if not is_stall_owner and not user.is_superuser %}
+  <div class="col-12 col-md-6">
+    <div class="glass-strong p-4 h-100">
+      <div class="fw-semibold mb-1">Mark Attendance</div>
+      <div class="smart-muted small mb-3">Record your attendance for active sessions.</div>
+      <div class="d-flex gap-2">
+        <a class="btn btn-light-blue" href="{% url 'attendance_home' %}">Mark Attendance</a>
       </div>
     </div>
+  </div>
+  {% endif %}
 
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="glass-strong p-4 h-100">
-        <div class="fw-semibold mb-1">Food Order</div>
-        <div class="smart-muted small mb-3">Pre-order meals from campus canteens and stalls.</div>
-        {% if recent_food_orders %}
-          <div class="mb-3">
-            <div class="small fw-semibold mb-2">Recent Orders:</div>
-            {% for order in recent_food_orders %}
-              <div class="d-flex justify-content-between align-items-center py-1 border-bottom">
-                <span class="small">{{ order.food_item.name }} ({{ order.quantity }})</span>
-                <span class="badge {% if order.status == 'pending' %}bg-warning{% elif order.status == 'ready' %}bg-success{% elif order.status == 'collected' %}bg-primary{% else %}bg-danger{% endif %}">{{ order.get_status_display }}</span>
-              </div>
-            {% endfor %}
-          </div>
-        {% endif %}
-        <div class="d-flex gap-2">
-          <a class="btn btn-light-blue" href="{% url 'food:create_order' %}">Place Order</a>
-          <a class="btn btn-light-blue" href="{% url 'food:my_orders' %}">View Orders</a>
+  <div class="col-12 col-md-6">
+    <div class="glass-strong p-4 h-100">
+      <div class="fw-semibold mb-1">Food Order</div>
+      <div class="smart-muted small mb-3">Pre-order meals from campus canteens and stalls.</div>
+      {% if recent_food_orders %}
+      <div class="mb-3">
+        <div class="small fw-semibold mb-2 text-success">Orders to Pickup:</div>
+        {% for order in recent_food_orders %}
+        <div class="d-flex justify-content-between align-items-center py-1 border-bottom">
+          <span class="small">{{ order.food_item.name }} ({{ order.quantity }})</span>
+          <span
+            class="badge {% if order.status == 'pending' %}bg-warning{% elif order.status == 'ready' %}bg-success{% elif order.status == 'collected' %}bg-primary{% else %}bg-danger{% endif %}">{{
+            order.get_status_display }}</span>
         </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <div class="d-flex gap-2">
+        <a class="btn btn-light-blue" href="{% url 'food:create_order' %}">Place Order</a>
+        <a class="btn btn-light-blue" href="{% url 'food:my_orders' %}">View Orders</a>
       </div>
     </div>
   </div>
+</div>
 {% endblock %}

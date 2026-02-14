@@ -1,14 +1,19 @@
 from django.db import models
+from django.core.validators import RegexValidator
 
 class Student(models.Model):
-    roll_no = models.CharField(max_length=32, unique=True)
+    registration_number = models.CharField(
+        max_length=6, 
+        unique=True,
+        validators=[RegexValidator(r'^\d{6}$', 'Registration number must be 6 digits')]
+    )
     full_name = models.CharField(max_length=128)
     email = models.EmailField(blank=True)
     parent_email = models.EmailField(blank=True)
     parent_phone = models.CharField(max_length=32, blank=True)
 
     def __str__(self) -> str:
-        return f"{self.roll_no} - {self.full_name}"
+        return f"{self.registration_number} - {self.full_name}"
 
 
 class Course(models.Model):
@@ -27,7 +32,7 @@ class Enrollment(models.Model):
         unique_together = ("student", "course")
 
     def __str__(self) -> str:
-        return f"{self.student.roll_no} -> {self.course.code}"
+        return f"{self.student.registration_number} -> {self.course.code}"
 
 
 class AttendanceSession(models.Model):
@@ -61,7 +66,7 @@ class AttendanceRecord(models.Model):
         unique_together = ("session", "student")
 
     def __str__(self) -> str:
-        return f"{self.session_id} {self.student.roll_no} {self.status}"
+        return f"{self.session_id} {self.student.registration_number} {self.status}"
 
 
 class Notification(models.Model):
@@ -71,11 +76,11 @@ class Notification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return f"{self.recipient_student.roll_no} {self.channel}"
+        return f"{self.recipient_student.registration_number} {self.channel}"
 
 
 def face_sample_upload_to(instance: "FaceSample", filename: str) -> str:
-    return f"faces/{instance.student.roll_no}/{filename}"
+    return f"faces/{instance.student.registration_number}/{filename}"
 
 
 class FaceSample(models.Model):
@@ -84,6 +89,6 @@ class FaceSample(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return f"{self.student.roll_no} sample"
+        return f"{self.student.registration_number} sample"
 
 

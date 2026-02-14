@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Bulk Orders - {{ stall.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Bulk Orders</h1>
+            <h5 class="text-primary mb-2">{{ stall.name }}</h5>
+            <p class="text-muted mb-0">View incoming bulk order requests</p>
+        </div>
+        <a href="{% url 'food:vendor_dashboard' %}" class="btn btn-outline-secondary">
+            Back to Dashboard
+        </a>
+    </div>
+
+    {% if bulk_orders %}
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Event</th>
+                        <th>Contact</th>
+                        <th>People</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bo in bulk_orders %}
+                    <tr>
+                        <td>
+                            <div class="fw-medium">{{ bo.delivery_date|date:"M d, Y" }}</div>
+                            <small class="text-muted">{{ bo.slot.start_time|time:"H:i" }}</small>
+                        </td>
+                        <td>
+                            <div class="fw-semibold">{{ bo.event_name }}</div>
+                        </td>
+                        <td>
+                            <div>{{ bo.contact_person }}</div>
+                            <small class="text-muted">
+                                {% if bo.contact_phone %}
+                                {{ bo.contact_phone }}
+                                {% else %}
+                                NA
+                                {% endif %}
+                            </small>
+                        </td>
+                        <td>{{ bo.people_count }}</td>
+                        <td>
+                            {% if bo.status == 'submitted' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif bo.status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                            {% elif bo.status == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                            {% elif bo.status == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ bo.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal"
+                                data-bs-target="#orderModal{{ bo.id }}">
+                                View Details
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="orderModal{{ bo.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content shadow-lg border-0 rounded-4">
+                                        <div class="modal-header border-0 pb-0">
+                                            <h5 class="modal-title fw-bold">Bulk Order Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-center p-4">
+                                            <div class="mb-3">
+                                                <div class="h2 mb-1 fw-bold text-primary">{{ bo.event_name }}</div>
+                                                <div class="text-muted small">
+                                                    Order #{{ bo.id }}
+                                                </div>
+                                            </div>
+
+                                            <div class="card bg-light border-0 p-3 mb-3 rounded-3 text-start">
+                                                <div class="row g-2">
+                                                    <div class="col-6">
+                                                        <small class="text-uppercase text-muted fw-bold"
+                                                            style="font-size: 0.7rem;">Delivery Date</small>
+                                                        <div class="fw-medium">{{ bo.delivery_date|date:"D, M d" }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <small class="text-uppercase text-muted fw-bold"
+                                                            style="font-size: 0.7rem;">Time</small>
+                                                        <div class="fw-medium">
+                                                            {{ bo.slot.start_time|time:"H:i" }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <small class="text-uppercase text-muted fw-bold"
+                                                            style="font-size: 0.7rem;">People</small>
+                                                        <div class="fw-medium">{{ bo.people_count }}</div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <small class="text-uppercase text-muted fw-bold"
+                                                            style="font-size: 0.7rem;">Status</small>
+                                                        <div>
+                                                            {% if bo.status == 'submitted' %}
+                                                            <span class="badge bg-warning text-dark">Pending</span>
+                                                            {% elif bo.status == 'approved' %}
+                                                            <span class="badge bg-success">Approved</span>
+                                                            {% elif bo.status == 'rejected' %}
+                                                            <span class="badge bg-danger">Rejected</span>
+                                                            {% elif bo.status == 'completed' %}
+                                                            <span class="badge bg-success">Completed</span>
+                                                            {% else %}
+                                                            <span class="badge bg-secondary">{{ bo.get_status_display
+                                                                }}</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="text-start mb-3">
+                                                <small class="text-uppercase text-muted fw-bold"
+                                                    style="font-size: 0.7rem;">Contact Person</small>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="fw-medium">{{ bo.contact_person }}</div>
+                                                    {% if bo.contact_phone %}
+                                                    <span class="badge bg-secondary">
+                                                        📞 {{ bo.contact_phone }}
+                                                    </span>
+                                                    {% else %}
+                                                    <span class="badge bg-secondary">NA</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+
+                                            <div class="text-start">
+                                                <small class="text-uppercase text-muted fw-bold"
+                                                    style="font-size: 0.7rem;">Special Instructions</small>
+                                                <div class="p-3 rounded-3 bg-white border mt-1 text-muted small">
+                                                    {% if bo.special_instructions %}
+                                                    {{ bo.special_instructions }}
+                                                    {% else %}
+                                                    NA
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="modal-footer border-0 pt-0 pb-4 px-4 d-flex justify-content-between">
+                                            <button type="button" class="btn btn-light"
+                                                data-bs-dismiss="modal">Close</button>
+
+                                            {% if bo.status == 'submitted' %}
+                                            <div class="d-flex gap-2">
+                                                <form method="post" action="{% url 'food:vendor_update_bulk_status' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="order_id" value="{{ bo.id }}">
+                                                    <input type="hidden" name="status" value="rejected">
+                                                    <button type="submit" class="btn btn-outline-danger">Reject</button>
+                                                </form>
+                                                <form method="post" action="{% url 'food:vendor_update_bulk_status' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="order_id" value="{{ bo.id }}">
+                                                    <input type="hidden" name="status" value="approved">
+                                                    <button type="submit" class="btn btn-primary">Approve</button>
+                                                </form>
+                                            </div>
+                                            {% elif bo.status == 'approved' %}
+                                            <form method="post" action="{% url 'food:vendor_update_bulk_status' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="order_id" value="{{ bo.id }}">
+                                                <input type="hidden" name="status" value="completed">
+                                                <button type="submit" class="btn btn-success text-white">Mark as
+                                                    Completed</button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="card shadow-sm border-0 text-center py-5">
+        <div class="card-body">
+            <div class="mb-3 text-muted display-4">📋</div>
+            <h5 class="text-secondary">No Bulk Orders Yet</h5>
+            <p class="text-muted">Any bulk order requests from students or staff will appear here.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

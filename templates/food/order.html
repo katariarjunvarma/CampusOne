@@ -3,37 +3,39 @@
 {% block title %}Food Pre-Order{% endblock %}
 
 {% block head %}
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui"] },
-          colors: {
-            smart: {
-              blue: "#2563EB",
-              bg: "#F8FAFC",
-              light: "#EFF6FF",
-              text: "#1E293B",
-            },
-          },
-          boxShadow: {
-            soft: "0 10px 30px rgba(15, 23, 42, 0.08)",
-            softer: "0 6px 16px rgba(15, 23, 42, 0.06)",
-          },
-          borderRadius: {
-            xl2: "16px",
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui"] },
+        colors: {
+          smart: {
+            blue: "#2563EB",
+            bg: "#F8FAFC",
+            light: "#EFF6FF",
+            text: "#1E293B",
           },
         },
+        boxShadow: {
+          soft: "0 10px 30px rgba(15, 23, 42, 0.08)",
+          softer: "0 6px 16px rgba(15, 23, 42, 0.06)",
+        },
+        borderRadius: {
+          xl2: "16px",
+        },
       },
-    };
-  </script>
-  <style>
-    .pos-page * { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif; }
-  </style>
+    },
+  };
+</script>
+<style>
+  .pos-page * {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -48,14 +50,22 @@
             <span class="text-slate-600">{{ loyalty.total_points|default:0 }} reward points</span>
             <span class="text-slate-300">|</span>
             <span class="text-slate-500">₹{{ loyalty.rupee_value|default:0 }} value</span>
-            <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded text-xs font-medium ml-1" onclick="document.getElementById('rewardInfoModal').showModal()">How to earn?</button>
+            <button type="button"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded text-xs font-medium ml-1"
+              onclick="document.getElementById('rewardInfoModal').showModal()">How to earn?</button>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-medium text-sm" href="{% url 'food:food_dashboard' %}">Dashboard</a>
-          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-medium text-sm" href="{% url 'food:my_orders' %}">My Orders</a>
-          <button type="button" class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-medium text-sm text-warning" data-bs-toggle="modal" data-bs-target="#bulkOrderModal">Bulk Order</button>
-          <button type="button" class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-medium text-sm text-info" data-bs-toggle="modal" data-bs-target="#instructionsModal">Instructions & Penalty</button>
+          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-medium text-sm"
+            href="{% url 'food:food_dashboard' %}">Dashboard</a>
+          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-medium text-sm"
+            href="{% url 'food:my_orders' %}">My Orders</a>
+          <button type="button"
+            class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-medium text-sm text-warning"
+            data-bs-toggle="modal" data-bs-target="#bulkOrderModal">Bulk Order</button>
+          <button type="button"
+            class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition font-medium text-sm text-info"
+            data-bs-toggle="modal" data-bs-target="#instructionsModal">Instructions & Penalty</button>
         </div>
       </div>
 
@@ -63,61 +73,66 @@
         <div class="relative flex-1 min-w-[400px]">
           <div class="absolute inset-y-0 left-3 flex items-center text-slate-400">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-80">
-              <path d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <path d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" />
             </svg>
           </div>
-          <input id="menuSearch" class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate-200 shadow-softer focus:outline-none focus:ring-2 focus:ring-smart-blue/25 text-base text-slate-800 placeholder:text-slate-400" placeholder="Search for items, canteens..." type="text" />
+          <input id="menuSearch"
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate-200 shadow-softer focus:outline-none focus:ring-2 focus:ring-smart-blue/25 text-base text-slate-800 placeholder:text-slate-400"
+            placeholder="Search for items, canteens..." type="text" />
         </div>
 
-        <select id="locationFilter" class="px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-base focus:outline-none focus:ring-2 focus:ring-smart-blue/25 min-w-[180px]">
+        <select id="locationFilter"
+          class="px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-base focus:outline-none focus:ring-2 focus:ring-smart-blue/25 min-w-[180px]">
           <option value="">All Locations</option>
           {% for loc in locations %}
-            <option value="{{ loc|lower }}">{{ loc }}</option>
+          <option value="{{ loc|lower }}">{{ loc }}</option>
           {% endfor %}
         </select>
       </div>
 
       <div class="mt-3 flex items-center gap-2 overflow-auto shrink-0 pb-1" id="categoryList">
-        <button type="button" data-category="All Items" class="shrink-0 px-3 py-1.5 rounded-lg bg-smart-light text-smart-blue font-semibold text-sm">All Items</button>
+        <button type="button" data-category="All Items"
+          class="shrink-0 px-3 py-1.5 rounded-lg bg-smart-light text-smart-blue font-semibold text-sm">All
+          Items</button>
         {% for c in categories %}
-          {% if c and c != 'All Items' %}
-            <button type="button" data-category="{{ c }}" class="shrink-0 px-3 py-1.5 rounded-lg border border-slate-200 font-semibold hover:bg-slate-50 transition text-sm">{{ c }}</button>
-          {% endif %}
+        {% if c and c != 'All Items' %}
+        <button type="button" data-category="{{ c }}"
+          class="shrink-0 px-3 py-1.5 rounded-lg border border-slate-200 font-semibold hover:bg-slate-50 transition text-sm">{{ c }}</button>
+        {% endif %}
         {% endfor %}
       </div>
 
       <div class="mt-4">
         <div class="grid grid-cols-3 gap-3" id="menuGrid">
           {% for item in items %}
-            <article
-              class="group rounded-xl bg-white border border-slate-100 shadow-softer hover:shadow-soft hover:-translate-y-[1px] transition-all overflow-hidden"
-              data-id="{{ item.id }}"
-              data-name="{{ item.name|lower }}"
-              data-stall="{{ item.stall_name|lower }}"
-              data-location="{{ item.location|lower }}"
-              data-category="{{ item.category }}"
-              data-price="{{ item.price }}"
-            >
-              <div class="p-3">
-                <div class="flex items-start justify-between gap-2">
-                  <div class="min-w-0">
-                    <div class="font-semibold leading-tight text-sm truncate">{{ item.name }}</div>
-                    <div class="text-xs text-slate-500 mt-0.5 truncate">{{ item.stall_name }}</div>
-                    <div class="text-xs text-slate-400 truncate">{{ item.location }}</div>
-                  </div>
-                  <button type="button" class="addBtn shrink-0 h-8 w-8 rounded-lg bg-smart-blue text-white grid place-items-center shadow-softer hover:brightness-95 transition" aria-label="Add" title="Add">
-                    <span class="text-lg leading-none">+</span>
-                  </button>
+          <article
+            class="group rounded-xl bg-white border border-slate-100 shadow-softer hover:shadow-soft hover:-translate-y-[1px] transition-all overflow-hidden"
+            data-id="{{ item.id }}" data-name="{{ item.name|lower }}" data-stall="{{ item.stall_name|lower }}"
+            data-location="{{ item.location|lower }}" data-category="{{ item.category }}" data-price="{{ item.price }}">
+            <div class="p-3">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <div class="font-semibold leading-tight text-sm truncate">{{ item.name }}</div>
+                  <div class="text-xs text-slate-500 mt-0.5 truncate">{{ item.stall_name }}</div>
+                  <div class="text-xs text-slate-400 truncate">{{ item.location }}</div>
                 </div>
-                <div class="mt-3 flex items-center justify-between">
-                  <div class="text-sm font-semibold text-smart-blue">₹{{ item.price|floatformat:0 }}</div>
-                </div>
+                <button type="button"
+                  class="addBtn shrink-0 h-8 w-8 rounded-lg bg-smart-blue text-white grid place-items-center shadow-softer hover:brightness-95 transition"
+                  aria-label="Add" title="Add">
+                  <span class="text-lg leading-none">+</span>
+                </button>
               </div>
-            </article>
+              <div class="mt-3 flex items-center justify-between">
+                <div class="text-sm font-semibold text-smart-blue">₹{{ item.price|floatformat:0 }}</div>
+              </div>
+            </div>
+          </article>
           {% endfor %}
         </div>
 
-        <div id="emptyState" class="hidden rounded-xl border border-dashed border-slate-200 p-6 text-center text-slate-500 mt-4">
+        <div id="emptyState"
+          class="hidden rounded-xl border border-dashed border-slate-200 p-6 text-center text-slate-500 mt-4">
           No items found.
         </div>
       </div>
@@ -127,7 +142,8 @@
       <div class="rounded-xl2 bg-white shadow-soft p-4 flex flex-col">
         <div class="flex items-center justify-between shrink-0">
           <h2 class="text-lg font-bold">Order For Today</h2>
-          <span id="cartCount" class="text-xs font-semibold bg-smart-light text-smart-blue px-2 py-1 rounded-lg">0 items</span>
+          <span id="cartCount" class="text-xs font-semibold bg-smart-light text-smart-blue px-2 py-1 rounded-lg">0
+            items</span>
         </div>
 
         <div id="cartList" class="mt-3 space-y-2 max-h-[280px] overflow-auto"></div>
@@ -139,10 +155,12 @@
 
           <div>
             <label class="text-sm font-semibold">Break Slot</label>
-            <select name="slot" id="slotSelect" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-smart-blue/25 text-sm" required>
+            <select name="slot" id="slotSelect"
+              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-smart-blue/25 text-sm"
+              required>
               <option value="">Select a break slot</option>
               {% for s in slots %}
-                <option value="{{ s.id }}">{{ s.start_time }} - {{ s.end_time }}</option>
+              <option value="{{ s.id }}">{{ s.start_time }} - {{ s.end_time }}</option>
               {% endfor %}
             </select>
           </div>
@@ -152,7 +170,7 @@
             <div class="mt-1 flex gap-3">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input type="radio" name="packaging" value="eat" checked class="accent-smart-blue" />
-                <span class="text-sm">Eat there only</span>
+                <span class="text-sm">Dine-in</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
                 <input type="radio" name="packaging" value="parcel" class="accent-smart-blue" />
@@ -181,17 +199,22 @@
             </div>
           </div>
 
-          <button id="redeemBtn" type="button" class="w-full rounded-xl bg-amber-100 text-amber-700 border border-amber-300 py-2 font-semibold hover:bg-amber-200 transition text-sm" onclick="toggleRedeemPoints()">
+          <button id="redeemBtn" type="button"
+            class="w-full rounded-xl bg-amber-100 text-amber-700 border border-amber-300 py-2 font-semibold hover:bg-amber-200 transition text-sm"
+            onclick="toggleRedeemPoints()">
             Redeem Points ({{ loyalty.total_points|default:0 }} available)
           </button>
 
-          <button id="placeBtn" type="submit" class="w-full rounded-xl bg-smart-blue text-white py-2.5 font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm" disabled>
+          <button id="placeBtn" type="submit"
+            class="w-full rounded-xl bg-smart-blue text-white py-2.5 font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            disabled>
             Place Order
           </button>
 
           <div class="text-xs text-slate-500 text-center space-y-1">
             <div>Do Payment at stalls during pickup</div>
-            <div><span class="font-semibold text-amber-600">Note:</span> Orders must be from a single stall only. Multi-stall orders are not allowed.</div>
+            <div><span class="font-semibold text-amber-600">Note:</span> Orders must be from a single stall only.
+              Multi-stall orders are not allowed.</div>
           </div>
           <div id="cartError" class="hidden text-xs text-rose-600 text-center bg-rose-50 rounded-lg p-2"></div>
         </form>
@@ -220,7 +243,7 @@
   let activeCategory = 'All Items';
   const cart = new Map();
   const cartError = document.getElementById('cartError');
-  
+
   let isRedeeming = false;
   let availablePoints = parseInt('{{ loyalty.total_points|default:0 }}') || 0;
   const MIN_REDEEM_POINTS = 20;
@@ -262,12 +285,12 @@
   function computeTotals() {
     let itemsSubtotal = 0;
     let totalQty = 0;
-    cart.forEach((x) => { 
-      itemsSubtotal += (Number(x.price) || 0) * (Number(x.qty) || 0); 
+    cart.forEach((x) => {
+      itemsSubtotal += (Number(x.price) || 0) * (Number(x.qty) || 0);
       totalQty += (Number(x.qty) || 0);
     });
     const packingCharge = getPackagingCharge();
-    
+
     // Calculate reward discount if redeeming
     let rewardDiscount = 0;
     let redeemedPts = 0;
@@ -275,9 +298,9 @@
       redeemedPts = Math.min(availablePoints, MAX_REDEEM_POINTS);
       rewardDiscount = redeemedPts * POINT_VALUE;
     }
-    
+
     const total = itemsSubtotal + packingCharge - rewardDiscount;
-    
+
     document.getElementById('itemsSubtotal').textContent = formatINR(itemsSubtotal);
 
     const packingRow = document.getElementById('packingChargeRow');
@@ -285,7 +308,7 @@
     document.getElementById('packingCharge').textContent = formatINR(packingCharge);
     document.getElementById('totalQtyDisplay').textContent = totalQty;
     document.getElementById('packingQtyDisplay').textContent = totalQty;
-    
+
     const rewardRow = document.getElementById('rewardDiscountRow');
     if (isRedeeming && rewardDiscount > 0) {
       rewardRow.classList.remove('hidden');
@@ -296,7 +319,7 @@
       rewardRow.classList.add('hidden');
       redeemedPointsInput.value = 0;
     }
-    
+
     totalEl.textContent = formatINR(Math.max(0, total));
   }
 
@@ -305,14 +328,14 @@
       showCartError(`Need at least ${MIN_REDEEM_POINTS} points to redeem. You have ${availablePoints}.`);
       return;
     }
-    
+
     if (cart.size === 0) {
       showCartError('Add items to cart before redeeming points.');
       return;
     }
-    
+
     isRedeeming = !isRedeeming;
-    
+
     if (isRedeeming) {
       const redeemingPts = Math.min(availablePoints, MAX_REDEEM_POINTS);
       const discount = redeemingPts * POINT_VALUE;
@@ -324,7 +347,7 @@
       redeemBtn.classList.remove('bg-rose-100', 'text-rose-700', 'border-rose-300');
       redeemBtn.classList.add('bg-amber-100', 'text-amber-700', 'border-amber-300');
     }
-    
+
     computeTotals();
   }
 
@@ -482,11 +505,13 @@
 </script>
 
 <!-- Instructions & Penalty Modal -->
-<div class="modal fade" id="instructionsModal" tabindex="-1" aria-labelledby="instructionsModalLabel" aria-hidden="true">
+<div class="modal fade" id="instructionsModal" tabindex="-1" aria-labelledby="instructionsModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.15);">
       <div class="modal-header" style="border-bottom: 1px solid #f1f5f9; padding: 20px 24px;">
-        <h5 class="modal-title" id="instructionsModalLabel" style="font-weight: 600; color: #1e293b; font-size: 18px;">📋 Food Pre-Order Instructions & Penalty Rules</h5>
+        <h5 class="modal-title" id="instructionsModalLabel" style="font-weight: 600; color: #1e293b; font-size: 18px;">
+          📋 Food Pre-Order Instructions & Penalty Rules</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" style="padding: 24px;">
@@ -500,34 +525,57 @@
             <li>Payment is made at the stall during pickup (Cash/UPI)</li>
           </ol>
         </div>
-        
-        <h6 style="font-weight: 600; color: #ef4444; margin-bottom: 12px; font-size: 14px;">⚠️ Penalty for Missed Orders</h6>
-        <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">If you order food but don't pick it up, the stall wastes prepared food. Penalties apply:</p>
-        
+
+        <h6 style="font-weight: 600; color: #ef4444; margin-bottom: 12px; font-size: 14px;">⚠️ Penalty for Missed Orders
+        </h6>
+        <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">If you order food but don't pick it up, the
+          stall wastes prepared food. Penalties apply:</p>
+
         <div style="border: 1px solid #f1f5f9; border-radius: 10px; overflow: hidden; margin-bottom: 16px;">
           <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
             <thead>
               <tr style="background: #f8fafc;">
-                <th style="padding: 10px 14px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e2e8f0;">Missed Orders</th>
-                <th style="padding: 10px 14px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e2e8f0;">Penalty Action</th>
+                <th
+                  style="padding: 10px 14px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e2e8f0;">
+                  Missed Orders</th>
+                <th
+                  style="padding: 10px 14px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e2e8f0;">
+                  Penalty Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9;">1st Miss</td><td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #64748b;">Warning notification</td></tr>
-              <tr><td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9;">2nd Miss</td><td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #64748b;">1-day ordering ban</td></tr>
-              <tr><td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9;">3rd Miss</td><td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #64748b;">3-day ordering ban</td></tr>
-              <tr style="background: #fef2f2;"><td style="padding: 10px 14px; color: #991b1b; font-weight: 500;">4+ Misses</td><td style="padding: 10px 14px; color: #991b1b; font-weight: 500;">1-week ban or account review</td></tr>
+              <tr>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9;">1st Miss</td>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #64748b;">Warning notification
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9;">2nd Miss</td>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #64748b;">1-day ordering ban
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9;">3rd Miss</td>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #64748b;">3-day ordering ban
+                </td>
+              </tr>
+              <tr style="background: #fef2f2;">
+                <td style="padding: 10px 14px; color: #991b1b; font-weight: 500;">4+ Misses</td>
+                <td style="padding: 10px 14px; color: #991b1b; font-weight: 500;">1-week ban or account review</td>
+              </tr>
             </tbody>
           </table>
         </div>
-        
-        <div style="background: #fef3c7; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;">
+
+        <div
+          style="background: #fef3c7; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;">
           <span style="font-weight: 600; color: #92400e; font-size: 13px;">Your Current Penalty Count: </span>
           <span style="color: #92400e; font-size: 13px;">
-            {% if user.preorder_set.exists %}{{ user.preorder_set.first.penalty_count|default:0 }}{% else %}0{% endif %} missed orders
+            {% if user.preorder_set.exists %}{{ user.preorder_set.first.penalty_count|default:0 }}{% else %}0{% endif %}
+            missed orders
           </span>
         </div>
-        
+
         <h6 style="font-weight: 600; color: #22c55e; margin-bottom: 12px; font-size: 14px;">✅ Important Notes</h6>
         <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #475569; line-height: 1.8;">
           <li>Orders must be from a single stall only</li>
@@ -535,10 +583,14 @@
           <li>You will receive an email when your order is ready</li>
           <li>All payments are made at the stall during pickup</li>
           <li>Bulk orders must be placed at least 2 days in advance</li>
+          <li><strong>Order History:</strong> Your past orders are cleared automatically every week.</li>
+          <li><strong>Penalty Reset:</strong> Your missed order count and penalties are reset automatically at the start
+            of every month.</li>
         </ul>
       </div>
       <div class="modal-footer" style="border-top: 1px solid #f1f5f9; padding: 16px 24px;">
-        <button type="button" class="btn" data-bs-dismiss="modal" style="background: #f1f5f9; color: #64748b; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 500;">Close</button>
+        <button type="button" class="btn" data-bs-dismiss="modal"
+          style="background: #f1f5f9; color: #64748b; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 500;">Close</button>
       </div>
     </div>
   </div>
@@ -549,52 +601,64 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.15);">
       <div class="modal-header" style="border-bottom: 1px solid #f1f5f9; padding: 20px 24px;">
-        <h5 class="modal-title" id="bulkOrderModalLabel" style="font-weight: 600; color: #1e293b; font-size: 18px;">🎉 Bulk Order for Events/Groups</h5>
+        <h5 class="modal-title" id="bulkOrderModalLabel" style="font-weight: 600; color: #1e293b; font-size: 18px;">🎉
+          Bulk Order for Events/Groups</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" style="padding: 24px;">
         <form id="bulkOrderForm">
           <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
             <div>
-              <label style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Event/Group Name</label>
+              <label
+                style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Event/Group
+                Name</label>
               <input type="text" id="eventName" placeholder="e.g., Class Trip, Birthday Party" required
                 style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
             </div>
             <div>
-              <label style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Number of People</label>
-              <input type="number" id="peopleCount" min="5" max="50" placeholder="10" required
+              <label
+                style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Number of
+                People</label>
+              <input type="number" id="peopleCount" min="5" max="80" placeholder="10" required
                 style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
             </div>
             <div>
-              <label style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Delivery Date</label>
+              <label
+                style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Delivery
+                Date</label>
               <input type="date" id="deliveryDate" required
                 style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
             </div>
           </div>
-          
+
           <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
             <div>
-              <label style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Break Slot</label>
+              <label
+                style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Break
+                Slot</label>
               <select id="bulkSlot" required
                 style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: white;">
                 <option value="">Select slot...</option>
                 {% for slot in slots %}
-                  <option value="{{ slot.id }}">{{ slot.name }}</option>
+                <option value="{{ slot.id }}">{{ slot.name }}</option>
                 {% endfor %}
               </select>
             </div>
             <div>
-              <label style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Stall</label>
+              <label
+                style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Stall</label>
               <select id="bulkStall" required
                 style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: white;">
                 <option value="">Select stall...</option>
                 {% for stall in stalls %}
-                  <option value="{{ stall.stall_name }}">{{ stall.stall_name }} - {{ stall.location }}</option>
+                <option value="{{ stall.stall_name }}">{{ stall.stall_name }} - {{ stall.location }}</option>
                 {% endfor %}
               </select>
             </div>
             <div>
-              <label style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Contact Person</label>
+              <label
+                style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Contact
+                Person</label>
               <input type="text" id="contactPerson" placeholder="Your name" required
                 style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
             </div>
@@ -602,23 +666,30 @@
 
           <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 16px;">
             <div>
-              <label style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Contact Number</label>
-              <input type="tel" id="contactPhone" placeholder="Phone number" required
+              <label
+                style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Contact
+                Number</label>
+              <input type="tel" id="contactPhone" placeholder="10-digit mobile number" required pattern="[0-9]{10}"
+                maxlength="10" minlength="10"
                 style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
             </div>
             <div style="display: flex; align-items: flex-end; padding-bottom: 10px;">
-              <span style="font-size: 12px; color: #94a3b8;">Note: Bulk orders must be placed at least 2 days in advance.</span>
+              <span style="font-size: 12px; color: #94a3b8;">Note: Bulk orders must be placed at least 2 days in
+                advance.</span>
             </div>
           </div>
-          
+
           <div style="margin-bottom: 16px;">
-            <label style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Special Instructions</label>
+            <label
+              style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Special
+              Instructions</label>
             <textarea id="specialInstructions" rows="2" placeholder="Any special requirements..."
               style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
           </div>
-          
+
           <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 16px;">
-            <h6 style="font-weight: 600; color: #0369a1; font-size: 14px; margin-bottom: 8px;">🎁 Bulk Order Benefits:</h6>
+            <h6 style="font-weight: 600; color: #0369a1; font-size: 14px; margin-bottom: 8px;">🎁 Bulk Order Benefits:
+            </h6>
             <ul style="margin: 0; padding-left: 18px; font-size: 13px; color: #0c4a6e; line-height: 1.6;">
               <li>10% discount for orders of 20+ people</li>
               <li>Priority preparation for large groups</li>
@@ -627,100 +698,164 @@
           </div>
         </form>
       </div>
-      <div class="modal-footer" style="border-top: 1px solid #f1f5f9; padding: 16px 24px; display: flex; gap: 12px; justify-content: flex-end;">
-        <button type="button" data-bs-dismiss="modal" style="padding: 10px 20px; background: #f1f5f9; color: #64748b; border: none; border-radius: 8px; font-weight: 500;">Cancel</button>
-        <button type="button" onclick="submitBulkOrder()" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: 500;">Submit Bulk Order</button>
+      <div class="modal-footer"
+        style="border-top: 1px solid #f1f5f9; padding: 16px 24px; display: flex; gap: 12px; justify-content: flex-end;">
+        <button type="button" data-bs-dismiss="modal"
+          style="padding: 10px 20px; background: #f1f5f9; color: #64748b; border: none; border-radius: 8px; font-weight: 500;">Cancel</button>
+        <button type="button" onclick="submitBulkOrder()"
+          style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: 500;">Submit
+          Bulk Order</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-  return '';
-}
-
-function formatDateYYYYMMDD(d) {
-  try {
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  } catch (_e) {
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
     return '';
   }
-}
 
-function getMinBulkDeliveryDateStr() {
-  const t = new Date();
-  t.setHours(0, 0, 0, 0);
-  t.setDate(t.getDate() + 2);
-  return formatDateYYYYMMDD(t);
-}
-
-// Enforce min date in the date picker UI
-(function initBulkOrderMinDate() {
-  const el = document.getElementById('deliveryDate');
-  if (!el) return;
-  el.min = getMinBulkDeliveryDateStr();
-})();
-
-function submitBulkOrder() {
-  const form = document.getElementById('bulkOrderForm');
-  if (!form.checkValidity()) {
-    form.reportValidity();
-    return;
+  function formatDateYYYYMMDD(d) {
+    try {
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    } catch (_e) {
+      return '';
+    }
   }
 
-  const deliveryDateStr = document.getElementById('deliveryDate').value;
-  const minDateStr = getMinBulkDeliveryDateStr();
-  if (deliveryDateStr && minDateStr && deliveryDateStr < minDateStr) {
-    alert('Bulk orders must be placed at least 2 days in advance. Please select a later date.');
-    return;
+  function getMinBulkDeliveryDateStr() {
+    const t = new Date();
+    t.setHours(0, 0, 0, 0);
+    t.setDate(t.getDate() + 2);
+    return formatDateYYYYMMDD(t);
   }
-  
-  const bulkData = {
-    event_name: document.getElementById('eventName').value,
-    people_count: Number(document.getElementById('peopleCount').value),
-    delivery_date: deliveryDateStr,
-    slot_id: Number(document.getElementById('bulkSlot').value),
-    stall_name: document.getElementById('bulkStall').value,
-    contact_person: document.getElementById('contactPerson').value,
-    contact_phone: document.getElementById('contactPhone').value,
-    special_instructions: document.getElementById('specialInstructions').value,
-    requested_items: [],
-  };
 
-  fetch("{% url 'food:submit_bulk_order' %}", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": getCookie('csrftoken'),
-    },
-    body: JSON.stringify(bulkData),
-  })
-    .then((r) => r.json())
-    .then((data) => {
-      if (!data || !data.ok) {
-        if (data && data.error === 'too_soon') {
-          alert('Bulk orders must be placed at least 2 days in advance. Please select a later date.');
+  // Enforce min date in the date picker UI
+  (function initBulkOrderMinDate() {
+    const el = document.getElementById('deliveryDate');
+    if (!el) return;
+    el.min = getMinBulkDeliveryDateStr();
+  })();
+
+  function submitBulkOrder() {
+    const form = document.getElementById('bulkOrderForm');
+
+    // Custom Validation
+    const phoneInput = document.getElementById('contactPhone');
+    const peopleInput = document.getElementById('peopleCount');
+
+    if (phoneInput.value.length !== 10 || isNaN(phoneInput.value)) {
+      alert('Please enter a valid 10-digit contact number.');
+      return;
+    }
+
+    if (Number(peopleInput.value) > 80) {
+      alert('Maximum number of people allowed is 80.');
+      return;
+    }
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const deliveryDateStr = document.getElementById('deliveryDate').value;
+    const minDateStr = getMinBulkDeliveryDateStr();
+    if (deliveryDateStr && minDateStr && deliveryDateStr < minDateStr) {
+      alert('Bulk orders must be placed at least 2 days in advance. Please select a later date.');
+      return;
+    }
+
+    const bulkData = {
+      event_name: document.getElementById('eventName').value,
+      people_count: Number(document.getElementById('peopleCount').value),
+      delivery_date: deliveryDateStr,
+      slot_id: Number(document.getElementById('bulkSlot').value),
+      stall_name: document.getElementById('bulkStall').value,
+      contact_person: document.getElementById('contactPerson').value,
+      contact_phone: document.getElementById('contactPhone').value,
+      special_instructions: document.getElementById('specialInstructions').value,
+      requested_items: [],
+    };
+
+    fetch("{% url 'food:submit_bulk_order' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie('csrftoken'),
+      },
+      body: JSON.stringify(bulkData),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data || !data.ok) {
+          if (data && data.error === 'too_soon') {
+            alert('Bulk orders must be placed at least 2 days in advance. Please select a later date.');
+            return;
+          }
+          alert("Could not submit bulk order. Please check details and try again.");
           return;
         }
-        alert("Could not submit bulk order. Please check details and try again.");
-        return;
-      }
-      alert(`Bulk order submitted!\n\nRequest ID: #${data.id}\nEvent: ${bulkData.event_name}\nPeople: ${bulkData.people_count}`);
-      const modal = bootstrap.Modal.getInstance(document.getElementById('bulkOrderModal'));
-      modal.hide();
-    })
-    .catch(() => {
-      alert("Could not submit bulk order. Please try again.");
-    });
-}
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('bulkOrderModal'));
+        modal.hide();
+
+        // Show success modal
+        const successModalEl = document.getElementById('successModal');
+        const successModal = new bootstrap.Modal(successModalEl);
+        document.getElementById('successReqId').innerText = `#${data.id}`;
+        document.getElementById('successEventName').innerText = bulkData.event_name;
+        document.getElementById('successPeopleCount').innerText = bulkData.people_count;
+        successModal.show();
+      })
+      .catch(() => {
+        alert("Could not submit bulk order. Please try again.");
+      });
+  }
 </script>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4 border-0 rounded-4 shadow-lg">
+      <div class="modal-body">
+        <div class="mb-3 text-success">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <h4 class="mb-2 fw-bold text-dark">Order Submitted!</h4>
+        <p class="text-muted mb-4">Your bulk order request has been sent successfully.</p>
+
+        <div class="bg-light p-3 rounded-3 text-start d-inline-block mx-auto mb-4 w-100" style="max-width: 300px;">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="text-muted small">Request ID</span>
+            <span class="fw-semibold text-dark small" id="successReqId">#</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <span class="text-muted small">Event</span>
+            <span class="fw-semibold text-dark small" id="successEventName"></span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">People</span>
+            <span class="fw-semibold text-dark small" id="successPeopleCount"></span>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary w-100 py-2 rounded-3 fw-semibold"
+          data-bs-dismiss="modal">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Reward Points Info Modal -->
 <dialog id="rewardInfoModal" class="rounded-xl p-0 shadow-2xl max-w-md w-full backdrop:bg-black/50">
@@ -728,24 +863,24 @@ function submitBulkOrder() {
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-lg font-bold text-blue-700 flex items-center gap-2">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
         </svg>
         Reward Points Program
       </h3>
       <button onclick="document.getElementById('rewardInfoModal').close()" class="text-slate-400 hover:text-slate-600">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M18 6L6 18M6 6l12 12"/>
+          <path d="M18 6L6 18M6 6l12 12" />
         </svg>
       </button>
     </div>
-    
+
     <div class="space-y-4 text-sm">
       <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <div class="text-blue-800 font-semibold">Current Balance</div>
         <div class="text-2xl font-bold text-blue-700">{{ loyalty.total_points|default:0 }} pts</div>
         <div class="text-blue-600">= ₹{{ loyalty.rupee_value|default:0 }}</div>
       </div>
-      
+
       <div>
         <h4 class="font-semibold text-slate-800 mb-2">How to Earn Points (Auto-Allotted)</h4>
         <table class="w-full text-xs">
@@ -773,7 +908,7 @@ function submitBulkOrder() {
           </tbody>
         </table>
       </div>
-      
+
       <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
         <h4 class="font-semibold text-amber-800 mb-1">How to Redeem</h4>
         <ul class="text-amber-700 text-xs space-y-1">
@@ -784,7 +919,7 @@ function submitBulkOrder() {
           <li>• Maximum 40 points per order (₹10 max discount)</li>
         </ul>
       </div>
-      
+
       {% if loyalty %}
       <div class="text-xs text-slate-500">
         <div class="flex justify-between py-1 border-b border-slate-100">
@@ -804,9 +939,10 @@ function submitBulkOrder() {
       </div>
       {% endif %}
     </div>
-    
+
     <div class="mt-4 text-center">
-      <button onclick="document.getElementById('rewardInfoModal').close()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+      <button onclick="document.getElementById('rewardInfoModal').close()"
+        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
         Got it!
       </button>
     </div>

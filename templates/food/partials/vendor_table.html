@@ -1,0 +1,84 @@
+{% if orders %}
+<div class="table-responsive">
+    <table class="table table-hover align-middle mb-0" style="table-layout: fixed; width: 100%;">
+        <thead class="table-light">
+            <tr>
+                <th style="width: 5%;">S.No</th>
+                <th style="width: 10%;">Order ID</th>
+                <th style="width: 18%;">Slot</th>
+                <th style="width: 18%;">Item</th>
+                <th style="width: 5%;">Qty</th>
+                <th style="width: 10%;">Cost</th>
+                <th style="width: 20%;">Customer</th>
+                {% if status == 'pending' or status == 'cooking' %}
+                <th style="width: 10%;">Type</th>
+                {% endif %}
+                {% if status != 'completed' and status != 'missed' %}
+                <th class="text-end" style="width: 20%;">Action</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr data-order-id="{{ order.id }}">
+                <td class="text-muted">{{ forloop.counter }}</td>
+                <td style="white-space: nowrap;"><span class="fw-medium text-primary">#{{ order.order_number|default:order.id }}</span></td>
+                <td>
+                    <div class="text-truncate" style="max-width: 220px;">
+                        <div class="fw-semibold" style="white-space: nowrap;">{{ order.slot.name }}</div>
+                        <div class="small text-muted" style="white-space: nowrap;">{{ order.slot.start_time|time:"H:i" }} - {{ order.slot.end_time|time:"H:i" }}</div>
+                    </div>
+                </td>
+                <td><div class="fw-semibold text-truncate" style="max-width: 220px;">{{ order.food_item.name }}</div></td>
+                <td>{{ order.quantity }}</td>
+                <td style="white-space: nowrap;"><span class="fw-medium">₹{{ order.item_total }}</span></td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2"
+                            style="width: 32px; height: 32px; flex-shrink: 0;">
+                            <span class="small text-secondary fw-bold">{{ order.ordered_by.username|default:"?"|slice:":1"|upper }}</span>
+                        </div>
+                        <div class="text-truncate" style="max-width: 180px;">{{ order.ordered_by.username|default:"Unknown" }}</div>
+                    </div>
+                </td>
+
+                {% if status == 'pending' or status == 'cooking' %}
+                <td>
+                    {% if order.packaging_option == 'parcel' %}
+                    <span class="badge bg-purple-soft text-purple">Parcel</span>
+                    {% else %}
+                    <span class="badge bg-success-soft text-success">Dine-in</span>
+                    {% endif %}
+                </td>
+                {% endif %}
+
+                {% if status != 'completed' and status != 'missed' %}
+                <td class="text-end">
+                    <div class="d-inline-flex flex-wrap justify-content-end" style="gap: 6px; max-width: 100%;">
+                    {% if status == 'pending' %}
+                    <button type="button" class="btn btn-sm btn-primary"
+                        onclick="updateStatus({{ order.id }}, 'ready')">Cooking Completed</button>
+                    {% elif status == 'cooking' %}
+                    <button type="button" class="btn btn-sm btn-success me-1"
+                        onclick="updateStatus({{ order.id }}, 'ready')">Mark Ready</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                        onclick="updateStatus({{ order.id }}, 'missed')">Mark Missed</button>
+                    {% elif status == 'ready' %}
+                    <button type="button" class="btn btn-sm btn-success me-1"
+                        onclick="updateStatus({{ order.id }}, 'collected')">Picked Up</button>
+                    <button type="button" class="btn btn-sm btn-warning me-1"
+                        onclick="remindUser({{ order.id }})">Remind</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                        onclick="updateStatus({{ order.id }}, 'missed')">Missed</button>
+                    {% endif %}
+                    </div>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<!-- Empty state handling is done in parent template now -->
+{% endif %}

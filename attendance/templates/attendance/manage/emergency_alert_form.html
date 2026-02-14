@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}Smart LPU - {{ title }}{% endblock %}
+
+{% block content %}
+<style>
+  .form-container {
+    padding: 24px 32px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .page-header {
+    margin-bottom: 24px;
+  }
+  .page-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  .form-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1e293b;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+  .form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  .btn-primary {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+  .btn-secondary {
+    padding: 10px 20px;
+    background: #f3f4f6;
+    color: #374151;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 10px;
+  }
+  .btn-secondary:hover {
+    background: #e5e7eb;
+  }
+</style>
+
+<div class="form-container">
+  <div class="page-header">
+    <h1>{{ title }}</h1>
+  </div>
+
+  <div class="form-card">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="title">Alert Title</label>
+        <input type="text" id="title" name="title" required placeholder="e.g., System Maintenance, Important Notice">
+      </div>
+      <div class="form-group">
+        <label for="message">Alert Message</label>
+        <textarea id="message" name="message" required placeholder="Enter the alert message details..."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="severity">Severity</label>
+        <select id="severity" name="severity" required>
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+          <option value="critical">Critical</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="alert_type">Alert Type</label>
+        <select id="alert_type" name="alert_type" required>
+          <option value="general" selected>General</option>
+          <option value="maintenance">Maintenance</option>
+          <option value="emergency">Emergency</option>
+          <option value="info">Information</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-primary">Create Alert</button>
+      <a href="{% url 'manage_emergency_alerts' %}" class="btn-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% block title %}Smart LPU - Super Admin View Attendance{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 text-gray-800">Super Admin: View Student Attendance</h1>
+        <a href="{% url 'manage_dashboard' %}" class="btn btn-secondary btn-sm">Back to Manage</a>
+    </div>
+
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-body p-4">
+            <form method="get" class="row g-3 align-items-center">
+                <div class="col-auto flex-grow-1">
+                    <label for="studentSearch" class="visually-hidden">Student Search</label>
+                    <input type="text" class="form-control py-2 px-3" id="studentSearch" name="q" value="{{ query }}"
+                        placeholder="Enter Student Registration Number or Name">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary py-2 px-4">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if student %}
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center"
+                            style="width: 80px; height: 80px;">
+                            <span class="fs-1 text-secondary">👤</span>
+                        </div>
+                    </div>
+                    <h5 class="card-title">{{ student.full_name }}</h5>
+                    <p class="text-muted mb-1">{{ student.registration_number }}</p>
+                    <p class="text-muted small">{{ student.email }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Overview</h5>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="p-3 border rounded bg-light">
+                                <div class="h3 fw-bold text-primary">{{ stats.total }}</div>
+                                <div class="small text-muted">Total Sessions</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 border rounded bg-light">
+                                <div class="h3 fw-bold text-success">{{ stats.present }}</div>
+                                <div class="small text-muted">Present</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 border rounded bg-light">
+                                <div class="h3 fw-bold text-danger">{{ stats.absent }}</div>
+                                <div class="small text-muted">Absent</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <div
+                            class="display-6 fw-bold {% if stats.percentage >= 75 %}text-success{% elif stats.percentage >= 60 %}text-warning{% else %}text-danger{% endif %}">
+                            {{ stats.percentage }}%
+                        </div>
+                        <div class="small text-muted">Overall Attendance</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            {% if selected_course %}
+            <div>
+                <h5 class="mb-0">Detailed Attendance: {{ selected_course.name }} ({{ selected_course.code }})</h5>
+            </div>
+            <a href="?q={{ query }}" class="btn btn-outline-secondary btn-sm">Back to Course List</a>
+            {% else %}
+            <h5 class="mb-0">Course-wise Attendance Summary</h5>
+            {% endif %}
+        </div>
+
+        <div class="table-responsive">
+            {% if selected_course %}
+            <!-- Detailed View for a Single Course -->
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td>{{ record.session.session_date|date:"M d, Y" }}</td>
+                        <td>{{ record.session.time_slot|default:"-" }}</td>
+                        <td>
+                            {% if record.status == 'present' %}
+                            <span
+                                class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">Present</span>
+                            {% else %}
+                            <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">Absent</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.source == 'face' %}
+                            <span class="badge bg-primary bg-opacity-10 text-primary">Face Scan</span>
+                            {% elif record.source == 'manual' %}
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary">Manual</span>
+                            {% else %}
+                            <span class="text-muted small">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">No attendance records found for this course.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <!-- Summary List of Courses -->
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Course Name</th>
+                        <th>Code</th>
+                        <th class="text-center">Total Classes</th>
+                        <th class="text-center">Present</th>
+                        <th class="text-center">Absent</th>
+                        <th class="text-center">Attendance %</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for summary in course_summaries %}
+                    <tr style="cursor: pointer;"
+                        onclick="window.location.href='?q={{ query }}&course_id={{ summary.course.id }}'">
+                        <td class="fw-medium">{{ summary.course.name }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ summary.course.code }}</span></td>
+                        <td class="text-center">{{ summary.total }}</td>
+                        <td class="text-center text-success fw-semibold">{{ summary.present }}</td>
+                        <td class="text-center text-danger fw-semibold">{{ summary.absent }}</td>
+                        <td class="text-center">
+                            <span
+                                class="badge {% if summary.percentage >= 75 %}bg-success{% elif summary.percentage >= 60 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ summary.percentage }}%
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a href="?q={{ query }}&course_id={{ summary.course.id }}"
+                                class="btn btn-sm btn-primary">View History</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No course attendance data found for this
+                            student.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+    {% elif query %}
+    <div class="text-center py-5">
+        <div class="alert alert-warning d-inline-block">
+            No student found matching "{{ query }}".
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <p class="text-muted">Please enter a Registration Number or Name to view attendance.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

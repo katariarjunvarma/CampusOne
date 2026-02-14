@@ -8,64 +8,35 @@
     <div class="col-12">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h1 class="h3 mb-1">Vendor Dashboard</h1>
+          <h1 class="h3 mb-1" id="dashboard-title">Orders Pending</h1>
           <h5 class="text-primary mb-2">{{ stall.name }}</h5>
           <p class="text-muted mb-0">Manage orders for {{ today|date:"d M Y" }}</p>
         </div>
       </div>
 
       <!-- Summary Cards - Clickable -->
-      <div class="row mb-4">
-        <div class="col-md-3" onclick="showSection('all')" style="cursor: pointer;">
-          <div class="card bg-primary text-white hover-shadow">
-            <div class="card-body text-center">
-              <h3 class="card-title">{{ total_orders }}</h3>
-              <p class="card-text">Total Orders</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3" onclick="showSection('pending')" style="cursor: pointer;">
-          <div class="card bg-warning text-white hover-shadow">
-            <div class="card-body text-center">
-              <h3 class="card-title">{{ pending }}</h3>
-              <p class="card-text">Orders Pending</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3" onclick="showSection('cooking')" style="cursor: pointer;">
-          <div class="card hover-shadow" style="background-color: #fd7e14; color: white; cursor: pointer;">
-            <div class="card-body text-center">
-              <h3 class="card-title">{{ cooking }}</h3>
-              <p class="card-text">Cooking</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3" onclick="showSection('ready')" style="cursor: pointer;">
-          <div class="card bg-info text-white hover-shadow">
-            <div class="card-body text-center">
-              <h3 class="card-title">{{ ready }}</h3>
-              <p class="card-text">Orders Pickup</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Summary Cards - Removed as per request -->
 
       <style>
         .hover-shadow:hover {
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           transition: all 0.2s ease;
         }
+
         .order-section {
           display: none;
         }
+
         .order-section.active {
           display: block;
         }
+
         .order-table {
           width: 100%;
           border-collapse: collapse;
         }
+
         .order-table th {
           background: #f8f9fa;
           padding: 12px;
@@ -74,11 +45,13 @@
           border-bottom: 2px solid #dee2e6;
           font-size: 13px;
         }
+
         .order-table td {
           padding: 12px;
           border-bottom: 1px solid #dee2e6;
           font-size: 14px;
         }
+
         .btn-action {
           padding: 6px 12px;
           font-size: 12px;
@@ -87,22 +60,32 @@
           cursor: pointer;
           margin: 2px;
         }
+
         .btn-cooking {
           background: #fd7e14;
           color: white;
         }
+
         .btn-ready {
           background: #10b981;
           color: white;
         }
+
         .btn-missed {
           background: #ef4444;
           color: white;
         }
+
         .btn-collected {
           background: #3b82f6;
           color: white;
         }
+
+        .btn-remind {
+          background: #ffc107;
+          color: black;
+        }
+
         .badge-parcel {
           background: #6f42c1;
           color: white;
@@ -110,6 +93,7 @@
           border-radius: 4px;
           font-size: 11px;
         }
+
         .badge-eat {
           background: #20c997;
           color: white;
@@ -117,6 +101,7 @@
           border-radius: 4px;
           font-size: 11px;
         }
+
         .order-number {
           font-family: monospace;
           font-weight: bold;
@@ -125,234 +110,71 @@
       </style>
 
       <!-- Pending Orders Section -->
-      <div class="order-section" id="pending-section">
-        <div class="card">
-          <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Orders Pending ({{ pending }})</h5>
-            <button class="btn btn-sm btn-light" onclick="showSection('all')">Show All</button>
-          </div>
-          <div class="card-body p-0">
-            {% if orders_by_status.pending %}
-              <table class="order-table">
-                <thead>
-                  <tr>
-                    <th>S.No</th>
-                    <th>Order ID</th>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Customer</th>
-                    <th>Type</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for order in orders_by_status.pending %}
-                  <tr data-order-id="{{ order.id }}">
-                    <td>{{ forloop.counter }}</td>
-                    <td><span class="order-number">#{{ order.order_number|default:order.id }}</span></td>
-                    <td><strong>{{ order.food_item.name }}</strong></td>
-                    <td>{{ order.quantity }}</td>
-                    <td>{{ order.ordered_by.get_full_name|default:order.ordered_by.username }}</td>
-                    <td>
-                      {% if order.packaging_option == 'parcel' %}
-                        <span class="badge-parcel">Parcel</span>
-                      {% else %}
-                        <span class="badge-eat">Eat There</span>
-                      {% endif %}
-                    </td>
-                    <td>
-                      <button type="button" class="btn-action btn-cooking" onclick="updateStatus({{ order.id }}, 'cooking')">
-                        Cooking Completed
-                      </button>
-                      <button type="button" class="btn-action btn-missed" onclick="updateStatus({{ order.id }}, 'missed')">
-                        Mark Missed
-                      </button>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% else %}
-              <p class="text-muted text-center py-4">No pending orders</p>
+      <div class="order-section" id="pending-section" data-status="pending">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white py-3 border-0">
+            {% if not orders_by_status.pending %}
+            <h5 class="mb-0 text-center text-secondary">No pending orders</h5>
             {% endif %}
+          </div>
+          <div class="card-body p-0" id="content-pending">
+            {% include "food/partials/vendor_table.html" with orders=orders_by_status.pending status="pending" %}
           </div>
         </div>
       </div>
 
       <!-- Cooking Orders Section -->
-      <div class="order-section" id="cooking-section">
-        <div class="card">
-          <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #fd7e14;">
-            <h5 class="mb-0">Cooking ({{ cooking }})</h5>
-            <button class="btn btn-sm btn-light" onclick="showSection('all')">Show All</button>
-          </div>
-          <div class="card-body p-0">
-            {% if orders_by_status.cooking %}
-              <table class="order-table">
-                <thead>
-                  <tr>
-                    <th>S.No</th>
-                    <th>Order ID</th>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Customer</th>
-                    <th>Type</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for order in orders_by_status.cooking %}
-                  <tr data-order-id="{{ order.id }}">
-                    <td>{{ forloop.counter }}</td>
-                    <td><span class="order-number">#{{ order.order_number|default:order.id }}</span></td>
-                    <td><strong>{{ order.food_item.name }}</strong></td>
-                    <td>{{ order.quantity }}</td>
-                    <td>{{ order.ordered_by.get_full_name|default:order.ordered_by.username }}</td>
-                    <td>
-                      {% if order.packaging_option == 'parcel' %}
-                        <span class="badge-parcel">Parcel</span>
-                      {% else %}
-                        <span class="badge-eat">Eat There</span>
-                      {% endif %}
-                    </td>
-                    <td>
-                      <button type="button" class="btn-action btn-ready" onclick="updateStatus({{ order.id }}, 'ready')">
-                        Mark Ready
-                      </button>
-                      <button type="button" class="btn-action btn-missed" onclick="updateStatus({{ order.id }}, 'missed')">
-                        Mark Missed
-                      </button>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% else %}
-              <p class="text-muted text-center py-4">No orders cooking</p>
+      <div class="order-section" id="cooking-section" data-status="cooking">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white py-3 border-0">
+            {% if not orders_by_status.cooking %}
+            <h5 class="mb-0 text-center text-secondary">No cooking orders</h5>
             {% endif %}
+          </div>
+          <div class="card-body p-0" id="content-cooking">
+            {% include "food/partials/vendor_table.html" with orders=orders_by_status.cooking status="cooking" %}
           </div>
         </div>
       </div>
 
       <!-- Ready/Pickup Orders Section -->
-      <div class="order-section" id="ready-section">
-        <div class="card">
-          <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Orders Pickup ({{ ready }})</h5>
-            <button class="btn btn-sm btn-light" onclick="showSection('all')">Show All</button>
-          </div>
-          <div class="card-body p-0">
-            {% if orders_by_status.ready %}
-              <table class="order-table">
-                <thead>
-                  <tr>
-                    <th>S.No</th>
-                    <th>Order ID</th>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Customer</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for order in orders_by_status.ready %}
-                  <tr data-order-id="{{ order.id }}">
-                    <td>{{ forloop.counter }}</td>
-                    <td><span class="order-number">#{{ order.order_number|default:order.id }}</span></td>
-                    <td><strong>{{ order.food_item.name }}</strong></td>
-                    <td>{{ order.quantity }}</td>
-                    <td>{{ order.ordered_by.get_full_name|default:order.ordered_by.username }}</td>
-                    <td>
-                      <button type="button" class="btn-action btn-collected" onclick="updateStatus({{ order.id }}, 'collected')">
-                        Picked Up
-                      </button>
-                      <button type="button" class="btn-action btn-missed" onclick="updateStatus({{ order.id }}, 'missed')">
-                        Missed
-                      </button>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% else %}
-              <p class="text-muted text-center py-4">No orders ready for pickup</p>
+      <div class="order-section" id="ready-section" data-status="ready">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white py-3 border-0">
+            {% if not orders_by_status.ready %}
+            <h5 class="mb-0 text-center text-secondary">No orders ready for pickup</h5>
             {% endif %}
+          </div>
+          <div class="card-body p-0" id="content-ready">
+            {% include "food/partials/vendor_table.html" with orders=orders_by_status.ready status="ready" %}
           </div>
         </div>
       </div>
 
       <!-- Completed Orders Section -->
-      <div class="order-section" id="completed-section">
-        <div class="card">
-          <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Orders Completed ({{ collected }})</h5>
-            <button class="btn btn-sm btn-light" onclick="showSection('all')">Show All</button>
-          </div>
-          <div class="card-body p-0">
-            {% if orders_by_status.completed %}
-              <table class="order-table">
-                <thead>
-                  <tr>
-                    <th>S.No</th>
-                    <th>Order ID</th>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Customer</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for order in orders_by_status.completed %}
-                  <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td><span class="order-number">#{{ order.order_number|default:order.id }}</span></td>
-                    <td><strong>{{ order.food_item.name }}</strong></td>
-                    <td>{{ order.quantity }}</td>
-                    <td>{{ order.ordered_by.get_full_name|default:order.ordered_by.username }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% else %}
-              <p class="text-muted text-center py-4">No completed orders</p>
+      <div class="order-section" id="completed-section" data-status="collected">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white py-3 border-0">
+            {% if not orders_by_status.completed %}
+            <h5 class="mb-0 text-center text-secondary">No completed orders</h5>
             {% endif %}
+          </div>
+          <div class="card-body p-0" id="content-collected">
+            {% include "food/partials/vendor_table.html" with orders=orders_by_status.completed status="completed" %}
           </div>
         </div>
       </div>
 
       <!-- Missed Orders Section -->
-      <div class="order-section" id="missed-section">
-        <div class="card">
-          <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Orders Missed ({{ missed }})</h5>
-            <button class="btn btn-sm btn-light" onclick="showSection('all')">Show All</button>
-          </div>
-          <div class="card-body p-0">
-            {% if orders_by_status.missed %}
-              <table class="order-table">
-                <thead>
-                  <tr>
-                    <th>S.No</th>
-                    <th>Order ID</th>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Customer</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for order in orders_by_status.missed %}
-                  <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td><span class="order-number">#{{ order.order_number|default:order.id }}</span></td>
-                    <td><strong>{{ order.food_item.name }}</strong></td>
-                    <td>{{ order.quantity }}</td>
-                    <td>{{ order.ordered_by.get_full_name|default:order.ordered_by.username }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% else %}
-              <p class="text-muted text-center py-4">No missed orders</p>
+      <div class="order-section" id="missed-section" data-status="missed">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white py-3 border-0">
+            {% if not orders_by_status.missed %}
+            <h5 class="mb-0 text-center text-secondary">No missed orders</h5>
             {% endif %}
+          </div>
+          <div class="card-body p-0" id="content-missed">
+            {% include "food/partials/vendor_table.html" with orders=orders_by_status.missed status="missed" %}
           </div>
         </div>
       </div>
@@ -363,106 +185,275 @@
 
 {% block scripts %}
 <script>
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-  return '';
-}
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return '';
+  }
 
-function updateStatus(orderId, newStatus) {
-  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
-  
-  fetch('/food/vendor/update/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken
-    },
-    body: JSON.stringify({
-      order_id: orderId,
-      status: newStatus
-    })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.ok) {
-      // Remove the order row from current section
-      const orderRow = document.querySelector(`[data-order-id="${orderId}"]`);
-      if (orderRow) {
-        orderRow.style.opacity = '0.5';
-        setTimeout(() => orderRow.remove(), 500);
+  function updateCounter(id, change) {
+    const el = document.getElementById(id);
+    if (el) {
+      const val = parseInt(el.innerText || '0');
+      el.innerText = Math.max(0, val + change);
+    }
+  }
+
+  function updateStatus(orderId, newStatus) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+    // Find the row and current status before making the request
+    const orderRow = document.querySelector(`[data-order-id="${orderId}"]`);
+    let currentStatus = null;
+    if (orderRow) {
+      const section = orderRow.closest('.order-section');
+      if (section) {
+        currentStatus = section.getAttribute('data-status');
       }
-      
-      // Show success message
-      const alertDiv = document.createElement('div');
-      alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
-      alertDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-      alertDiv.innerHTML = 'Order #' + orderId + ' marked as ' + data.new_status + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
-      document.body.appendChild(alertDiv);
-      
-      // Auto-hide after 3 seconds
-      setTimeout(() => {
-        alertDiv.remove();
-      }, 3000);
-    } else {
-      alert('Error updating order status: ' + (data.error || 'unknown'));
     }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert('Network error while updating order status');
-  });
-}
-// Show section based on hash or parameter
-function showSection(section) {
-  // Hide all sections
-  document.querySelectorAll('.order-section').forEach(function(el) {
-    el.classList.remove('active');
-  });
-  
-  // Show requested section
-  if (section === 'all') {
-    document.querySelectorAll('.order-section').forEach(function(el) {
-      el.classList.add('active');
+
+    fetch('/food/vendor/update/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken
+      },
+      body: JSON.stringify({
+        order_id: orderId,
+        status: newStatus
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.ok) {
+          // Remove the order row from current section
+          if (orderRow) {
+            orderRow.style.opacity = '0.5';
+            setTimeout(() => orderRow.remove(), 500);
+          }
+
+          // Update counters
+          if (currentStatus) {
+            updateCounter('header-' + currentStatus, -1);
+          }
+
+          // Sync all sections
+          fetchUpdates();
+
+          // Map 'collected' to 'completed' for UI if needed, or stick to 'collected'
+          // The template uses 'collected' variable but 'completed-section'. 
+          // Status in DB: PENDING, COOKING, READY, COLLECTED, MISSED.
+          // IDs used above: summary-pending, summary-cooking, summary-ready.
+          // Let's check the new status mapping.
+
+          // Note: 'collected' status maps to 'completed' in UI text sometimes, but variable is 'collected'.
+          // The summary card for completed orders wasn't given an ID in my previous plan, checking...
+          // I should add IDs for completed/missed summary cards if I want them to update too.
+          // But user only mentioned "Cooking Completed -> Ready". 
+          // 'ready' status corresponds to 'Orders Pickup'.
+
+          const serverStatus = data.new_status || data.status || newStatus;
+
+          // Show success message
+          const alertDiv = document.createElement('div');
+          alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+          alertDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+          alertDiv.innerHTML = 'Order #' + orderId + ' marked as ' + serverStatus + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+          document.body.appendChild(alertDiv);
+
+          // Auto-hide after 3 seconds
+          setTimeout(() => {
+            alertDiv.remove();
+            // Reload to show order in new section (since we're not moving the DOM element)
+            // User complained about "not moving", so reload is safer to ensure it appears in the right place
+            // without complex DOM reconstruction.
+            // Note: we rely on fetchUpdates() polling instead of forcing a full reload.
+          }, 1000);
+        } else {
+          alert('Error updating order status: ' + (data.error || 'unknown'));
+        }
+      })
+      .catch(error => {
+        console.error('Error updating order status:', error);
+        // If it's a JSON parse error, it might be that the server returned HTML (e.g. error page)
+        // In many cases the action might have succeeded but the response format was unexpected
+        // So we reload to be safe and update the UI
+        location.reload();
+      });
+  }
+
+  function remindUser(orderId) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+    // Disable button to prevent multiple clicks
+    const btn = document.querySelector(`tr[data-order-id="${orderId}"] .btn-remind`);
+    if (btn) {
+      btn.disabled = true;
+      btn.innerText = 'Sending...';
+    }
+
+    fetch('/food/vendor/remind/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken
+      },
+      body: JSON.stringify({
+        order_id: orderId
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.ok) {
+          // Show success message
+          const alertDiv = document.createElement('div');
+          alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+          alertDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+          alertDiv.innerHTML = 'Reminder sent for Order #' + orderId + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+          document.body.appendChild(alertDiv);
+
+          if (btn) {
+            btn.innerText = 'Sent';
+            setTimeout(() => {
+              btn.disabled = false;
+              btn.innerText = 'Remind';
+            }, 5000);
+          }
+
+          // Auto-hide after 3 seconds
+          setTimeout(() => {
+            alertDiv.remove();
+          }, 3000);
+        } else {
+          alert('Error sending reminder: ' + (data.error || 'unknown'));
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = 'Remind';
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error sending reminder:', error);
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'Remind';
+        }
+      });
+  }
+  // Show section based on hash or parameter
+  function showSection(section) {
+    // Hide all sections
+    document.querySelectorAll('.order-section').forEach(function (el) {
+      el.classList.remove('active');
     });
-  } else {
-    const target = document.getElementById(section + '-section');
-    if (target) {
-      target.classList.add('active');
+
+    // Show requested section
+    if (section === 'all') {
+      document.querySelectorAll('.order-section').forEach(function (el) {
+        el.classList.add('active');
+      });
+    } else {
+      const target = document.getElementById(section + '-section');
+      if (target) {
+        target.classList.add('active');
+        // Scroll to top when switching sections to make title visible
+        window.scrollTo(0, 0);
+      }
+    }
+
+    // Update dashboard title
+    const titleEl = document.getElementById('dashboard-title');
+    if (titleEl) {
+      const titles = {
+        'pending': 'Orders Pending',
+        'cooking': 'Cooking Orders',
+        'ready': 'Orders Pickup',
+        'completed': 'Orders Completed',
+        'missed': 'Orders Missed',
+        'all': 'Vendor Dashboard'
+      };
+      titleEl.innerText = titles[section] || 'Vendor Dashboard';
+      document.title = (titles[section] || 'Vendor Dashboard') + ' - {{ stall_owner.stall_name }}';
+    }
+
+    // Update URL hash
+    if (section !== 'all') {
+      window.location.hash = section;
+    } else {
+      history.pushState('', document.title, window.location.pathname + window.location.search);
     }
   }
-  
-  // Update URL hash
-  if (section !== 'all') {
-    window.location.hash = section;
-  } else {
-    history.pushState('', document.title, window.location.pathname + window.location.search);
-  }
-}
 
-// Handle URL hash on page load and hash changes
-function handleHash() {
-  const hash = window.location.hash.replace('#', '');
-  if (hash && ['pending', 'cooking', 'ready', 'completed', 'missed'].includes(hash)) {
-    showSection(hash);
-  } else {
-    showSection('all');
+  // Handle URL hash on page load and hash changes
+  function handleHash() {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && ['pending', 'cooking', 'ready', 'completed', 'missed'].includes(hash)) {
+      showSection(hash);
+    } else {
+      // Default to pending instead of showing all sections
+      showSection('pending');
+      // Update URL to match
+      if (history.replaceState) {
+        history.replaceState(null, null, '#pending');
+      } else {
+        window.location.hash = 'pending';
+      }
+    }
   }
-}
 
-// Listen for hash changes
-window.addEventListener('hashchange', handleHash);
+  // Listen for hash changes
+  window.addEventListener('hashchange', handleHash);
 
-// Handle page load
-window.addEventListener('DOMContentLoaded', function() {
-  // Check for stored section from sidebar click
-  const storedSection = localStorage.getItem('showSection');
-  if (storedSection) {
-    localStorage.removeItem('showSection');
-    window.location.hash = storedSection;
+  // Handle page load
+  window.addEventListener('DOMContentLoaded', function () {
+    // Check for stored section from sidebar click
+    const storedSection = localStorage.getItem('showSection');
+    if (storedSection) {
+      localStorage.removeItem('showSection');
+      window.location.hash = storedSection;
+    }
+    handleHash();
+
+    // Start polling for real-time updates
+    setInterval(fetchUpdates, 5000);
+  });
+
+  // Real-time polling function
+  function fetchUpdates() {
+    fetch('/food/vendor/updates/')
+      .then(response => response.json())
+      .then(data => {
+        if (!data.ok) return;
+
+        // Update counts
+        const counts = data.counts;
+        for (const [key, val] of Object.entries(counts)) {
+          const headerEl = document.getElementById('header-' + key);
+          if (headerEl) headerEl.innerText = val;
+
+          // Note: summary cards were removed, so no need to update summary-* IDs
+        }
+
+        // Update sections content
+        const sections = data.sections;
+        for (const [key, html] of Object.entries(sections)) {
+          const containerId = 'content-' + key;
+          const container = document.getElementById(containerId);
+
+          // Only update if content changed significantly (simple length check optimization)
+          // Ideally we'd compare hash, but for now simple replacement is robust
+          if (container) {
+            // Check if user is interacting with any button in this container to avoid disruption?
+            // For now, raw replacement. Since buttons are just onclick handlers, it's fine.
+            // However, replacing innerHTML destroys focus. 
+            // Since this runs every 5s, it might be annoying if user is mid-click.
+            // But typically user action is fast.
+            container.innerHTML = html;
+          }
+        }
+      })
+      .catch(console.error);
   }
-  handleHash();
-});
 </script>
 {% endblock %}

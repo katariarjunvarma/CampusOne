@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Smart LPU - Manage PreOrders{% endblock %}
+
+{% block content %}
+<style>
+  .manage-container {
+    padding: 24px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .page-header {
+    margin-bottom: 24px;
+  }
+  .page-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  .data-table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+  }
+  .data-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #1e293b;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .data-table tr:hover td {
+    background: #f9fafb;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .badge-pending { background: #fef3c7; color: #f59e0b; }
+  .badge-cooking { background: #dbeafe; color: #3b82f6; }
+  .badge-ready { background: #d1fae5; color: #059669; }
+  .badge-collected { background: #e0e7ff; color: #4f46e5; }
+  .badge-missed { background: #fee2e2; color: #dc2626; }
+  .empty-state {
+    text-align: center;
+    padding: 60px;
+    color: #94a3b8;
+    font-size: 14px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+</style>
+
+<div class="manage-container">
+  <div class="page-header">
+    <h1>PreOrders</h1>
+  </div>
+
+  {% if orders %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Date</th>
+        <th>Customer</th>
+        <th>Item</th>
+        <th>Qty</th>
+        <th>Slot</th>
+        <th>Status</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+      <tr>
+        <td>#{{ order.order_number|default:order.id }}</td>
+        <td>{{ order.order_date }}</td>
+        <td>{{ order.ordered_by.username|default:"-" }}</td>
+        <td>{{ order.food_item.name }}</td>
+        <td>{{ order.quantity }}</td>
+        <td>{{ order.slot.name }}</td>
+        <td>
+          <span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span>
+        </td>
+        <td>₹{{ order.item_total }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">No preorders found.</div>
+  {% endif %}
+</div>
+{% endblock %}

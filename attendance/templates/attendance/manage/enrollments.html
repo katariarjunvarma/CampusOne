@@ -8,7 +8,7 @@
     max-width: 1200px;
     margin: 0 auto;
   }
-  
+
   .page-header {
     background: #ffffff;
     border-radius: 16px;
@@ -16,32 +16,32 @@
     margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
-  
+
   .header-content {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 16px;
   }
-  
+
   .header-title h1 {
     font-size: 20px;
     font-weight: 600;
     color: #1e293b;
     margin: 0;
   }
-  
+
   .header-subtitle {
     font-size: 13px;
     color: #64748b;
     margin-top: 4px;
   }
-  
+
   .header-actions {
     display: flex;
     gap: 8px;
   }
-  
+
   .btn-primary {
     padding: 8px 16px;
     background: #3b82f6;
@@ -55,11 +55,11 @@
     transition: all 0.2s;
     box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
   }
-  
+
   .btn-primary:hover {
     background: #2563eb;
   }
-  
+
   .btn-secondary {
     padding: 8px 16px;
     background: #ffffff;
@@ -72,17 +72,17 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  
+
   .btn-secondary:hover {
     background: #eff6ff;
   }
-  
+
   .nav-tabs {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
   }
-  
+
   .nav-tab {
     padding: 6px 12px;
     background: #f1f5f9;
@@ -93,30 +93,30 @@
     text-decoration: none;
     transition: all 0.2s;
   }
-  
+
   .nav-tab:hover {
     background: #e2e8f0;
     color: #374151;
   }
-  
+
   .nav-tab.active {
     background: #3b82f6;
     color: #ffffff;
   }
-  
+
   .data-card {
     background: #ffffff;
     border-radius: 16px;
     padding: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
-  
+
   .data-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
   }
-  
+
   .data-table th {
     text-align: left;
     padding: 12px 16px;
@@ -125,23 +125,23 @@
     color: #374151;
     border-bottom: 1px solid #e5e7eb;
   }
-  
+
   .data-table td {
     padding: 14px 16px;
     font-size: 14px;
     color: #1e293b;
     border-bottom: 1px solid #f3f4f6;
   }
-  
+
   .data-table tr:hover td {
     background: #f9fafb;
   }
-  
+
   .course-cell {
     font-weight: 500;
     color: #1e293b;
   }
-  
+
   .empty-state {
     text-align: center;
     padding: 40px;
@@ -181,12 +181,14 @@
       </thead>
       <tbody>
         {% for e in enrollments %}
-          <tr>
-            <td class="course-cell">{{ e.course.code }}</td>
-            <td>{{ e.student.roll_no }} - {{ e.student.full_name }}</td>
-          </tr>
+        <tr>
+          <td class="course-cell">{{ e.course.code }}</td>
+          <td>{{ e.student.registration_number }} - {{ e.student.full_name }}</td>
+        </tr>
         {% empty %}
-          <tr><td colspan="2" class="empty-state">No enrollments yet.</td></tr>
+        <tr>
+          <td colspan="2" class="empty-state">No enrollments yet.</td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>

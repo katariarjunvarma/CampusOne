@@ -8,7 +8,7 @@
     max-width: 1200px;
     margin: 0 auto;
   }
-  
+
   .page-header {
     background: #ffffff;
     border-radius: 16px;
@@ -16,32 +16,32 @@
     margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
-  
+
   .header-content {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 16px;
   }
-  
+
   .header-title h1 {
     font-size: 20px;
     font-weight: 600;
     color: #1e293b;
     margin: 0;
   }
-  
+
   .header-subtitle {
     font-size: 13px;
     color: #64748b;
     margin-top: 4px;
   }
-  
+
   .header-actions {
     display: flex;
     gap: 8px;
   }
-  
+
   .btn-primary {
     padding: 8px 16px;
     background: #3b82f6;
@@ -55,11 +55,11 @@
     transition: all 0.2s;
     box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
   }
-  
+
   .btn-primary:hover {
     background: #2563eb;
   }
-  
+
   .btn-danger {
     padding: 8px 16px;
     background: #ffffff;
@@ -72,11 +72,11 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  
+
   .btn-danger:hover {
     background: #fef2f2;
   }
-  
+
   .btn-secondary {
     padding: 8px 16px;
     background: #ffffff;
@@ -89,17 +89,17 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  
+
   .btn-secondary:hover {
     background: #eff6ff;
   }
-  
+
   .nav-tabs {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
   }
-  
+
   .nav-tab {
     padding: 6px 12px;
     background: #f1f5f9;
@@ -110,30 +110,30 @@
     text-decoration: none;
     transition: all 0.2s;
   }
-  
+
   .nav-tab:hover {
     background: #e2e8f0;
     color: #374151;
   }
-  
+
   .nav-tab.active {
     background: #3b82f6;
     color: #ffffff;
   }
-  
+
   .data-card {
     background: #ffffff;
     border-radius: 16px;
     padding: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
-  
+
   .data-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
   }
-  
+
   .data-table th {
     text-align: left;
     padding: 12px 16px;
@@ -142,31 +142,31 @@
     color: #374151;
     border-bottom: 1px solid #e5e7eb;
   }
-  
+
   .data-table td {
     padding: 14px 16px;
     font-size: 14px;
     color: #1e293b;
     border-bottom: 1px solid #f3f4f6;
   }
-  
+
   .data-table tr:hover td {
     background: #f9fafb;
   }
-  
+
   .student-cell {
     font-weight: 500;
     color: #1e293b;
   }
-  
+
   .muted-cell {
     color: #6b7280;
   }
-  
+
   .actions-cell {
     text-align: right;
   }
-  
+
   .btn-view {
     padding: 6px 12px;
     background: #dbeafe;
@@ -180,11 +180,11 @@
     transition: all 0.2s;
     margin-right: 8px;
   }
-  
+
   .btn-view:hover {
     background: #bfdbfe;
   }
-  
+
   .btn-delete {
     padding: 6px 12px;
     background: #fee2e2;
@@ -197,11 +197,11 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  
+
   .btn-delete:hover {
     background: #fecaca;
   }
-  
+
   .empty-state {
     text-align: center;
     padding: 40px;
@@ -244,20 +244,22 @@
       </thead>
       <tbody>
         {% for fs in samples %}
-          <tr>
-            <td class="student-cell">{{ fs.student.roll_no }} - {{ fs.student.full_name }}</td>
-            <td class="muted-cell">{{ fs.created_at|date:"M d, Y" }}</td>
-            <td>
-              {% if fs.image %}
-                <a href="{{ fs.image.url }}" target="_blank" class="btn-view">View</a>
-              {% endif %}
-            </td>
-            <td class="actions-cell">
-              <a href="{% url 'manage_face_sample_delete' face_sample_id=fs.id %}" class="btn-delete">Delete</a>
-            </td>
-          </tr>
+        <tr>
+          <td class="student-cell">{{ fs.student.registration_number }} - {{ fs.student.full_name }}</td>
+          <td class="muted-cell">{{ fs.created_at|date:"M d, Y" }}</td>
+          <td>
+            {% if fs.image %}
+            <a href="{{ fs.image.url }}" target="_blank" class="btn-view">View</a>
+            {% endif %}
+          </td>
+          <td class="actions-cell">
+            <a href="{% url 'manage_face_sample_delete' face_sample_id=fs.id %}" class="btn-delete">Delete</a>
+          </td>
+        </tr>
         {% empty %}
-          <tr><td colspan="4" class="empty-state">No face samples yet.</td></tr>
+        <tr>
+          <td colspan="4" class="empty-state">No face samples yet.</td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>

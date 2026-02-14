@@ -81,7 +81,7 @@ class Command(BaseCommand):
         for record in records:
             report_data.append({
                 'student_name': record.student.full_name,
-                'roll_number': record.student.roll_no,
+                'roll_number': record.student.registration_number,
                 'course_name': record.session.course.name,
                 'course_code': record.session.course.code,
                 'date': record.session.session_date.strftime('%d %B %Y'),
@@ -122,7 +122,7 @@ class Command(BaseCommand):
         
         # Write header
         writer.writerow([
-            'Student Name', 'Roll Number', 'Course Code', 'Course Name',
+            'Student Name', 'Registration Number', 'Course Code', 'Course Name',
             'Date', 'Time', 'Status', 'Marked By'
         ])
         
@@ -130,7 +130,7 @@ class Command(BaseCommand):
         for record in records:
             writer.writerow([
                 record.student.full_name,
-                record.student.roll_no,
+                record.student.registration_number,
                 record.session.course.code,
                 record.session.course.name,
                 record.session.session_date.strftime('%d %B %Y'),

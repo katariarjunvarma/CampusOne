@@ -61,6 +61,26 @@ class PreOrderAdmin(admin.ModelAdmin):
     list_display = ("order_date", "slot", "ordered_by", "food_item", "quantity", "status", "created_at")
     list_filter = ("order_date", "slot", "status")
     search_fields = ("ordered_by__username", "food_item__name")
+    actions = ["clear_weekly_history", "clear_all_history"]
+
+    @admin.action(description="Clear orders older than 7 days")
+    def clear_weekly_history(self, request, queryset):
+        from django.utils import timezone
+        from datetime import timedelta
+        cutoff = timezone.localdate() - timedelta(days=7)
+        deleted_count, _ = PreOrder.objects.filter(order_date__lt=cutoff).delete()
+        self.message_user(request, f"Cleared {deleted_count} orders older than 7 days.")
+
+    @admin.action(description="Clear ALL orders (Warning: Clears everything)")
+    def clear_all_history(self, request, queryset):
+        # We use the queryset if selected, or all if we want a global button (but actions are usually selection-based).
+        # To make it global-like, we can ignore queryset, but that's confusing.
+        # Let's just make it delete the SELECTED ones, but rename it "Delete Selected History".
+        # Actually, the user asked for a "clear food history button".
+        # Best way is to delete ALL.
+        count, _ = PreOrder.objects.all().delete()
+        self.message_user(request, f"Cleared ALL {count} food orders history.")
+
 
 
 @admin.register(BulkOrder)

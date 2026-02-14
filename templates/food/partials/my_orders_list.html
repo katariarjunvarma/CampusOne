@@ -1,0 +1,65 @@
+{% if grouped_orders %}
+{% for group in grouped_orders %}
+<div class="order-card">
+    <div class="order-header">
+        <div>
+            <span class="order-number">#{{ group.order_number }}</span>
+            <span style="margin-left: 16px; color: #6b7280;">{{ group.slot.name }}</span>
+        </div>
+        <div class="order-meta">
+            <span class="order-total">Total: ₹{{ group.total_cost }}</span>
+            {% if group.status == 'pending' %}
+            <span class="status-badge status-pending">Pending</span>
+            {% elif group.status == 'ready' %}
+            <span class="status-badge status-ready">Ready</span>
+            {% elif group.status == 'missed' %}
+            <span class="status-badge status-missed">Missed</span>
+            {% else %}
+            <span class="status-badge status-collected">Collected</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <table class="order-items-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Stall</th>
+                <th>Location</th>
+                <th class="text-right">Qty</th>
+                <th class="text-right">Price</th>
+                <th class="text-right">Subtotal</th>
+                {% if group.status == 'pending' %}
+                <th class="text-right">Action</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in group.orders %}
+            <tr>
+                <td class="item-name">{{ o.food_item.name }}</td>
+                <td class="muted-cell">{{ o.food_item.stall_name }}</td>
+                <td class="muted-cell">{{ o.food_item.location }}</td>
+                <td class="text-right">{{ o.quantity }}</td>
+                <td class="text-right">₹{{ o.food_item.price }}</td>
+                <td class="text-right">₹{{ o.item_total }}</td>
+                {% if group.status == 'pending' %}
+                <td class="text-right">
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="order_id" value="{{ o.id }}">
+                        <button type="submit" class="btn-cancel">Cancel</button>
+                    </form>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endfor %}
+{% else %}
+<div class="order-card">
+    <div class="empty-state">No orders found for this date.</div>
+</div>
+{% endif %}

@@ -57,7 +57,7 @@ class PreOrder(models.Model):
     PACK_EAT = "eat"
     PACK_PARCEL = "parcel"
     PACK_CHOICES = [
-        (PACK_EAT, "Eat there only"),
+        (PACK_EAT, "Dine-in"),
         (PACK_PARCEL, "Pack for parcel"),
     ]
 
@@ -107,11 +107,13 @@ class BulkOrder(models.Model):
     STATUS_APPROVED = "approved"
     STATUS_REJECTED = "rejected"
     STATUS_CANCELLED = "cancelled"
+    STATUS_COMPLETED = "completed"
     STATUS_CHOICES = [
         (STATUS_SUBMITTED, "Submitted"),
         (STATUS_APPROVED, "Approved"),
         (STATUS_REJECTED, "Rejected"),
         (STATUS_CANCELLED, "Cancelled"),
+        (STATUS_COMPLETED, "Completed"),
     ]
 
     created_by = models.ForeignKey(

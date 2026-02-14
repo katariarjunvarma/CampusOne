@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% block title %}Smart LPU - {{ title }}{% endblock %}
+
+{% block content %}
+<style>
+  .form-page {
+    padding: 24px 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .form-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .form-header {
+    margin-bottom: 24px;
+  }
+
+  .form-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .form-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+
+  .form-section {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: #f8fafc;
+  }
+
+  .form-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 12px;
+  }
+
+  .checkbox-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #1e293b;
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+
+  .form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1e293b;
+    background: #ffffff;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .btn-primary {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    text-decoration: none;
+  }
+
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+
+  .btn-secondary {
+    padding: 10px 20px;
+    background: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover {
+    background: #eff6ff;
+  }
+
+  .help-text {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 6px;
+  }
+
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="form-page">
+  <div class="form-card">
+    <div class="form-header">
+      <h1>{{ title }}</h1>
+      <div class="form-subtitle">Update permissions, groups, and access control.</div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="form-section">
+        <div class="form-section-title">Account Status</div>
+        <div class="checkbox-row">
+          <label class="check">{{ form.is_active }} Active</label>
+          <label class="check">{{ form.is_staff }} Staff</label>
+          <label class="check">{{ form.is_superuser }} Superuser</label>
+        </div>
+        <div class="help-text">Superuser has all permissions automatically.</div>
+      </div>
+
+      <div class="split">
+        <div class="form-section">
+          <div class="form-section-title">Groups</div>
+          <div class="form-group">
+            <label for="{{ form.groups.id_for_label }}">Assign Groups</label>
+            {{ form.groups }}
+          </div>
+          <div class="help-text">Users inherit permissions from assigned groups.</div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">User Permissions</div>
+          <div class="form-group">
+            <label for="{{ form.user_permissions.id_for_label }}">Assign Permissions</label>
+            {{ form.user_permissions }}
+          </div>
+          <div class="help-text">Use this for per-user permissions when groups are not enough.</div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Save Changes</button>
+        <a href="{% url 'manage_users' %}" class="btn-secondary">Back</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

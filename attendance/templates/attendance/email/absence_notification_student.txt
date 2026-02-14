@@ -6,7 +6,7 @@ Dear Student,
 Student Information:
 -------------------
 Name: {{ student_name }}
-Roll Number: {{ roll_number }}
+Registration Number: {{ roll_number }}
 Course: {{ course_name }}
 Date: {{ date }}
 Class Time Slot: {{ time_slot }}

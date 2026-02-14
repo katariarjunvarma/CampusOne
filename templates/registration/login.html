@@ -20,12 +20,18 @@
 
       <div class="glass-strong p-4">
         <div class="d-flex align-items-center justify-content-between mb-3">
-          <div class="fw-semibold">User / Teacher Login</div>
+          <div class="fw-semibold">Staff & Stall Owner Login</div>
           <span class="badge badge-soft">LPU</span>
         </div>
 
           {% if form.errors %}
-            <div class="alert alert-danger">Invalid username or password.</div>
+            <div class="alert alert-danger">
+              {% if admin_error %}
+                Admins must login through the Admin Login session.
+              {% else %}
+                Invalid username or password.
+              {% endif %}
+            </div>
           {% endif %}
 
           <form method="post" action="{% url 'login' %}">

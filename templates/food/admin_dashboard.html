@@ -8,7 +8,7 @@
     max-width: 1400px;
     margin: 0 auto;
   }
-  
+
   .page-header {
     background: #ffffff;
     border-radius: 16px;
@@ -16,34 +16,34 @@
     margin-bottom: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
-  
+
   .header-content {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 16px;
   }
-  
+
   .header-title h1 {
     font-size: 24px;
     font-weight: 600;
     color: #1e293b;
     margin: 0;
   }
-  
+
   .header-subtitle {
     font-size: 14px;
     color: #64748b;
     margin-top: 4px;
   }
-  
+
   .stats-row {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 16px;
     margin-bottom: 24px;
   }
-  
+
   .stat-card {
     background: #ffffff;
     border-radius: 12px;
@@ -51,22 +51,27 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     text-align: center;
   }
-  
+
   .stat-value {
     font-size: 28px;
     font-weight: 700;
     color: #1e293b;
   }
-  
+
   .stat-label {
     font-size: 13px;
     color: #64748b;
     margin-top: 4px;
   }
-  
-  .stat-active { color: #22c55e; }
-  .stat-blocked { color: #ef4444; }
-  
+
+  .stat-active {
+    color: #22c55e;
+  }
+
+  .stat-blocked {
+    color: #ef4444;
+  }
+
   .section {
     background: #ffffff;
     border-radius: 16px;
@@ -74,21 +79,21 @@
     margin-bottom: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
-  
+
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
   }
-  
+
   .section-title {
     font-size: 18px;
     font-weight: 600;
     color: #1e293b;
     margin: 0;
   }
-  
+
   .btn-primary {
     padding: 10px 20px;
     background: #3b82f6;
@@ -102,11 +107,11 @@
     transition: all 0.2s;
     box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
   }
-  
+
   .btn-primary:hover {
     background: #2563eb;
   }
-  
+
   .btn-success {
     padding: 8px 14px;
     background: #22c55e;
@@ -119,11 +124,11 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  
+
   .btn-success:hover {
     background: #16a34a;
   }
-  
+
   .btn-danger {
     padding: 8px 14px;
     background: #ef4444;
@@ -136,11 +141,11 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  
+
   .btn-danger:hover {
     background: #dc2626;
   }
-  
+
   .btn-secondary {
     padding: 8px 14px;
     background: #f3f4f6;
@@ -153,17 +158,17 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  
+
   .btn-secondary:hover {
     background: #e5e7eb;
   }
-  
+
   .data-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
   }
-  
+
   .data-table th {
     text-align: left;
     padding: 12px 16px;
@@ -173,18 +178,18 @@
     border-bottom: 1px solid #e5e7eb;
     background: #f9fafb;
   }
-  
+
   .data-table td {
     padding: 14px 16px;
     font-size: 14px;
     color: #1e293b;
     border-bottom: 1px solid #f3f4f6;
   }
-  
+
   .data-table tr:hover td {
     background: #f9fafb;
   }
-  
+
   .badge {
     display: inline-block;
     padding: 4px 10px;
@@ -192,34 +197,34 @@
     font-size: 12px;
     font-weight: 500;
   }
-  
+
   .badge-active {
     background: #d1fae5;
     color: #059669;
   }
-  
+
   .badge-blocked {
     background: #fee2e2;
     color: #dc2626;
   }
-  
+
   .badge-category {
     background: #dbeafe;
     color: #3b82f6;
   }
-  
+
   .actions-cell {
     display: flex;
     gap: 8px;
   }
-  
+
   .empty-state {
     text-align: center;
     padding: 40px;
     color: #94a3b8;
     font-size: 14px;
   }
-  
+
   .tabs {
     display: flex;
     gap: 8px;
@@ -227,7 +232,7 @@
     border-bottom: 1px solid #e5e7eb;
     padding-bottom: 12px;
   }
-  
+
   .tab {
     padding: 8px 16px;
     background: #f1f5f9;
@@ -240,20 +245,20 @@
     transition: all 0.2s;
     border: none;
   }
-  
+
   .tab:hover {
     background: #e2e8f0;
   }
-  
+
   .tab.active {
     background: #3b82f6;
     color: #ffffff;
   }
-  
+
   .tab-content {
     display: none;
   }
-  
+
   .tab-content.active {
     display: block;
   }
@@ -266,9 +271,17 @@
         <h1>Food Order Editor</h1>
         <div class="header-subtitle">Manage food items, stalls, and menu categories</div>
       </div>
-      <a href="{% url 'manage_dashboard' %}" class="btn-secondary">Back to Manage</a>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <form method="post" action="{% url 'food:food_admin_clear_history' %}"
+          onsubmit="return confirm('WARNING: This will delete ALL food order history. This action cannot be undone. Are you sure?');"
+          style="margin: 0;">
+          {% csrf_token %}
+          <button type="submit" class="btn-danger">Clear Order History</button>
+        </form>
+        <a href="{% url 'manage_dashboard' %}" class="btn-secondary">Back to Manage</a>
+      </div>
     </div>
-    
+
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-value">{{ stats.total_stalls }}</div>
@@ -292,13 +305,13 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Tabs -->
   <div class="tabs">
     <button class="tab active" onclick="showTab('stalls')">Stalls</button>
     <button class="tab" onclick="showTab('items')">Food Items</button>
   </div>
-  
+
   <!-- Stalls Tab -->
   <div id="stalls" class="tab-content active">
     <div class="section">
@@ -306,7 +319,7 @@
         <h2 class="section-title">All Stalls</h2>
         <span class="badge badge-active">Manage stall status (Active/Blocked)</span>
       </div>
-      
+
       <table class="data-table">
         <thead>
           <tr>
@@ -326,27 +339,27 @@
             <td>{{ stall.location }}</td>
             <td>
               {% with owner=stall.stallowner_set.first %}
-                {% if owner %}{{ owner.user.username }}{% else %}-{% endif %}
+              {% if owner %}{{ owner.user.username }}{% else %}-{% endif %}
               {% endwith %}
             </td>
             <td>
               {% with owner=stall.stallowner_set.first %}
-                {% if owner %}{{ owner.phone|default:"-" }}{% else %}-{% endif %}
+              {% if owner %}{{ owner.phone|default:"-" }}{% else %}-{% endif %}
               {% endwith %}
             </td>
             <td>{{ stall.fooditem_set.count }}</td>
             <td>
               {% if stall.is_active %}
-                <span class="badge badge-active">Active</span>
+              <span class="badge badge-active">Active</span>
               {% else %}
-                <span class="badge badge-blocked">Blocked</span>
+              <span class="badge badge-blocked">Blocked</span>
               {% endif %}
             </td>
             <td class="actions-cell">
               {% if stall.is_active %}
-                <a href="{% url 'food:food_admin_stall_toggle' stall.id %}" class="btn-danger">Block</a>
+              <a href="{% url 'food:food_admin_stall_toggle' stall.id %}" class="btn-danger">Block</a>
               {% else %}
-                <a href="{% url 'food:food_admin_stall_toggle' stall.id %}" class="btn-success">Unblock</a>
+              <a href="{% url 'food:food_admin_stall_toggle' stall.id %}" class="btn-success">Unblock</a>
               {% endif %}
             </td>
           </tr>
@@ -359,7 +372,7 @@
       </table>
     </div>
   </div>
-  
+
   <!-- Food Items Tab -->
   <div id="items" class="tab-content">
     <div class="section">
@@ -367,7 +380,7 @@
         <h2 class="section-title">All Food Items</h2>
         <a href="{% url 'food:food_admin_item_create' %}" class="btn-primary">+ Add Food Item</a>
       </div>
-      
+
       <table class="data-table">
         <thead>
           <tr>
@@ -390,14 +403,15 @@
             <td>{{ item.location }}</td>
             <td>
               {% if item.is_active %}
-                <span class="badge badge-active">Active</span>
+              <span class="badge badge-active">Active</span>
               {% else %}
-                <span class="badge badge-blocked">Inactive</span>
+              <span class="badge badge-blocked">Inactive</span>
               {% endif %}
             </td>
             <td class="actions-cell">
               <a href="{% url 'food:food_admin_item_edit' item.id %}" class="btn-secondary">Edit</a>
-              <a href="{% url 'food:food_admin_item_delete' item.id %}" class="btn-danger" onclick="return confirm('Delete this item?')">Delete</a>
+              <a href="{% url 'food:food_admin_item_delete' item.id %}" class="btn-danger"
+                onclick="return confirm('Delete this item?')">Delete</a>
             </td>
           </tr>
           {% empty %}
@@ -412,22 +426,22 @@
 </div>
 
 <script>
-function showTab(tabName) {
-  // Hide all tab contents
-  document.querySelectorAll('.tab-content').forEach(content => {
-    content.classList.remove('active');
-  });
-  
-  // Remove active class from all tabs
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.classList.remove('active');
-  });
-  
-  // Show selected tab content
-  document.getElementById(tabName).classList.add('active');
-  
-  // Add active class to clicked tab
-  event.target.classList.add('active');
-}
+  function showTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.remove('active');
+    });
+
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.remove('active');
+    });
+
+    // Show selected tab content
+    document.getElementById(tabName).classList.add('active');
+
+    // Add active class to clicked tab
+    event.target.classList.add('active');
+  }
 </script>
 {% endblock %}

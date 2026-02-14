@@ -8,7 +8,7 @@
     max-width: 1200px;
     margin: 0 auto;
   }
-  
+
   .page-header {
     background: #ffffff;
     border-radius: 16px;
@@ -16,27 +16,27 @@
     margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
-  
+
   .header-content {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 16px;
   }
-  
+
   .header-title h1 {
     font-size: 20px;
     font-weight: 600;
     color: #1e293b;
     margin: 0;
   }
-  
+
   .header-subtitle {
     font-size: 13px;
     color: #64748b;
     margin-top: 4px;
   }
-  
+
   .btn-secondary {
     padding: 8px 16px;
     background: #ffffff;
@@ -49,17 +49,17 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  
+
   .btn-secondary:hover {
     background: #eff6ff;
   }
-  
+
   .nav-tabs {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
   }
-  
+
   .nav-tab {
     padding: 6px 12px;
     background: #f1f5f9;
@@ -70,30 +70,30 @@
     text-decoration: none;
     transition: all 0.2s;
   }
-  
+
   .nav-tab:hover {
     background: #e2e8f0;
     color: #374151;
   }
-  
+
   .nav-tab.active {
     background: #3b82f6;
     color: #ffffff;
   }
-  
+
   .data-card {
     background: #ffffff;
     border-radius: 16px;
     padding: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
-  
+
   .data-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
   }
-  
+
   .data-table th {
     text-align: left;
     padding: 12px 16px;
@@ -102,35 +102,35 @@
     color: #374151;
     border-bottom: 1px solid #e5e7eb;
   }
-  
+
   .data-table td {
     padding: 14px 16px;
     font-size: 14px;
     color: #1e293b;
     border-bottom: 1px solid #f3f4f6;
   }
-  
+
   .data-table tr:hover td {
     background: #f9fafb;
   }
-  
+
   .time-cell {
     color: #6b7280;
     font-size: 13px;
     white-space: nowrap;
   }
-  
+
   .student-cell {
     font-weight: 500;
     color: #1e293b;
     white-space: nowrap;
   }
-  
+
   .message-cell {
     color: #4b5563;
     line-height: 1.5;
   }
-  
+
   .empty-state {
     text-align: center;
     padding: 40px;
@@ -168,13 +168,16 @@
       </thead>
       <tbody>
         {% for n in notifications %}
-          <tr>
-            <td class="time-cell">{{ n.created_at|date:"M d, Y, g:i a" }}</td>
-            <td class="student-cell">{{ n.recipient_student.roll_no }} - {{ n.recipient_student.full_name }}</td>
-            <td class="message-cell">{{ n.message }}</td>
-          </tr>
+        <tr>
+          <td class="time-cell">{{ n.created_at|date:"M d, Y, g:i a" }}</td>
+          <td class="student-cell">{{ n.recipient_student.registration_number }} - {{ n.recipient_student.full_name }}
+          </td>
+          <td class="message-cell">{{ n.message }}</td>
+        </tr>
         {% empty %}
-          <tr><td colspan="3" class="empty-state">No notifications yet.</td></tr>
+        <tr>
+          <td colspan="3" class="empty-state">No notifications yet.</td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>

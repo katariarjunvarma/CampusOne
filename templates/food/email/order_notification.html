@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Notification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .status-reminder {
+            background-color: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .order-details {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .value {
+            font-weight: 600;
+            color: #212529;
+            text-align: right;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+            border-top: 1px solid #e9ecef;
+        }
+
+        /* Helper classes for table cells */
+        .cell-border {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .cell-plain {
+            padding: 8px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Smart LPU Food Court</h1>
+        </div>
+        <div class="content">
+            <p>Hello <strong>{{ order.ordered_by.first_name|default:order.ordered_by.username }}</strong>,</p>
+
+            {% if type == 'ready' %}
+            <p>Good news! Your order is now <span class="status-badge">Ready for Pickup</span></p>
+            <p>Please head to the stall to collect your delicious meal.</p>
+            {% else %}
+            <p>This is a reminder that your order is <span class="status-badge status-reminder">Waiting for You</span>
+            </p>
+            <p>It has been ready for a while. Please pick it up soon to enjoy it fresh!</p>
+            {% endif %}
+
+            <div class="order-details">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td class="label cell-border">Order ID</td>
+                        <td class="value cell-border">#{{ order.order_number|default:order.id }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label cell-border">Stall</td>
+                        <td class="value cell-border">{{ order.food_item.stall_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label cell-border">Item</td>
+                        <td class="value cell-border">{{ order.food_item.name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label cell-border">Quantity</td>
+                        <td class="value cell-border">{{ order.quantity }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label cell-plain">Total Amount</td>
+                        <td class="value cell-plain">₹{{ order.item_total }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <p style="text-align: center; color: #6c757d; font-size: 14px;">
+                Show your Order ID at the counter to collect your food.
+            </p>
+        </div>
+        <div class="footer">
+            <p>&copy; {% now "Y" %} Smart LPU Food Court System. All rights reserved.</p>
+            <p>This is an automated message, please do not reply.</p>
+        </div>
+    </div>
+</body>
+
+</html>

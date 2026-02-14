@@ -19,7 +19,7 @@ def send_absence_notification(student, session):
         
         context = {
             'student_name': student.full_name,
-            'roll_number': student.roll_no,
+            'roll_number': student.registration_number,
             'course_name': session.course.name,
             'course_code': session.course.code,
             'date': session.session_date.strftime('%d %B %Y'),
@@ -62,7 +62,7 @@ def send_low_attendance_warning(student, course):
         
         context = {
             'student_name': student.full_name,
-            'roll_number': student.roll_no,
+            'roll_number': student.registration_number,
             'course_name': course.name,
             'course_code': course.code,
             'attendance_percentage': round(attendance_percentage, 1),
@@ -124,7 +124,7 @@ def send_monthly_attendance_summary(student, year, month):
         
         context = {
             'student_name': student.full_name,
-            'roll_number': student.roll_no,
+            'roll_number': student.registration_number,
             'month': month_name,
             'year': year,
             'attendance_percentage': round(attendance_percentage, 1),

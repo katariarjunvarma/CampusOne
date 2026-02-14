@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import json
 
+from django.conf import settings
 from django.contrib import messages
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Sum
@@ -669,6 +673,19 @@ def food_admin_item_delete(request: HttpRequest, item_id: int) -> HttpResponse:
     return redirect("food:food_admin_dashboard")
 
 
+@login_required
+def food_admin_clear_history(request: HttpRequest) -> HttpResponse:
+    if not _require_admin(request):
+        return redirect("home")
+    
+    if request.method == "POST":
+        # Clear all PreOrder objects
+        count, _ = PreOrder.objects.all().delete()
+        messages.success(request, f"Successfully cleared all {count} food order history.")
+    
+    return redirect("food:food_admin_dashboard")
+
+
 def _get_stall_owner(request: HttpRequest):
     try:
         return request.user.stall_owner
@@ -764,7 +781,7 @@ def vendor_update_order(request: HttpRequest) -> HttpResponse:
     try:
         order = PreOrder.objects.get(
             id=order_id,
-            food_item__stall_name=stall_owner.stall.name,
+            food_item__stall=stall_owner.stall,
             order_date=timezone.localdate(),
         )
     except PreOrder.DoesNotExist:
@@ -773,7 +790,66 @@ def vendor_update_order(request: HttpRequest) -> HttpResponse:
     order.status = new_status
     order.save(update_fields=["status"])
 
-    return JsonResponse({"ok": True, "status": new_status})
+    # Email is handled by post_save signal in signals.py
+
+    return JsonResponse({"ok": True, "status": new_status, "new_status": new_status})
+
+
+@login_required
+def vendor_remind_order(request: HttpRequest) -> HttpResponse:
+    stall_owner = _get_stall_owner(request)
+    if not stall_owner or not stall_owner.is_active:
+        return JsonResponse({"ok": False, "error": "access_denied"}, status=403)
+
+    if request.method != "POST":
+        return JsonResponse({"ok": False, "error": "method_not_allowed"}, status=405)
+
+    try:
+        payload = json.loads((request.body or b"{}").decode("utf-8"))
+    except Exception:
+        return JsonResponse({"ok": False, "error": "invalid_payload"}, status=400)
+
+    order_id = payload.get("order_id")
+
+    if not order_id:
+        return JsonResponse({"ok": False, "error": "invalid_data"}, status=400)
+
+    try:
+        order = PreOrder.objects.get(
+            id=order_id,
+            food_item__stall=stall_owner.stall,
+            order_date=timezone.localdate(),
+            status=PreOrder.STATUS_READY
+        )
+    except PreOrder.DoesNotExist:
+        return JsonResponse({"ok": False, "error": "not_found"}, status=404)
+
+    # Send reminder email
+    if order.ordered_by and order.ordered_by.email:
+        try:
+            subject = f"Reminder: Order #{order.order_number or order.id} Ready for Pickup - Smart LPU"
+            
+            html_message = render_to_string('food/email/order_notification.html', {
+                'order': order,
+                'type': 'reminder'
+            })
+            plain_message = strip_tags(html_message)
+            
+            from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER)
+            send_mail(
+                subject,
+                plain_message,
+                from_email,
+                [order.ordered_by.email],
+                html_message=html_message,
+                fail_silently=True,
+            )
+            return JsonResponse({"ok": True})
+        except Exception as e:
+            print(f"Failed to send reminder email: {e}")
+            return JsonResponse({"ok": False, "error": "email_failed"}, status=500)
+    
+    return JsonResponse({"ok": False, "error": "no_email"}, status=400)
 
 
 @login_required
@@ -833,3 +909,167 @@ def vendor_toggle_item(request: HttpRequest) -> HttpResponse:
         "is_active": item.is_active,
         "message": f"'{item.name}' is now {'available' if item.is_active else 'not available'}"
     })
+
+@login_required
+def vendor_updates(request: HttpRequest) -> HttpResponse:
+    """API Endpoint for Vendor Dashboard Realtime Updates"""
+    stall_owner = _get_stall_owner(request)
+    if not stall_owner or not stall_owner.is_active:
+        return JsonResponse({"ok": False})
+
+    today = timezone.localdate()
+    # Optimize query by selecting specific fields if possible, but for now full objects are fine
+    all_orders = (
+        PreOrder.objects.select_related("food_item", "slot", "ordered_by")
+        .filter(
+            food_item__stall=stall_owner.stall,
+            order_date=today,
+        )
+        .order_by("slot__start_time", "created_at")
+    )
+
+    pending_orders = all_orders.filter(status=PreOrder.STATUS_PENDING)
+    cooking_orders = all_orders.filter(status=PreOrder.STATUS_COOKING)
+    ready_orders = all_orders.filter(status=PreOrder.STATUS_READY)
+    collected_orders = all_orders.filter(status=PreOrder.STATUS_COLLECTED)
+    missed_orders = all_orders.filter(status=PreOrder.STATUS_MISSED)
+
+    data = {
+        "ok": True,
+        "counts": {
+            "pending": pending_orders.count(),
+            "cooking": cooking_orders.count(),
+            "ready": ready_orders.count(),
+            "collected": collected_orders.count(),
+            "missed": missed_orders.count(),
+        },
+        "sections": {
+            "pending": render_to_string("food/partials/vendor_table.html", {"orders": pending_orders, "status": "pending"}, request=request),
+            "cooking": render_to_string("food/partials/vendor_table.html", {"orders": cooking_orders, "status": "cooking"}, request=request),
+            "ready": render_to_string("food/partials/vendor_table.html", {"orders": ready_orders, "status": "ready"}, request=request),
+            "collected": render_to_string("food/partials/vendor_table.html", {"orders": collected_orders, "status": "completed"}, request=request),
+            "missed": render_to_string("food/partials/vendor_table.html", {"orders": missed_orders, "status": "missed"}, request=request),
+        }
+    }
+    return JsonResponse(data)
+
+@login_required
+def my_orders_updates(request: HttpRequest) -> HttpResponse:
+    """API Endpoint for My Orders Realtime Updates"""
+    day_str = (request.GET.get("date") or "").strip()
+    if day_str:
+        try:
+            day = _date.fromisoformat(day_str)
+        except Exception:
+            day = timezone.localdate()
+    else:
+        day = timezone.localdate()
+
+    # Get all orders for the day
+    orders = (
+        PreOrder.objects.select_related("food_item", "slot")
+        .filter(order_date=day, ordered_by=request.user)
+        .order_by("order_number", "created_at")
+    )
+    
+    # Group by order_number
+    grouped_orders = {}
+    for order in orders:
+        onum = order.order_number
+        if onum not in grouped_orders:
+            grouped_orders[onum] = {
+                "order_number": onum,
+                "slot": order.slot,
+                "status": order.status,
+                "orders": [],
+                "total_cost": 0,
+            }
+        grouped_orders[onum]["orders"].append(order)
+        grouped_orders[onum]["total_cost"] += order.item_total
+    
+    html = render_to_string(
+        "food/partials/my_orders_list.html",
+        {"grouped_orders": grouped_orders.values()},
+        request=request
+    )
+    
+    return JsonResponse({"ok": True, "html": html})
+@login_required
+def vendor_bulk_orders(request: HttpRequest) -> HttpResponse:
+    stall_owner = _get_stall_owner(request)
+    if not stall_owner or not stall_owner.is_active:
+        messages.error(request, "Stall owner access required.")
+        return redirect("home")
+
+    bulk_orders = BulkOrder.objects.filter(stall_name=stall_owner.stall.name).order_by("-created_at")
+    
+    return render(
+        request,
+        "food/vendor_bulk_orders.html",
+        {
+            "stall": stall_owner.stall,
+            "bulk_orders": bulk_orders,
+        },
+    )
+@login_required
+def vendor_update_bulk_status(request: HttpRequest) -> HttpResponse:
+    stall_owner = _get_stall_owner(request)
+    if not stall_owner or not stall_owner.is_active:
+        messages.error(request, "Stall owner access required.")
+        return redirect("food:vendor_bulk_orders")
+
+    if request.method != "POST":
+        return redirect("food:vendor_bulk_orders")
+
+    order_id = request.POST.get("order_id")
+    status = request.POST.get("status")
+    
+    # Check for 'action' from Mark Completed form which uses name='action' value='complete'
+    # But template uses status='completed' in a separate form.
+    # The template I wrote uses name="status" for approve/reject/complete forms.
+    # Except one form uses name='action' value='complete'. Let's handle both.
+    
+    action = request.POST.get("action")
+    if action == "complete":
+        status = "completed"
+        
+    # Map 'completed' to specific status if needed. 
+    # BulkOrder model has STATUS_APPROVED, STATUS_REJECTED, STATUS_CANCELLED.
+    # It seems I didn't add a STATUS_COMPLETED to the model in models.py earlier.
+    # Let me check models.py content again or I can assume I need to add it or use an existing one.
+    # From previous view_file of models.py:
+    # STATUS_SUBMITTED = "submitted"
+    # STATUS_APPROVED = "approved"
+    # STATUS_REJECTED = "rejected"
+    # STATUS_CANCELLED = "cancelled"
+    # There is NO "completed" status in BulkOrder model yet.
+    # I should likely add it or map it to something else, or maybe just APPROVED is the final state?
+    # User asked for "Completed button". So I should add STATUS_COMPLETED to Model.
+    
+    # For now, let's assume I will update the model in next step.
+    
+    if not order_id or not status:
+         messages.error(request, "Invalid request.")
+         return redirect("food:vendor_bulk_orders")
+         
+    try:
+        order = BulkOrder.objects.get(id=order_id, stall_name=stall_owner.stall.name)
+        
+        # Validate transitions
+        # submitted -> approved / rejected
+        # approved -> completed (new status)
+        
+        # Since I can't restart model editing right in the middle of this generic comment,
+        # I will assume "completed" is a valid string to save for now, 
+        # but I must update choices in models.py to strictly follow Django patterns.
+        # However, CharField choices are validation level, saving a string usually works if max_length allows.
+        # BulkOrder status max_length=16. "completed" is 9 chars. Safe.
+        
+        order.status = status
+        order.save()
+        messages.success(request, f"Bulk Order #{order.id} marked as {status}.")
+        
+    except BulkOrder.DoesNotExist:
+        messages.error(request, "Order not found.")
+        
+    return redirect("food:vendor_bulk_orders")

@@ -19,12 +19,16 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from attendance.views import AdminLoginView, StaffLoginView
+
 admin.site.site_header = 'Smart LPU Admin'
 admin.site.site_title = 'Smart LPU'
 admin.site.index_title = 'Smart LPU Administration'
 
 urlpatterns = [
+    path('admin/login/', AdminLoginView.as_view(), name='admin_login'),
     path('admin/', admin.site.urls),
+    path('accounts/login/', StaffLoginView.as_view(), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('', include('attendance.urls')),
     path('food/', include('food.urls')),

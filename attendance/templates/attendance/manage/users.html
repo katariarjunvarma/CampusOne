@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block title %}Smart LPU - Manage Users{% endblock %}
+
+{% block content %}
+<style>
+  .manage-container {
+    padding: 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .page-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  .btn-primary {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  .data-table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+  }
+  .data-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #1e293b;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .data-table tr:hover td {
+    background: #f9fafb;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .badge-superuser {
+    background: #dbeafe;
+    color: #3b82f6;
+  }
+  .badge-staff {
+    background: #fef3c7;
+    color: #f59e0b;
+  }
+  .badge-regular {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 60px;
+    color: #94a3b8;
+    font-size: 14px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+</style>
+
+<div class="manage-container">
+  <div class="page-header">
+    <h1>Users</h1>
+    <a href="{% url 'manage_user_create' %}" class="btn-primary">+ Add User</a>
+  </div>
+
+  {% if users %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Joined</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td><strong>{{ user.username }}</strong></td>
+        <td>{{ user.email|default:"-" }}</td>
+        <td>{{ user.date_joined|date:"M d, Y" }}</td>
+        <td>
+          {% if user.is_superuser %}
+          <span class="badge badge-superuser">Superuser</span>
+          {% elif user.is_staff %}
+          <span class="badge badge-staff">Staff</span>
+          {% else %}
+          <span class="badge badge-regular">User</span>
+          {% endif %}
+        </td>
+        <td>{% if user.is_active %}<span style="color: #22c55e;">Active</span>{% else %}<span style="color: #ef4444;">Inactive</span>{% endif %}</td>
+        <td>
+          <a class="btn-primary" style="padding: 8px 12px; font-size: 13px;" href="{% url 'manage_user_edit' user.id %}">Edit</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">No users found.</div>
+  {% endif %}
+</div>
+{% endblock %}

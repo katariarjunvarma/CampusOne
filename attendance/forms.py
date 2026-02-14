@@ -1,6 +1,11 @@
 from django import forms
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, Permission
 
 from .models import AttendanceSession, Course, Enrollment, FaceSample, Student
+
+
+User = get_user_model()
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -75,7 +80,7 @@ class AttendancePhotoUploadForm(forms.Form):
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ["roll_no", "full_name", "email", "parent_email", "parent_phone"]
+        fields = ["registration_number", "full_name", "email", "parent_email", "parent_phone"]
 
 
 class EnrollmentForm(forms.ModelForm):
@@ -91,7 +96,7 @@ class FaceSampleForm(forms.ModelForm):
 
 
 class FaceSampleMultiForm(forms.Form):
-    student = forms.ModelChoiceField(queryset=Student.objects.order_by("roll_no"))
+    student = forms.ModelChoiceField(queryset=Student.objects.order_by("registration_number"))
     images = MultipleFileField(
         required=True,
         widget=MultipleFileInput(
@@ -106,3 +111,27 @@ class FaceSampleMultiForm(forms.Form):
         if len(files) > 10:
             raise forms.ValidationError("Please upload at most 10 photos.")
         return files
+
+
+class UserPermissionsForm(forms.ModelForm):
+    groups = forms.ModelMultipleChoiceField(
+        queryset=Group.objects.order_by("name"),
+        required=False,
+        widget=forms.SelectMultiple(attrs={"class": "form-select", "size": "10"}),
+    )
+    user_permissions = forms.ModelMultipleChoiceField(
+        queryset=Permission.objects.select_related("content_type").order_by(
+            "content_type__app_label", "content_type__model", "codename"
+        ),
+        required=False,
+        widget=forms.SelectMultiple(attrs={"class": "form-select", "size": "10"}),
+    )
+
+    class Meta:
+        model = User
+        fields = ["is_active", "is_staff", "is_superuser", "groups", "user_permissions"]
+        widgets = {
+            "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "is_staff": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "is_superuser": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }

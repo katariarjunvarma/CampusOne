@@ -207,9 +207,170 @@
       <h1>Manage Data</h1>
       <div class="header-subtitle">Control students, courses & attendance records</div>
     </div>
-    <div class="status-badge">
-      <span class="status-dot"></span>
-      System Healthy
+    <div class="d-flex align-items-center" style="gap: 12px;">
+      <a href="/admin/" class="btn-primary" style="box-shadow: none;">Open Django Admin</a>
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        System Healthy
+      </div>
+    </div>
+  </div>
+  
+  <!-- System Management -->
+  <h2 class="section-title">System Management</h2>
+  <div class="cards-grid">
+    <!-- Users -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon" style="background: #e0e7ff; color: #4f46e5;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <span class="card-title">Users</span>
+      </div>
+      <div class="card-description">Manage system users and stall owners</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_users' %}" class="btn-primary">Open Users</a>
+        <a href="{% url 'manage_user_create' %}" class="btn-secondary">Add User</a>
+      </div>
+    </div>
+    
+    <!-- Stalls -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon" style="background: #fef3c7; color: #f59e0b;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </div>
+        <span class="card-title">Stalls</span>
+      </div>
+      <div class="card-description">Manage food stalls and locations</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_stalls' %}" class="btn-primary">Open Stalls</a>
+        <a href="{% url 'manage_stall_create' %}" class="btn-secondary">Add Stall</a>
+      </div>
+    </div>
+    
+    <!-- Break Slots -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon" style="background: #dbeafe; color: #3b82f6;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <span class="card-title">Break Slots</span>
+      </div>
+      <div class="card-description">Manage time slots for food ordering</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_break_slots' %}" class="btn-primary">Open Slots</a>
+        <a href="{% url 'manage_break_slot_create' %}" class="btn-secondary">Add Slot</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Food Management -->
+  <h2 class="section-title">Food Management</h2>
+  <div class="cards-grid">
+    <!-- Food Items -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon" style="background: #fed7aa; color: #f97316;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+          </svg>
+        </div>
+        <span class="card-title">Food Items</span>
+      </div>
+      <div class="card-description">Manage menu items and pricing</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_food_items' %}" class="btn-primary">Open Items</a>
+        <a href="{% url 'manage_food_item_create' %}" class="btn-secondary">Add Item</a>
+      </div>
+    </div>
+    
+    <!-- PreOrders -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon" style="background: #d1fae5; color: #059669;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+        </div>
+        <span class="card-title">PreOrders</span>
+      </div>
+      <div class="card-description">View and manage food pre-orders</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_preorders' %}" class="btn-primary">View Orders</a>
+      </div>
+    </div>
+    
+    <!-- Bulk Orders -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon" style="background: #ede9fe; color: #8b5cf6;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <span class="card-title">Bulk Orders</span>
+      </div>
+      <div class="card-description">Manage group and event orders</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_bulk_orders' %}" class="btn-primary">View Bulk Orders</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Rewards & Alerts -->
+  <h2 class="section-title">Rewards & Alerts</h2>
+  <div class="cards-grid two-col">
+    <!-- Loyalty Points -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon" style="background: #fef9c3; color: #eab308;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </div>
+        <span class="card-title">Loyalty Points</span>
+      </div>
+      <div class="card-description">Manage user reward points</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_loyalty_points' %}" class="btn-primary">View Points</a>
+      </div>
+    </div>
+    
+    <!-- Emergency Alerts -->
+    <div class="manage-card">
+      <div class="card-header">
+        <div class="card-icon" style="background: #fee2e2; color: #dc2626;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <span class="card-title">Emergency Alerts</span>
+      </div>
+      <div class="card-description">Manage system alerts and notifications</div>
+      <div class="card-actions">
+        <a href="{% url 'manage_emergency_alerts' %}" class="btn-primary">View Alerts</a>
+        <a href="{% url 'manage_emergency_alert_create' %}" class="btn-secondary">Create Alert</a>
+      </div>
     </div>
   </div>
   
@@ -319,11 +480,9 @@
     </div>
   </div>
   
-  {% if request.user.is_superuser %}
-  <!-- Food Management -->
-  <h2 class="section-title">Food Management</h2>
+  <!-- Food Order Editor (Old) -->
+  <h2 class="section-title">Food Order Editor</h2>
   <div class="cards-grid two-col">
-    <!-- Food Order Editor -->
     <div class="manage-card">
       <div class="card-header">
         <div class="card-icon" style="background: #fed7aa; color: #f97316;">
@@ -333,15 +492,14 @@
             <path d="M2 12l10 5 10-5"></path>
           </svg>
         </div>
-        <span class="card-title">Food Order Editor</span>
+        <span class="card-title">Legacy Food Editor</span>
       </div>
-      <div class="card-description">Manage food items, stalls, categories, and pricing for the food ordering system.</div>
+      <div class="card-description">Manage stalls and food items using the classic editor.</div>
       <div class="card-actions">
-        <a href="{% url 'food:food_admin_dashboard' %}" class="btn-primary">Open Editor</a>
+        <a href="{% url 'food:food_admin_dashboard' %}" class="btn-primary" style="box-shadow: none;">Open Editor</a>
       </div>
     </div>
   </div>
-  {% endif %}
   
   <!-- Monitoring -->
   <h2 class="section-title">Monitoring</h2>
