@@ -62,16 +62,22 @@
           </a>
           {% endif %}
           {% if user.is_authenticated and user.is_superuser %}
-          <a href="{% url 'manage_dashboard' %}">
-            <div class="nav-text">
-              <div class="nav-title">Manage Data</div>
-              <div class="hint">Admin Console</div>
-            </div>
-          </a>
           <a href="{% url 'super_admin_view_attendance' %}">
             <div class="nav-text">
               <div class="nav-title">View Attendance</div>
               <div class="hint">Student History</div>
+            </div>
+          </a>
+          <a href="{% url 'campus_resources_dashboard' %}">
+            <div class="nav-text">
+              <div class="nav-title">Campus Resources</div>
+              <div class="hint">Blocks, Rooms, Faculty</div>
+            </div>
+          </a>
+          <a href="{% url 'manage_dashboard' %}">
+            <div class="nav-text">
+              <div class="nav-title">Manage Data</div>
+              <div class="hint">Admin Console</div>
             </div>
           </a>
           {% endif %}

@@ -116,9 +116,20 @@
     font-weight: 700;
   }
 
-  .pill.low { background: #dcfce7; color: #16a34a; }
-  .pill.mid { background: #fef3c7; color: #d97706; }
-  .pill.high { background: #fee2e2; color: #dc2626; }
+  .pill.low {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+
+  .pill.mid {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  .pill.high {
+    background: #fee2e2;
+    color: #dc2626;
+  }
 
   .empty-state {
     text-align: center;
@@ -147,7 +158,9 @@
         <tr>
           <th style="width: 260px;">Faculty</th>
           <th style="width: 220px;">Employee ID</th>
-          <th style="width: 200px;">Sessions / Week</th>
+          <th style="width: 150px;">Sessions / Week</th>
+          <th style="width: 150px;">Max Load</th>
+          <th style="width: 150px;">Status</th>
         </tr>
       </thead>
       <tbody>
@@ -155,13 +168,15 @@
         <tr>
           <td><span class="badge-soft">{{ r.faculty.user.username }}</span></td>
           <td class="muted">{% if r.faculty.employee_id %}{{ r.faculty.employee_id }}{% else %}-{% endif %}</td>
+          <td>{{ r.sessions_per_week }}</td>
+          <td class="muted">{{ r.max_load }}</td>
           <td>
-            {% if r.sessions_per_week >= 10 %}
-              <span class="pill high">{{ r.sessions_per_week }}</span>
-            {% elif r.sessions_per_week >= 6 %}
-              <span class="pill mid">{{ r.sessions_per_week }}</span>
+            {% if r.is_overloaded %}
+            <span class="pill high">Overload ({{ r.load_pct }}%)</span>
+            {% elif r.load_pct >= 90 %}
+            <span class="pill mid">Heavy ({{ r.load_pct }}%)</span>
             {% else %}
-              <span class="pill low">{{ r.sessions_per_week }}</span>
+            <span class="pill low">Normal ({{ r.load_pct }}%)</span>
             {% endif %}
           </td>
         </tr>

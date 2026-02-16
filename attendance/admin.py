@@ -45,3 +45,36 @@ class NotificationAdmin(admin.ModelAdmin):
 class FaceSampleAdmin(admin.ModelAdmin):
     list_display = ("student", "created_at")
     search_fields = ("student__registration_number", "student__full_name")
+
+
+from .models import Block, Classroom, FacultyProfile, CourseOffering
+
+
+@admin.register(Block)
+class BlockAdmin(admin.ModelAdmin):
+    list_display = ("code", "name", "is_active")
+    search_fields = ("code", "name")
+    list_filter = ("is_active",)
+
+
+@admin.register(Classroom)
+class ClassroomAdmin(admin.ModelAdmin):
+    list_display = ("room_number", "block", "capacity", "room_type", "is_active")
+    search_fields = ("room_number", "block__code", "block__name")
+    list_filter = ("block", "room_type", "is_active", "has_projector")
+
+
+@admin.register(FacultyProfile)
+class FacultyProfileAdmin(admin.ModelAdmin):
+    list_display = ("user", "employee_id", "department", "designation", "is_active")
+    search_fields = ("user__username", "user__email", "employee_id", "department")
+    list_filter = ("department", "designation", "is_active")
+
+
+@admin.register(CourseOffering)
+class CourseOfferingAdmin(admin.ModelAdmin):
+    list_display = ("course", "faculty", "classroom", "day_of_week", "start_time", "end_time", "is_active")
+    search_fields = ("course__code", "course__name", "faculty__user__username", "classroom__room_number")
+    list_filter = ("day_of_week", "mode", "is_active", "semester", "academic_year")
+    autocomplete_fields = ["course", "faculty", "classroom"]
+

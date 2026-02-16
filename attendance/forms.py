@@ -172,12 +172,77 @@ class CourseOfferingForm(forms.ModelForm):
             "course",
             "faculty",
             "classroom",
+            "section",
+            "semester",
+            "academic_year",
+            "expected_strength",
+            "mode",
             "day_of_week",
             "start_time",
             "end_time",
             "is_active",
         ]
         widgets = {
-            "start_time": forms.TimeInput(attrs={"type": "time"}),
-            "end_time": forms.TimeInput(attrs={"type": "time"}),
+            "start_time": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
+            "end_time": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
+            "course": forms.Select(attrs={"class": "form-select"}),
+            "faculty": forms.Select(attrs={"class": "form-select"}),
+            "classroom": forms.Select(attrs={"class": "form-select"}),
+            "section": forms.TextInput(attrs={"class": "form-control"}),
+            "semester": forms.NumberInput(attrs={"class": "form-control"}),
+            "academic_year": forms.TextInput(attrs={"class": "form-control"}),
+            "expected_strength": forms.NumberInput(attrs={"class": "form-control"}),
+            "mode": forms.Select(attrs={"class": "form-select"}),
+            "day_of_week": forms.Select(attrs={"class": "form-select"}),
+            "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        classroom = cleaned_data.get("classroom")
+        faculty = cleaned_data.get("faculty")
+        day = cleaned_data.get("day_of_week")
+        start = cleaned_data.get("start_time")
+        end = cleaned_data.get("end_time")
+        pk = self.instance.pk
+
+        # Check 1: Time validation
+        if start and end and start >= end:
+            self.add_error("end_time", "End time must be after start time.")
+
+        if not (classroom and faculty and day is not None and start and end):
+             return cleaned_data
+
+        # Check 2: Classroom Clash
+        # Find any other active offering in same room, same day, overlapping time
+        room_clash = CourseOffering.objects.filter(
+            classroom=classroom,
+            day_of_week=day,
+            is_active=True,
+            start_time__lt=end,
+            end_time__gt=start,
+        ).exclude(pk=pk)
+
+        if room_clash.exists():
+            clash = room_clash.first()
+            msg = f"Room {classroom} is already booked for {clash.course.code} ({clash.start_time}-{clash.end_time})"
+            self.add_error("classroom", msg)
+            self.add_error("start_time", "Time clash in this room")
+
+        # Check 3: Faculty Clash
+        # Find any other active offering for same faculty, same day, overlapping time
+        faculty_clash = CourseOffering.objects.filter(
+            faculty=faculty,
+            day_of_week=day,
+            is_active=True,
+            start_time__lt=end,
+            end_time__gt=start,
+        ).exclude(pk=pk)
+
+        if faculty_clash.exists():
+            clash = faculty_clash.first()
+            msg = f"Faculty {faculty} is already teaching {clash.course.code} ({clash.start_time}-{clash.end_time})"
+            self.add_error("faculty", msg)
+            self.add_error("start_time", "Faculty is busy at this time")
+        
+        return cleaned_data

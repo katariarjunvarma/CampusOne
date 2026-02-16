@@ -14,6 +14,7 @@ from .views_attendance import (
     session_view,
 )
 from .views_manage import (
+    campus_resources_dashboard,
     manage_block_create,
     manage_block_delete,
     manage_block_edit,

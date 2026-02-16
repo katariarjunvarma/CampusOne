@@ -116,9 +116,20 @@
     font-weight: 700;
   }
 
-  .pill.good { background: #dcfce7; color: #16a34a; }
-  .pill.mid { background: #fef3c7; color: #d97706; }
-  .pill.high { background: #fee2e2; color: #dc2626; }
+  .pill.good {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+
+  .pill.mid {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  .pill.high {
+    background: #fee2e2;
+    color: #dc2626;
+  }
 
   .empty-state {
     text-align: center;
@@ -148,7 +159,8 @@
           <th style="width: 140px;">Course</th>
           <th style="width: 180px;">Faculty</th>
           <th style="width: 180px;">Classroom</th>
-          <th style="width: 140px;">Enrolled</th>
+          <th style="width: 140px;">Used Count</th>
+          <th style="width: 120px;">Source</th>
           <th style="width: 140px;">Capacity</th>
           <th style="width: 180px;">Utilization</th>
         </tr>
@@ -159,15 +171,22 @@
           <td><span class="badge-soft">{{ r.offering.course.code }}</span></td>
           <td class="muted">{{ r.offering.faculty.user.username }}</td>
           <td class="muted">{{ r.offering.classroom.block.code }}-{{ r.offering.classroom.room_number }}</td>
-          <td class="muted">{{ r.enrolled }}</td>
+          <td class="muted">{{ r.used_count }}</td>
+          <td>
+            {% if r.source == 'Enrollment' %}
+            <span class="badge-soft" style="background:#ecfdf5; color:#047857;">Actual</span>
+            {% else %}
+            <span class="badge-soft" style="background:#fffbeb; color:#b45309;">Expected</span>
+            {% endif %}
+          </td>
           <td class="muted">{{ r.capacity }}</td>
           <td>
             {% if r.utilization >= 90 %}
-              <span class="pill high">{{ r.utilization }}%</span>
+            <span class="pill high">{{ r.utilization }}%</span>
             {% elif r.utilization >= 70 %}
-              <span class="pill mid">{{ r.utilization }}%</span>
+            <span class="pill mid">{{ r.utilization }}%</span>
             {% else %}
-              <span class="pill good">{{ r.utilization }}%</span>
+            <span class="pill good">{{ r.utilization }}%</span>
             {% endif %}
           </td>
         </tr>

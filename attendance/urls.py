@@ -6,6 +6,7 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("attendance/", views.attendance_home, name="attendance_home"),
     path("manage/", views.manage_dashboard, name="manage_dashboard"),
+    path("campus-resources/", views.campus_resources_dashboard, name="campus_resources_dashboard"),
     path("manage/blocks/", views.manage_blocks, name="manage_blocks"),
     path("manage/blocks/new/", views.manage_block_create, name="manage_block_create"),
     path("manage/blocks/<int:block_id>/edit/", views.manage_block_edit, name="manage_block_edit"),

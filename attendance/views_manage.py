@@ -124,6 +124,18 @@ def manage_dashboard(request: HttpRequest) -> HttpResponse:
 
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def campus_resources_dashboard(request: HttpRequest) -> HttpResponse:
+    stats = {
+        "blocks": Block.objects.count(),
+        "classrooms": Classroom.objects.count(),
+        "faculty": FacultyProfile.objects.count(),
+        "offerings": CourseOffering.objects.count(),
+    }
+    return render(request, "attendance/manage/campus_resources_dashboard.html", {"stats": stats})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_blocks(request: HttpRequest) -> HttpResponse:
     blocks = Block.objects.order_by("code")
     return render(request, "attendance/manage/blocks.html", {"blocks": blocks})
@@ -140,7 +152,15 @@ def manage_block_create(request: HttpRequest) -> HttpResponse:
             return redirect("manage_blocks")
     else:
         form = BlockForm()
-    return render(request, "attendance/manage/form.html", {"form": form, "title": "Add Block"})
+    return render(
+        request,
+        "attendance/manage/form.html",
+        {
+            "form": form,
+            "title": "Add Block",
+            "cancel_url": reverse("campus_resources_dashboard"),
+        },
+    )
 
 
 @login_required
@@ -155,7 +175,15 @@ def manage_block_edit(request: HttpRequest, block_id: int) -> HttpResponse:
             return redirect("manage_blocks")
     else:
         form = BlockForm(instance=block)
-    return render(request, "attendance/manage/form.html", {"form": form, "title": "Edit Block"})
+    return render(
+        request,
+        "attendance/manage/form.html",
+        {
+            "form": form,
+            "title": "Edit Block",
+            "cancel_url": reverse("campus_resources_dashboard"),
+        },
+    )
 
 
 @login_required
@@ -166,7 +194,11 @@ def manage_block_delete(request: HttpRequest, block_id: int) -> HttpResponse:
         block.delete()
         messages.success(request, "Block deleted.")
         return redirect("manage_blocks")
-    return render(request, "attendance/manage/confirm_delete.html", {"object": block, "type": "Block"})
+    return render(
+        request,
+        "attendance/manage/confirm_delete.html",
+        {"object": block, "type": "Block", "cancel_url": "campus_resources_dashboard"},
+    )
 
 
 @login_required
@@ -191,7 +223,15 @@ def manage_classroom_create(request: HttpRequest) -> HttpResponse:
             return redirect("manage_classrooms")
     else:
         form = ClassroomForm()
-    return render(request, "attendance/manage/form.html", {"form": form, "title": "Add Classroom"})
+    return render(
+        request,
+        "attendance/manage/form.html",
+        {
+            "form": form,
+            "title": "Add Classroom",
+            "cancel_url": reverse("campus_resources_dashboard"),
+        },
+    )
 
 
 @login_required
@@ -206,7 +246,15 @@ def manage_classroom_edit(request: HttpRequest, classroom_id: int) -> HttpRespon
             return redirect("manage_classrooms")
     else:
         form = ClassroomForm(instance=classroom)
-    return render(request, "attendance/manage/form.html", {"form": form, "title": "Edit Classroom"})
+    return render(
+        request,
+        "attendance/manage/form.html",
+        {
+            "form": form,
+            "title": "Edit Classroom",
+            "cancel_url": reverse("campus_resources_dashboard"),
+        },
+    )
 
 
 @login_required
@@ -217,7 +265,15 @@ def manage_classroom_delete(request: HttpRequest, classroom_id: int) -> HttpResp
         classroom.delete()
         messages.success(request, "Classroom deleted.")
         return redirect("manage_classrooms")
-    return render(request, "attendance/manage/confirm_delete.html", {"object": classroom, "type": "Classroom"})
+    return render(
+        request,
+        "attendance/manage/confirm_delete.html",
+        {
+            "object": classroom,
+            "type": "Classroom",
+            "cancel_url": "campus_resources_dashboard",
+        },
+    )
 
 
 @login_required
@@ -238,7 +294,15 @@ def manage_faculty_create(request: HttpRequest) -> HttpResponse:
             return redirect("manage_faculty")
     else:
         form = FacultyProfileForm()
-    return render(request, "attendance/manage/form.html", {"form": form, "title": "Add Faculty"})
+    return render(
+        request,
+        "attendance/manage/form.html",
+        {
+            "form": form,
+            "title": "Add Faculty",
+            "cancel_url": reverse("campus_resources_dashboard"),
+        },
+    )
 
 
 @login_required
@@ -253,7 +317,15 @@ def manage_faculty_edit(request: HttpRequest, faculty_id: int) -> HttpResponse:
             return redirect("manage_faculty")
     else:
         form = FacultyProfileForm(instance=faculty)
-    return render(request, "attendance/manage/form.html", {"form": form, "title": "Edit Faculty"})
+    return render(
+        request,
+        "attendance/manage/form.html",
+        {
+            "form": form,
+            "title": "Edit Faculty",
+            "cancel_url": reverse("campus_resources_dashboard"),
+        },
+    )
 
 
 @login_required
@@ -264,7 +336,11 @@ def manage_faculty_delete(request: HttpRequest, faculty_id: int) -> HttpResponse
         faculty.delete()
         messages.success(request, "Faculty profile deleted.")
         return redirect("manage_faculty")
-    return render(request, "attendance/manage/confirm_delete.html", {"object": faculty, "type": "Faculty"})
+    return render(
+        request,
+        "attendance/manage/confirm_delete.html",
+        {"object": faculty, "type": "Faculty", "cancel_url": "campus_resources_dashboard"},
+    )
 
 
 @login_required
@@ -288,7 +364,15 @@ def manage_course_offering_create(request: HttpRequest) -> HttpResponse:
             return redirect("manage_course_offerings")
     else:
         form = CourseOfferingForm()
-    return render(request, "attendance/manage/form.html", {"form": form, "title": "Add Course Offering"})
+    return render(
+        request,
+        "attendance/manage/form.html",
+        {
+            "form": form,
+            "title": "Add Course Offering",
+            "cancel_url": reverse("campus_resources_dashboard"),
+        },
+    )
 
 
 @login_required
@@ -303,7 +387,15 @@ def manage_course_offering_edit(request: HttpRequest, offering_id: int) -> HttpR
             return redirect("manage_course_offerings")
     else:
         form = CourseOfferingForm(instance=offering)
-    return render(request, "attendance/manage/form.html", {"form": form, "title": "Edit Course Offering"})
+    return render(
+        request,
+        "attendance/manage/form.html",
+        {
+            "form": form,
+            "title": "Edit Course Offering",
+            "cancel_url": reverse("campus_resources_dashboard"),
+        },
+    )
 
 
 @login_required
@@ -314,7 +406,15 @@ def manage_course_offering_delete(request: HttpRequest, offering_id: int) -> Htt
         offering.delete()
         messages.success(request, "Course offering deleted.")
         return redirect("manage_course_offerings")
-    return render(request, "attendance/manage/confirm_delete.html", {"object": offering, "type": "Course Offering"})
+    return render(
+        request,
+        "attendance/manage/confirm_delete.html",
+        {
+            "object": offering,
+            "type": "Course Offering",
+            "cancel_url": "campus_resources_dashboard",
+        },
+    )
 
 
 @login_required
@@ -328,16 +428,24 @@ def report_capacity_utilization(request: HttpRequest) -> HttpResponse:
     rows = []
     for o in offerings:
         enrolled = Enrollment.objects.filter(course=o.course).count()
+        # Logic: Use actual enrollment if available (>0), otherwise fallback to expected strength
+        used_count = enrolled if enrolled > 0 else (o.expected_strength or 0)
+        source = "Enrollment" if enrolled > 0 else "Expected"
+        
         capacity = int(o.classroom.capacity or 0)
-        utilization = (enrolled / capacity * 100.0) if capacity > 0 else 0.0
+        utilization = (used_count / capacity * 100.0) if capacity > 0 else 0.0
+        
         rows.append(
             {
                 "offering": o,
                 "enrolled": enrolled,
+                "used_count": used_count,
+                "source": source,
                 "capacity": capacity,
                 "utilization": round(utilization, 1),
             }
         )
+    # Sort by utilization descending
     rows.sort(key=lambda r: r["utilization"], reverse=True)
     return render(request, "attendance/manage/report_capacity.html", {"rows": rows})
 
@@ -345,11 +453,26 @@ def report_capacity_utilization(request: HttpRequest) -> HttpResponse:
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def report_workload_distribution(request: HttpRequest) -> HttpResponse:
-    faculty = FacultyProfile.objects.select_related("user").order_by("user__username")
+    faculty = FacultyProfile.objects.filter(is_active=True).select_related("user").order_by("user__username")
     rows = []
     for f in faculty:
         sessions_per_week = CourseOffering.objects.filter(faculty=f, is_active=True).count()
-        rows.append({"faculty": f, "sessions_per_week": sessions_per_week})
+        max_load = f.max_weekly_load
+        
+        # Calculate load percentage
+        load_pct = (sessions_per_week / max_load * 100.0) if max_load > 0 else 0.0
+        
+        is_overloaded = sessions_per_week > max_load
+        
+        rows.append({
+            "faculty": f,
+            "sessions_per_week": sessions_per_week,
+            "max_load": max_load,
+            "load_pct": round(load_pct, 1),
+            "is_overloaded": is_overloaded
+        })
+    
+    # Sort by sessions descending
     rows.sort(key=lambda r: r["sessions_per_week"], reverse=True)
     return render(request, "attendance/manage/report_workload.html", {"rows": rows})
 
