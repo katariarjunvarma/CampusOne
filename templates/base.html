@@ -74,51 +74,6 @@
               <div class="hint">Student History</div>
             </div>
           </a>
-          <a href="#campusResourcesSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-            <div class="nav-text">
-              <div class="nav-title">Campus Resources</div>
-              <div class="hint">Blocks, Rooms, Faculty</div>
-            </div>
-          </a>
-          <div class="collapse" id="campusResourcesSubmenu" style="padding-left: 12px; border-left: 2px solid #e5e7eb; margin-left: 8px;">
-            <a href="{% url 'manage_blocks' %}">
-              <div class="nav-text">
-                <div class="nav-title" style="font-size: 14px;">Blocks</div>
-                <div class="hint" style="font-size: 11px;">Campus Buildings</div>
-              </div>
-            </a>
-            <a href="{% url 'manage_classrooms' %}">
-              <div class="nav-text">
-                <div class="nav-title" style="font-size: 14px;">Classrooms</div>
-                <div class="hint" style="font-size: 11px;">Rooms & Capacity</div>
-              </div>
-            </a>
-            <a href="{% url 'manage_faculty' %}">
-              <div class="nav-text">
-                <div class="nav-title" style="font-size: 14px;">Faculty</div>
-                <div class="hint" style="font-size: 11px;">Teacher Profiles</div>
-              </div>
-            </a>
-            <a href="{% url 'manage_course_offerings' %}">
-              <div class="nav-text">
-                <div class="nav-title" style="font-size: 14px;">Course Offerings</div>
-                <div class="hint" style="font-size: 11px;">Schedule & Assign</div>
-              </div>
-            </a>
-            <div class="fw-semibold mb-1 mt-2" style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Reports</div>
-            <a href="{% url 'report_capacity_utilization' %}">
-              <div class="nav-text">
-                <div class="nav-title" style="font-size: 14px;">Capacity Utilization</div>
-                <div class="hint" style="font-size: 11px;">Room Usage %</div>
-              </div>
-            </a>
-            <a href="{% url 'report_workload_distribution' %}">
-              <div class="nav-text">
-                <div class="nav-title" style="font-size: 14px;">Workload Distribution</div>
-                <div class="hint" style="font-size: 11px;">Faculty Load</div>
-              </div>
-            </a>
-          </div>
           {% endif %}
 
           {% if user.is_authenticated and is_stall_owner %}
