@@ -74,6 +74,44 @@
               <div class="hint">Student History</div>
             </div>
           </a>
+          <div class="fw-semibold mb-2 mt-3" style="font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Campus Resources</div>
+          <a href="{% url 'manage_blocks' %}">
+            <div class="nav-text">
+              <div class="nav-title">Blocks</div>
+              <div class="hint">Campus Buildings</div>
+            </div>
+          </a>
+          <a href="{% url 'manage_classrooms' %}">
+            <div class="nav-text">
+              <div class="nav-title">Classrooms</div>
+              <div class="hint">Rooms & Capacity</div>
+            </div>
+          </a>
+          <a href="{% url 'manage_faculty' %}">
+            <div class="nav-text">
+              <div class="nav-title">Faculty</div>
+              <div class="hint">Teacher Profiles</div>
+            </div>
+          </a>
+          <a href="{% url 'manage_course_offerings' %}">
+            <div class="nav-text">
+              <div class="nav-title">Course Offerings</div>
+              <div class="hint">Schedule & Assign</div>
+            </div>
+          </a>
+          <div class="fw-semibold mb-2 mt-3" style="font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Reports</div>
+          <a href="{% url 'report_capacity_utilization' %}">
+            <div class="nav-text">
+              <div class="nav-title">Capacity Utilization</div>
+              <div class="hint">Room Usage %</div>
+            </div>
+          </a>
+          <a href="{% url 'report_workload_distribution' %}">
+            <div class="nav-text">
+              <div class="nav-title">Workload Distribution</div>
+              <div class="hint">Faculty Load</div>
+            </div>
+          </a>
           {% endif %}
 
           {% if user.is_authenticated and is_stall_owner %}
