@@ -15,6 +15,17 @@
         <div class="smart-muted small">{{ object.email }}</div>
         {% elif type == 'Course' %}
         <div class="fw-semibold">{{ object.code }} - {{ object.name }}</div>
+        {% elif type == 'Block' %}
+        <div class="fw-semibold">{{ object.code }} - {{ object.name }}</div>
+        {% elif type == 'Classroom' %}
+        <div class="fw-semibold">{{ object.block.code }}-{{ object.room_number }}</div>
+        <div class="smart-muted small">Capacity: {{ object.capacity }}</div>
+        {% elif type == 'Faculty' %}
+        <div class="fw-semibold">{{ object.user.username }}</div>
+        <div class="smart-muted small">Employee ID: {{ object.employee_id|default:'-' }}</div>
+        {% elif type == 'Course Offering' %}
+        <div class="fw-semibold">{{ object.course.code }} - {{ object.faculty.user.username }}</div>
+        <div class="smart-muted small">{{ object.classroom.block.code }}-{{ object.classroom.room_number }} | {{ object.get_day_of_week_display }} {{ object.start_time }}-{{ object.end_time }}</div>
         {% elif object %}
         <div class="fw-semibold">{{ object.student.registration_number }} - {{ object.student.full_name }}</div>
         {% if object.image %}

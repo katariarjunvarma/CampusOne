@@ -2,7 +2,17 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 
-from .models import AttendanceSession, Course, Enrollment, FaceSample, Student
+from .models import (
+    AttendanceSession,
+    Block,
+    Classroom,
+    Course,
+    CourseOffering,
+    Enrollment,
+    FaceSample,
+    FacultyProfile,
+    Student,
+)
 
 
 User = get_user_model()
@@ -134,4 +144,40 @@ class UserPermissionsForm(forms.ModelForm):
             "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
             "is_staff": forms.CheckboxInput(attrs={"class": "form-check-input"}),
             "is_superuser": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+
+
+class BlockForm(forms.ModelForm):
+    class Meta:
+        model = Block
+        fields = ["code", "name", "is_active"]
+
+
+class ClassroomForm(forms.ModelForm):
+    class Meta:
+        model = Classroom
+        fields = ["block", "room_number", "capacity", "is_active"]
+
+
+class FacultyProfileForm(forms.ModelForm):
+    class Meta:
+        model = FacultyProfile
+        fields = ["user", "employee_id", "is_active"]
+
+
+class CourseOfferingForm(forms.ModelForm):
+    class Meta:
+        model = CourseOffering
+        fields = [
+            "course",
+            "faculty",
+            "classroom",
+            "day_of_week",
+            "start_time",
+            "end_time",
+            "is_active",
+        ]
+        widgets = {
+            "start_time": forms.TimeInput(attrs={"type": "time"}),
+            "end_time": forms.TimeInput(attrs={"type": "time"}),
         }

@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from django.conf import settings
 
 class Student(models.Model):
     registration_number = models.CharField(
@@ -90,5 +91,73 @@ class FaceSample(models.Model):
 
     def __str__(self) -> str:
         return f"{self.student.registration_number} sample"
+
+
+class Block(models.Model):
+    code = models.CharField(max_length=16, unique=True)
+    name = models.CharField(max_length=64)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self) -> str:
+        return f"{self.code} - {self.name}".strip(" -")
+
+
+class Classroom(models.Model):
+    block = models.ForeignKey(Block, on_delete=models.PROTECT, related_name="classrooms")
+    room_number = models.CharField(max_length=32)
+    capacity = models.PositiveIntegerField(default=1)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ("block", "room_number")
+
+    def __str__(self) -> str:
+        return f"{self.block.code}-{self.room_number} ({self.capacity})"
+
+
+class FacultyProfile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    employee_id = models.CharField(max_length=32, unique=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        label = self.employee_id or "Faculty"
+        return f"{self.user.username} ({label})"
+
+
+class CourseOffering(models.Model):
+    DOW_MON = 0
+    DOW_TUE = 1
+    DOW_WED = 2
+    DOW_THU = 3
+    DOW_FRI = 4
+    DOW_SAT = 5
+    DOW_SUN = 6
+
+    DAY_OF_WEEK_CHOICES = [
+        (DOW_MON, "Mon"),
+        (DOW_TUE, "Tue"),
+        (DOW_WED, "Wed"),
+        (DOW_THU, "Thu"),
+        (DOW_FRI, "Fri"),
+        (DOW_SAT, "Sat"),
+        (DOW_SUN, "Sun"),
+    ]
+
+    course = models.ForeignKey(Course, on_delete=models.PROTECT)
+    faculty = models.ForeignKey(FacultyProfile, on_delete=models.PROTECT, related_name="offerings")
+    classroom = models.ForeignKey(Classroom, on_delete=models.PROTECT, related_name="offerings")
+    day_of_week = models.IntegerField(choices=DAY_OF_WEEK_CHOICES)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["day_of_week", "start_time"]
+
+    def __str__(self) -> str:
+        return f"{self.course.code} {self.get_day_of_week_display()} {self.start_time}-{self.end_time}"
 
 

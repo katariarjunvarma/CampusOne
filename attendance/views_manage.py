@@ -33,14 +33,30 @@ from .face_recognition import (
 from .forms import (
     AttendancePhotoUploadForm,
     AttendanceSessionCreateForm,
+    BlockForm,
     CourseCreateForm,
+    CourseOfferingForm,
     EnrollmentForm,
     FaceSampleMultiForm,
     FaceSampleForm,
+    FacultyProfileForm,
+    ClassroomForm,
     StudentForm,
     UserPermissionsForm,
 )
-from .models import AttendanceRecord, AttendanceSession, Course, Enrollment, FaceSample, Notification, Student
+from .models import (
+    AttendanceRecord,
+    AttendanceSession,
+    Block,
+    Classroom,
+    Course,
+    CourseOffering,
+    Enrollment,
+    FaceSample,
+    FacultyProfile,
+    Notification,
+    Student,
+)
 
 from food.models import BulkOrder, BreakSlot, EmergencyAlert, FoodItem, LoyaltyPoints, PreOrder, Stall
 
@@ -98,8 +114,244 @@ def manage_dashboard(request: HttpRequest) -> HttpResponse:
         "sessions": AttendanceSession.objects.count(),
         "sessions_today": sessions_today,
         "records": AttendanceRecord.objects.count(),
+        "blocks": Block.objects.count(),
+        "classrooms": Classroom.objects.count(),
+        "faculty": FacultyProfile.objects.count(),
+        "offerings": CourseOffering.objects.count(),
     }
     return render(request, "attendance/manage/dashboard.html", {"stats": stats})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_blocks(request: HttpRequest) -> HttpResponse:
+    blocks = Block.objects.order_by("code")
+    return render(request, "attendance/manage/blocks.html", {"blocks": blocks})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_block_create(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        form = BlockForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Block created.")
+            return redirect("manage_blocks")
+    else:
+        form = BlockForm()
+    return render(request, "attendance/manage/form.html", {"form": form, "title": "Add Block"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_block_edit(request: HttpRequest, block_id: int) -> HttpResponse:
+    block = get_object_or_404(Block, id=block_id)
+    if request.method == "POST":
+        form = BlockForm(request.POST, instance=block)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Block updated.")
+            return redirect("manage_blocks")
+    else:
+        form = BlockForm(instance=block)
+    return render(request, "attendance/manage/form.html", {"form": form, "title": "Edit Block"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_block_delete(request: HttpRequest, block_id: int) -> HttpResponse:
+    block = get_object_or_404(Block, id=block_id)
+    if request.method == "POST":
+        block.delete()
+        messages.success(request, "Block deleted.")
+        return redirect("manage_blocks")
+    return render(request, "attendance/manage/confirm_delete.html", {"object": block, "type": "Block"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_classrooms(request: HttpRequest) -> HttpResponse:
+    classrooms = Classroom.objects.select_related("block").order_by("block__code", "room_number")
+    return render(
+        request,
+        "attendance/manage/classrooms.html",
+        {"classrooms": classrooms},
+    )
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_classroom_create(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        form = ClassroomForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Classroom created.")
+            return redirect("manage_classrooms")
+    else:
+        form = ClassroomForm()
+    return render(request, "attendance/manage/form.html", {"form": form, "title": "Add Classroom"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_classroom_edit(request: HttpRequest, classroom_id: int) -> HttpResponse:
+    classroom = get_object_or_404(Classroom, id=classroom_id)
+    if request.method == "POST":
+        form = ClassroomForm(request.POST, instance=classroom)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Classroom updated.")
+            return redirect("manage_classrooms")
+    else:
+        form = ClassroomForm(instance=classroom)
+    return render(request, "attendance/manage/form.html", {"form": form, "title": "Edit Classroom"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_classroom_delete(request: HttpRequest, classroom_id: int) -> HttpResponse:
+    classroom = get_object_or_404(Classroom, id=classroom_id)
+    if request.method == "POST":
+        classroom.delete()
+        messages.success(request, "Classroom deleted.")
+        return redirect("manage_classrooms")
+    return render(request, "attendance/manage/confirm_delete.html", {"object": classroom, "type": "Classroom"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_faculty(request: HttpRequest) -> HttpResponse:
+    faculty = FacultyProfile.objects.select_related("user").order_by("user__username")
+    return render(request, "attendance/manage/faculty.html", {"faculty": faculty})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_faculty_create(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        form = FacultyProfileForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Faculty profile created.")
+            return redirect("manage_faculty")
+    else:
+        form = FacultyProfileForm()
+    return render(request, "attendance/manage/form.html", {"form": form, "title": "Add Faculty"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_faculty_edit(request: HttpRequest, faculty_id: int) -> HttpResponse:
+    faculty = get_object_or_404(FacultyProfile, id=faculty_id)
+    if request.method == "POST":
+        form = FacultyProfileForm(request.POST, instance=faculty)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Faculty profile updated.")
+            return redirect("manage_faculty")
+    else:
+        form = FacultyProfileForm(instance=faculty)
+    return render(request, "attendance/manage/form.html", {"form": form, "title": "Edit Faculty"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_faculty_delete(request: HttpRequest, faculty_id: int) -> HttpResponse:
+    faculty = get_object_or_404(FacultyProfile, id=faculty_id)
+    if request.method == "POST":
+        faculty.delete()
+        messages.success(request, "Faculty profile deleted.")
+        return redirect("manage_faculty")
+    return render(request, "attendance/manage/confirm_delete.html", {"object": faculty, "type": "Faculty"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_course_offerings(request: HttpRequest) -> HttpResponse:
+    offerings = (
+        CourseOffering.objects.select_related("course", "faculty__user", "classroom__block")
+        .order_by("day_of_week", "start_time")
+    )
+    return render(request, "attendance/manage/course_offerings.html", {"offerings": offerings})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_course_offering_create(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        form = CourseOfferingForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Course offering created.")
+            return redirect("manage_course_offerings")
+    else:
+        form = CourseOfferingForm()
+    return render(request, "attendance/manage/form.html", {"form": form, "title": "Add Course Offering"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_course_offering_edit(request: HttpRequest, offering_id: int) -> HttpResponse:
+    offering = get_object_or_404(CourseOffering, id=offering_id)
+    if request.method == "POST":
+        form = CourseOfferingForm(request.POST, instance=offering)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Course offering updated.")
+            return redirect("manage_course_offerings")
+    else:
+        form = CourseOfferingForm(instance=offering)
+    return render(request, "attendance/manage/form.html", {"form": form, "title": "Edit Course Offering"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_course_offering_delete(request: HttpRequest, offering_id: int) -> HttpResponse:
+    offering = get_object_or_404(CourseOffering, id=offering_id)
+    if request.method == "POST":
+        offering.delete()
+        messages.success(request, "Course offering deleted.")
+        return redirect("manage_course_offerings")
+    return render(request, "attendance/manage/confirm_delete.html", {"object": offering, "type": "Course Offering"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def report_capacity_utilization(request: HttpRequest) -> HttpResponse:
+    offerings = (
+        CourseOffering.objects.filter(is_active=True)
+        .select_related("course", "faculty__user", "classroom__block")
+        .order_by("day_of_week", "start_time")
+    )
+    rows = []
+    for o in offerings:
+        enrolled = Enrollment.objects.filter(course=o.course).count()
+        capacity = int(o.classroom.capacity or 0)
+        utilization = (enrolled / capacity * 100.0) if capacity > 0 else 0.0
+        rows.append(
+            {
+                "offering": o,
+                "enrolled": enrolled,
+                "capacity": capacity,
+                "utilization": round(utilization, 1),
+            }
+        )
+    rows.sort(key=lambda r: r["utilization"], reverse=True)
+    return render(request, "attendance/manage/report_capacity.html", {"rows": rows})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def report_workload_distribution(request: HttpRequest) -> HttpResponse:
+    faculty = FacultyProfile.objects.select_related("user").order_by("user__username")
+    rows = []
+    for f in faculty:
+        sessions_per_week = CourseOffering.objects.filter(faculty=f, is_active=True).count()
+        rows.append({"faculty": f, "sessions_per_week": sessions_per_week})
+    rows.sort(key=lambda r: r["sessions_per_week"], reverse=True)
+    return render(request, "attendance/manage/report_workload.html", {"rows": rows})
 
 
 @login_required
