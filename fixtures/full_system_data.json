@@ -1,0 +1,6903 @@
+[
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$8MdHGQCfSIOhJeobDpXpTP$NLnO9YbICzvI4+9ln5nw8ZH74D8WwY61kh47XmtOM2E=",
+    "last_login": "2026-02-21T16:00:39.652Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-02-21T11:42:23.772Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$w1GOzEi0w7JhZChtKAA8Bj$4Bu2+ZoWV6qobFArr+u+a/RbL6575VK6+NMJzBnVgeY=",
+    "last_login": "2026-02-21T11:45:27.572Z",
+    "is_superuser": false,
+    "username": "arjunvarma",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-02-21T11:44:59.734Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$ZMJC2gtObvqtwaocpCY8wO$s+EdeJPZktv1jWntjImncJRAFTQ25O1vyXDbvOZFQgc=",
+    "last_login": "2026-02-21T16:00:11.362Z",
+    "is_superuser": false,
+    "username": "stall1",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-02-21T15:36:58Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 1,
+  "fields": {
+    "code": "BLOCK-1",
+    "name": "Admin Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 2,
+  "fields": {
+    "code": "BLOCK-2",
+    "name": "CSE Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 3,
+  "fields": {
+    "code": "BLOCK-3",
+    "name": "IT Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 4,
+  "fields": {
+    "code": "BLOCK-4",
+    "name": "ICE Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 5,
+  "fields": {
+    "code": "BLOCK-5",
+    "name": "ECE Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 6,
+  "fields": {
+    "code": "BLOCK-6",
+    "name": "Mechanical Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 7,
+  "fields": {
+    "code": "BLOCK-7",
+    "name": "Civil Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 8,
+  "fields": {
+    "code": "BLOCK-8",
+    "name": "MBA Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 9,
+  "fields": {
+    "code": "BLOCK-9",
+    "name": "Commerce Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 10,
+  "fields": {
+    "code": "BLOCK-10",
+    "name": "Fashion Design Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 11,
+  "fields": {
+    "code": "BLOCK-11",
+    "name": "Architecture Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 12,
+  "fields": {
+    "code": "BLOCK-12",
+    "name": "Law Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 13,
+  "fields": {
+    "code": "BLOCK-13",
+    "name": "Pharmacy Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 14,
+  "fields": {
+    "code": "BLOCK-14",
+    "name": "Biotechnology Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 15,
+  "fields": {
+    "code": "BLOCK-15",
+    "name": "Agriculture Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 16,
+  "fields": {
+    "code": "BLOCK-16",
+    "name": "Hotel Management Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 17,
+  "fields": {
+    "code": "BLOCK-17",
+    "name": "Psychology Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 18,
+  "fields": {
+    "code": "BLOCK-18",
+    "name": "Arts Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 19,
+  "fields": {
+    "code": "BLOCK-19",
+    "name": "Physics Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 20,
+  "fields": {
+    "code": "BLOCK-20",
+    "name": "Chemistry Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 21,
+  "fields": {
+    "code": "BLOCK-21",
+    "name": "Mathematics Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 22,
+  "fields": {
+    "code": "BLOCK-22",
+    "name": "English Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 23,
+  "fields": {
+    "code": "BLOCK-23",
+    "name": "Economics Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 24,
+  "fields": {
+    "code": "BLOCK-24",
+    "name": "Data Science Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 25,
+  "fields": {
+    "code": "BLOCK-25",
+    "name": "AI & ML Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 26,
+  "fields": {
+    "code": "BLOCK-26",
+    "name": "Robotics Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 27,
+  "fields": {
+    "code": "BLOCK-27",
+    "name": "Media Studies Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 28,
+  "fields": {
+    "code": "BLOCK-28",
+    "name": "Animation Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 29,
+  "fields": {
+    "code": "BLOCK-29",
+    "name": "Design Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 30,
+  "fields": {
+    "code": "BLOCK-30",
+    "name": "Research Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 31,
+  "fields": {
+    "code": "BLOCK-31",
+    "name": "Innovation Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 32,
+  "fields": {
+    "code": "BLOCK-32",
+    "name": "Training Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 33,
+  "fields": {
+    "code": "BLOCK-33",
+    "name": "Placement Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 34,
+  "fields": {
+    "code": "BLOCK-34",
+    "name": "Examination Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 35,
+  "fields": {
+    "code": "BLOCK-35",
+    "name": "Auditorium Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.block",
+  "pk": 36,
+  "fields": {
+    "code": "BLOCK-36",
+    "name": "Central Administration Block",
+    "notes": "",
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 1,
+  "fields": {
+    "block": 1,
+    "room_number": "BLOCK-1-106",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 2,
+  "fields": {
+    "block": 1,
+    "room_number": "BLOCK-1-108",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 3,
+  "fields": {
+    "block": 1,
+    "room_number": "BLOCK-1-203",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 4,
+  "fields": {
+    "block": 1,
+    "room_number": "BLOCK-1-208",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 5,
+  "fields": {
+    "block": 1,
+    "room_number": "BLOCK-1-308",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 6,
+  "fields": {
+    "block": 1,
+    "room_number": "BLOCK-1-408",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 7,
+  "fields": {
+    "block": 1,
+    "room_number": "BLOCK-1-409",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 8,
+  "fields": {
+    "block": 1,
+    "room_number": "BLOCK-1-507",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 9,
+  "fields": {
+    "block": 1,
+    "room_number": "BLOCK-1-609",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 10,
+  "fields": {
+    "block": 1,
+    "room_number": "BLOCK-1-610",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 11,
+  "fields": {
+    "block": 10,
+    "room_number": "BLOCK-10-203",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 12,
+  "fields": {
+    "block": 10,
+    "room_number": "BLOCK-10-204",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 13,
+  "fields": {
+    "block": 10,
+    "room_number": "BLOCK-10-207",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 14,
+  "fields": {
+    "block": 10,
+    "room_number": "BLOCK-10-208",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 15,
+  "fields": {
+    "block": 10,
+    "room_number": "BLOCK-10-402",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 16,
+  "fields": {
+    "block": 10,
+    "room_number": "BLOCK-10-403",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 17,
+  "fields": {
+    "block": 10,
+    "room_number": "BLOCK-10-408",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 18,
+  "fields": {
+    "block": 10,
+    "room_number": "BLOCK-10-507",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 19,
+  "fields": {
+    "block": 10,
+    "room_number": "BLOCK-10-604",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 20,
+  "fields": {
+    "block": 10,
+    "room_number": "BLOCK-10-609",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 21,
+  "fields": {
+    "block": 11,
+    "room_number": "BLOCK-11-105",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 22,
+  "fields": {
+    "block": 11,
+    "room_number": "BLOCK-11-107",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 23,
+  "fields": {
+    "block": 11,
+    "room_number": "BLOCK-11-203",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 24,
+  "fields": {
+    "block": 11,
+    "room_number": "BLOCK-11-207",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 25,
+  "fields": {
+    "block": 11,
+    "room_number": "BLOCK-11-507",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 26,
+  "fields": {
+    "block": 11,
+    "room_number": "BLOCK-11-508",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 27,
+  "fields": {
+    "block": 11,
+    "room_number": "BLOCK-11-510",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 28,
+  "fields": {
+    "block": 11,
+    "room_number": "BLOCK-11-601",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 29,
+  "fields": {
+    "block": 11,
+    "room_number": "BLOCK-11-603",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 30,
+  "fields": {
+    "block": 11,
+    "room_number": "BLOCK-11-604",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 31,
+  "fields": {
+    "block": 12,
+    "room_number": "BLOCK-12-101",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 32,
+  "fields": {
+    "block": 12,
+    "room_number": "BLOCK-12-104",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 33,
+  "fields": {
+    "block": 12,
+    "room_number": "BLOCK-12-205",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 34,
+  "fields": {
+    "block": 12,
+    "room_number": "BLOCK-12-206",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 35,
+  "fields": {
+    "block": 12,
+    "room_number": "BLOCK-12-301",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 36,
+  "fields": {
+    "block": 12,
+    "room_number": "BLOCK-12-405",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 37,
+  "fields": {
+    "block": 12,
+    "room_number": "BLOCK-12-406",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 38,
+  "fields": {
+    "block": 12,
+    "room_number": "BLOCK-12-604",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 39,
+  "fields": {
+    "block": 12,
+    "room_number": "BLOCK-12-606",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 40,
+  "fields": {
+    "block": 12,
+    "room_number": "BLOCK-12-610",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 41,
+  "fields": {
+    "block": 13,
+    "room_number": "BLOCK-13-106",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 42,
+  "fields": {
+    "block": 13,
+    "room_number": "BLOCK-13-107",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 43,
+  "fields": {
+    "block": 13,
+    "room_number": "BLOCK-13-205",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 44,
+  "fields": {
+    "block": 13,
+    "room_number": "BLOCK-13-206",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 45,
+  "fields": {
+    "block": 13,
+    "room_number": "BLOCK-13-209",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 46,
+  "fields": {
+    "block": 13,
+    "room_number": "BLOCK-13-302",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 47,
+  "fields": {
+    "block": 13,
+    "room_number": "BLOCK-13-310",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 48,
+  "fields": {
+    "block": 13,
+    "room_number": "BLOCK-13-506",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 49,
+  "fields": {
+    "block": 13,
+    "room_number": "BLOCK-13-607",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 50,
+  "fields": {
+    "block": 13,
+    "room_number": "BLOCK-13-608",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 51,
+  "fields": {
+    "block": 14,
+    "room_number": "BLOCK-14-101",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 52,
+  "fields": {
+    "block": 14,
+    "room_number": "BLOCK-14-107",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 53,
+  "fields": {
+    "block": 14,
+    "room_number": "BLOCK-14-201",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 54,
+  "fields": {
+    "block": 14,
+    "room_number": "BLOCK-14-301",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 55,
+  "fields": {
+    "block": 14,
+    "room_number": "BLOCK-14-304",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 56,
+  "fields": {
+    "block": 14,
+    "room_number": "BLOCK-14-309",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 57,
+  "fields": {
+    "block": 14,
+    "room_number": "BLOCK-14-406",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 58,
+  "fields": {
+    "block": 14,
+    "room_number": "BLOCK-14-509",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 59,
+  "fields": {
+    "block": 14,
+    "room_number": "BLOCK-14-606",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 60,
+  "fields": {
+    "block": 14,
+    "room_number": "BLOCK-14-610",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 61,
+  "fields": {
+    "block": 15,
+    "room_number": "BLOCK-15-106",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 62,
+  "fields": {
+    "block": 15,
+    "room_number": "BLOCK-15-109",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 63,
+  "fields": {
+    "block": 15,
+    "room_number": "BLOCK-15-203",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 64,
+  "fields": {
+    "block": 15,
+    "room_number": "BLOCK-15-205",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 65,
+  "fields": {
+    "block": 15,
+    "room_number": "BLOCK-15-208",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 66,
+  "fields": {
+    "block": 15,
+    "room_number": "BLOCK-15-302",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 67,
+  "fields": {
+    "block": 15,
+    "room_number": "BLOCK-15-308",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 68,
+  "fields": {
+    "block": 15,
+    "room_number": "BLOCK-15-502",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 69,
+  "fields": {
+    "block": 15,
+    "room_number": "BLOCK-15-504",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 70,
+  "fields": {
+    "block": 15,
+    "room_number": "BLOCK-15-510",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 71,
+  "fields": {
+    "block": 16,
+    "room_number": "BLOCK-16-205",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 72,
+  "fields": {
+    "block": 16,
+    "room_number": "BLOCK-16-210",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 73,
+  "fields": {
+    "block": 16,
+    "room_number": "BLOCK-16-402",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 74,
+  "fields": {
+    "block": 16,
+    "room_number": "BLOCK-16-403",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 75,
+  "fields": {
+    "block": 16,
+    "room_number": "BLOCK-16-405",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 76,
+  "fields": {
+    "block": 16,
+    "room_number": "BLOCK-16-407",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 77,
+  "fields": {
+    "block": 16,
+    "room_number": "BLOCK-16-408",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 78,
+  "fields": {
+    "block": 16,
+    "room_number": "BLOCK-16-501",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 79,
+  "fields": {
+    "block": 16,
+    "room_number": "BLOCK-16-505",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 80,
+  "fields": {
+    "block": 16,
+    "room_number": "BLOCK-16-601",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 81,
+  "fields": {
+    "block": 17,
+    "room_number": "BLOCK-17-109",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 82,
+  "fields": {
+    "block": 17,
+    "room_number": "BLOCK-17-201",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 83,
+  "fields": {
+    "block": 17,
+    "room_number": "BLOCK-17-203",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 84,
+  "fields": {
+    "block": 17,
+    "room_number": "BLOCK-17-303",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 85,
+  "fields": {
+    "block": 17,
+    "room_number": "BLOCK-17-307",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 86,
+  "fields": {
+    "block": 17,
+    "room_number": "BLOCK-17-308",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 87,
+  "fields": {
+    "block": 17,
+    "room_number": "BLOCK-17-401",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 88,
+  "fields": {
+    "block": 17,
+    "room_number": "BLOCK-17-402",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 89,
+  "fields": {
+    "block": 17,
+    "room_number": "BLOCK-17-504",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 90,
+  "fields": {
+    "block": 17,
+    "room_number": "BLOCK-17-505",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 91,
+  "fields": {
+    "block": 18,
+    "room_number": "BLOCK-18-102",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 92,
+  "fields": {
+    "block": 18,
+    "room_number": "BLOCK-18-203",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 93,
+  "fields": {
+    "block": 18,
+    "room_number": "BLOCK-18-206",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 94,
+  "fields": {
+    "block": 18,
+    "room_number": "BLOCK-18-302",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 95,
+  "fields": {
+    "block": 18,
+    "room_number": "BLOCK-18-304",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 96,
+  "fields": {
+    "block": 18,
+    "room_number": "BLOCK-18-308",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 97,
+  "fields": {
+    "block": 18,
+    "room_number": "BLOCK-18-401",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 98,
+  "fields": {
+    "block": 18,
+    "room_number": "BLOCK-18-404",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 99,
+  "fields": {
+    "block": 18,
+    "room_number": "BLOCK-18-505",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 100,
+  "fields": {
+    "block": 18,
+    "room_number": "BLOCK-18-610",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 101,
+  "fields": {
+    "block": 19,
+    "room_number": "BLOCK-19-105",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 102,
+  "fields": {
+    "block": 19,
+    "room_number": "BLOCK-19-108",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 103,
+  "fields": {
+    "block": 19,
+    "room_number": "BLOCK-19-201",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 104,
+  "fields": {
+    "block": 19,
+    "room_number": "BLOCK-19-204",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 105,
+  "fields": {
+    "block": 19,
+    "room_number": "BLOCK-19-310",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 106,
+  "fields": {
+    "block": 19,
+    "room_number": "BLOCK-19-403",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 107,
+  "fields": {
+    "block": 19,
+    "room_number": "BLOCK-19-407",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 108,
+  "fields": {
+    "block": 19,
+    "room_number": "BLOCK-19-501",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 109,
+  "fields": {
+    "block": 19,
+    "room_number": "BLOCK-19-509",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 110,
+  "fields": {
+    "block": 19,
+    "room_number": "BLOCK-19-609",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 111,
+  "fields": {
+    "block": 2,
+    "room_number": "BLOCK-2-208",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 112,
+  "fields": {
+    "block": 2,
+    "room_number": "BLOCK-2-301",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 113,
+  "fields": {
+    "block": 2,
+    "room_number": "BLOCK-2-304",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 114,
+  "fields": {
+    "block": 2,
+    "room_number": "BLOCK-2-401",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 115,
+  "fields": {
+    "block": 2,
+    "room_number": "BLOCK-2-403",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 116,
+  "fields": {
+    "block": 2,
+    "room_number": "BLOCK-2-407",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 117,
+  "fields": {
+    "block": 2,
+    "room_number": "BLOCK-2-409",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 118,
+  "fields": {
+    "block": 2,
+    "room_number": "BLOCK-2-410",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 119,
+  "fields": {
+    "block": 2,
+    "room_number": "BLOCK-2-503",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 120,
+  "fields": {
+    "block": 2,
+    "room_number": "BLOCK-2-606",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 121,
+  "fields": {
+    "block": 20,
+    "room_number": "BLOCK-20-103",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 122,
+  "fields": {
+    "block": 20,
+    "room_number": "BLOCK-20-110",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 123,
+  "fields": {
+    "block": 20,
+    "room_number": "BLOCK-20-208",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 124,
+  "fields": {
+    "block": 20,
+    "room_number": "BLOCK-20-302",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 125,
+  "fields": {
+    "block": 20,
+    "room_number": "BLOCK-20-401",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 126,
+  "fields": {
+    "block": 20,
+    "room_number": "BLOCK-20-505",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 127,
+  "fields": {
+    "block": 20,
+    "room_number": "BLOCK-20-508",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 128,
+  "fields": {
+    "block": 20,
+    "room_number": "BLOCK-20-510",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 129,
+  "fields": {
+    "block": 20,
+    "room_number": "BLOCK-20-606",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 130,
+  "fields": {
+    "block": 20,
+    "room_number": "BLOCK-20-608",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 131,
+  "fields": {
+    "block": 21,
+    "room_number": "BLOCK-21-106",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 132,
+  "fields": {
+    "block": 21,
+    "room_number": "BLOCK-21-110",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 133,
+  "fields": {
+    "block": 21,
+    "room_number": "BLOCK-21-201",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 134,
+  "fields": {
+    "block": 21,
+    "room_number": "BLOCK-21-205",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 135,
+  "fields": {
+    "block": 21,
+    "room_number": "BLOCK-21-301",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 136,
+  "fields": {
+    "block": 21,
+    "room_number": "BLOCK-21-302",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 137,
+  "fields": {
+    "block": 21,
+    "room_number": "BLOCK-21-303",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 138,
+  "fields": {
+    "block": 21,
+    "room_number": "BLOCK-21-601",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 139,
+  "fields": {
+    "block": 21,
+    "room_number": "BLOCK-21-609",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 140,
+  "fields": {
+    "block": 21,
+    "room_number": "BLOCK-21-610",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 141,
+  "fields": {
+    "block": 22,
+    "room_number": "BLOCK-22-110",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 142,
+  "fields": {
+    "block": 22,
+    "room_number": "BLOCK-22-201",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 143,
+  "fields": {
+    "block": 22,
+    "room_number": "BLOCK-22-309",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 144,
+  "fields": {
+    "block": 22,
+    "room_number": "BLOCK-22-404",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 145,
+  "fields": {
+    "block": 22,
+    "room_number": "BLOCK-22-408",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 146,
+  "fields": {
+    "block": 22,
+    "room_number": "BLOCK-22-409",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 147,
+  "fields": {
+    "block": 22,
+    "room_number": "BLOCK-22-410",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 148,
+  "fields": {
+    "block": 22,
+    "room_number": "BLOCK-22-501",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 149,
+  "fields": {
+    "block": 22,
+    "room_number": "BLOCK-22-502",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 150,
+  "fields": {
+    "block": 22,
+    "room_number": "BLOCK-22-505",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 151,
+  "fields": {
+    "block": 23,
+    "room_number": "BLOCK-23-107",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 152,
+  "fields": {
+    "block": 23,
+    "room_number": "BLOCK-23-202",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 153,
+  "fields": {
+    "block": 23,
+    "room_number": "BLOCK-23-203",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 154,
+  "fields": {
+    "block": 23,
+    "room_number": "BLOCK-23-204",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 155,
+  "fields": {
+    "block": 23,
+    "room_number": "BLOCK-23-308",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 156,
+  "fields": {
+    "block": 23,
+    "room_number": "BLOCK-23-309",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 157,
+  "fields": {
+    "block": 23,
+    "room_number": "BLOCK-23-404",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 158,
+  "fields": {
+    "block": 23,
+    "room_number": "BLOCK-23-502",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 159,
+  "fields": {
+    "block": 23,
+    "room_number": "BLOCK-23-506",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 160,
+  "fields": {
+    "block": 23,
+    "room_number": "BLOCK-23-607",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 161,
+  "fields": {
+    "block": 24,
+    "room_number": "BLOCK-24-106",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 162,
+  "fields": {
+    "block": 24,
+    "room_number": "BLOCK-24-107",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 163,
+  "fields": {
+    "block": 24,
+    "room_number": "BLOCK-24-108",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 164,
+  "fields": {
+    "block": 24,
+    "room_number": "BLOCK-24-110",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 165,
+  "fields": {
+    "block": 24,
+    "room_number": "BLOCK-24-201",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 166,
+  "fields": {
+    "block": 24,
+    "room_number": "BLOCK-24-203",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 167,
+  "fields": {
+    "block": 24,
+    "room_number": "BLOCK-24-302",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 168,
+  "fields": {
+    "block": 24,
+    "room_number": "BLOCK-24-303",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 169,
+  "fields": {
+    "block": 24,
+    "room_number": "BLOCK-24-410",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 170,
+  "fields": {
+    "block": 24,
+    "room_number": "BLOCK-24-507",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 171,
+  "fields": {
+    "block": 25,
+    "room_number": "BLOCK-25-106",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 172,
+  "fields": {
+    "block": 25,
+    "room_number": "BLOCK-25-107",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 173,
+  "fields": {
+    "block": 25,
+    "room_number": "BLOCK-25-201",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 174,
+  "fields": {
+    "block": 25,
+    "room_number": "BLOCK-25-202",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 175,
+  "fields": {
+    "block": 25,
+    "room_number": "BLOCK-25-209",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 176,
+  "fields": {
+    "block": 25,
+    "room_number": "BLOCK-25-301",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 177,
+  "fields": {
+    "block": 25,
+    "room_number": "BLOCK-25-307",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 178,
+  "fields": {
+    "block": 25,
+    "room_number": "BLOCK-25-502",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 179,
+  "fields": {
+    "block": 25,
+    "room_number": "BLOCK-25-503",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 180,
+  "fields": {
+    "block": 25,
+    "room_number": "BLOCK-25-505",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 181,
+  "fields": {
+    "block": 26,
+    "room_number": "BLOCK-26-104",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 182,
+  "fields": {
+    "block": 26,
+    "room_number": "BLOCK-26-106",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 183,
+  "fields": {
+    "block": 26,
+    "room_number": "BLOCK-26-201",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 184,
+  "fields": {
+    "block": 26,
+    "room_number": "BLOCK-26-304",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 185,
+  "fields": {
+    "block": 26,
+    "room_number": "BLOCK-26-306",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 186,
+  "fields": {
+    "block": 26,
+    "room_number": "BLOCK-26-308",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 187,
+  "fields": {
+    "block": 26,
+    "room_number": "BLOCK-26-404",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 188,
+  "fields": {
+    "block": 26,
+    "room_number": "BLOCK-26-503",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 189,
+  "fields": {
+    "block": 26,
+    "room_number": "BLOCK-26-507",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 190,
+  "fields": {
+    "block": 26,
+    "room_number": "BLOCK-26-603",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 191,
+  "fields": {
+    "block": 27,
+    "room_number": "BLOCK-27-107",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 192,
+  "fields": {
+    "block": 27,
+    "room_number": "BLOCK-27-108",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 193,
+  "fields": {
+    "block": 27,
+    "room_number": "BLOCK-27-203",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 194,
+  "fields": {
+    "block": 27,
+    "room_number": "BLOCK-27-305",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 195,
+  "fields": {
+    "block": 27,
+    "room_number": "BLOCK-27-307",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 196,
+  "fields": {
+    "block": 27,
+    "room_number": "BLOCK-27-405",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 197,
+  "fields": {
+    "block": 27,
+    "room_number": "BLOCK-27-406",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 198,
+  "fields": {
+    "block": 27,
+    "room_number": "BLOCK-27-504",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 199,
+  "fields": {
+    "block": 27,
+    "room_number": "BLOCK-27-505",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 200,
+  "fields": {
+    "block": 27,
+    "room_number": "BLOCK-27-610",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 201,
+  "fields": {
+    "block": 28,
+    "room_number": "BLOCK-28-102",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 202,
+  "fields": {
+    "block": 28,
+    "room_number": "BLOCK-28-109",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 203,
+  "fields": {
+    "block": 28,
+    "room_number": "BLOCK-28-204",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 204,
+  "fields": {
+    "block": 28,
+    "room_number": "BLOCK-28-301",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 205,
+  "fields": {
+    "block": 28,
+    "room_number": "BLOCK-28-306",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 206,
+  "fields": {
+    "block": 28,
+    "room_number": "BLOCK-28-307",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 207,
+  "fields": {
+    "block": 28,
+    "room_number": "BLOCK-28-308",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 208,
+  "fields": {
+    "block": 28,
+    "room_number": "BLOCK-28-408",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 209,
+  "fields": {
+    "block": 28,
+    "room_number": "BLOCK-28-604",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 210,
+  "fields": {
+    "block": 28,
+    "room_number": "BLOCK-28-605",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 211,
+  "fields": {
+    "block": 29,
+    "room_number": "BLOCK-29-105",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 212,
+  "fields": {
+    "block": 29,
+    "room_number": "BLOCK-29-109",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 213,
+  "fields": {
+    "block": 29,
+    "room_number": "BLOCK-29-201",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 214,
+  "fields": {
+    "block": 29,
+    "room_number": "BLOCK-29-207",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 215,
+  "fields": {
+    "block": 29,
+    "room_number": "BLOCK-29-401",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 216,
+  "fields": {
+    "block": 29,
+    "room_number": "BLOCK-29-408",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 217,
+  "fields": {
+    "block": 29,
+    "room_number": "BLOCK-29-410",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 218,
+  "fields": {
+    "block": 29,
+    "room_number": "BLOCK-29-509",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 219,
+  "fields": {
+    "block": 29,
+    "room_number": "BLOCK-29-510",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 220,
+  "fields": {
+    "block": 29,
+    "room_number": "BLOCK-29-609",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 221,
+  "fields": {
+    "block": 3,
+    "room_number": "BLOCK-3-102",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 222,
+  "fields": {
+    "block": 3,
+    "room_number": "BLOCK-3-104",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 223,
+  "fields": {
+    "block": 3,
+    "room_number": "BLOCK-3-105",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 224,
+  "fields": {
+    "block": 3,
+    "room_number": "BLOCK-3-202",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 225,
+  "fields": {
+    "block": 3,
+    "room_number": "BLOCK-3-209",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 226,
+  "fields": {
+    "block": 3,
+    "room_number": "BLOCK-3-302",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 227,
+  "fields": {
+    "block": 3,
+    "room_number": "BLOCK-3-305",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 228,
+  "fields": {
+    "block": 3,
+    "room_number": "BLOCK-3-306",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 229,
+  "fields": {
+    "block": 3,
+    "room_number": "BLOCK-3-504",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 230,
+  "fields": {
+    "block": 3,
+    "room_number": "BLOCK-3-506",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 231,
+  "fields": {
+    "block": 30,
+    "room_number": "BLOCK-30-202",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 232,
+  "fields": {
+    "block": 30,
+    "room_number": "BLOCK-30-206",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 233,
+  "fields": {
+    "block": 30,
+    "room_number": "BLOCK-30-302",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 234,
+  "fields": {
+    "block": 30,
+    "room_number": "BLOCK-30-305",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 235,
+  "fields": {
+    "block": 30,
+    "room_number": "BLOCK-30-403",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 236,
+  "fields": {
+    "block": 30,
+    "room_number": "BLOCK-30-404",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 237,
+  "fields": {
+    "block": 30,
+    "room_number": "BLOCK-30-405",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 238,
+  "fields": {
+    "block": 30,
+    "room_number": "BLOCK-30-510",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 239,
+  "fields": {
+    "block": 30,
+    "room_number": "BLOCK-30-603",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 240,
+  "fields": {
+    "block": 30,
+    "room_number": "BLOCK-30-610",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 241,
+  "fields": {
+    "block": 31,
+    "room_number": "BLOCK-31-201",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 242,
+  "fields": {
+    "block": 31,
+    "room_number": "BLOCK-31-305",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 243,
+  "fields": {
+    "block": 31,
+    "room_number": "BLOCK-31-306",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 244,
+  "fields": {
+    "block": 31,
+    "room_number": "BLOCK-31-307",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 245,
+  "fields": {
+    "block": 31,
+    "room_number": "BLOCK-31-409",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 246,
+  "fields": {
+    "block": 31,
+    "room_number": "BLOCK-31-503",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 247,
+  "fields": {
+    "block": 31,
+    "room_number": "BLOCK-31-504",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 248,
+  "fields": {
+    "block": 31,
+    "room_number": "BLOCK-31-604",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 249,
+  "fields": {
+    "block": 31,
+    "room_number": "BLOCK-31-605",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 250,
+  "fields": {
+    "block": 31,
+    "room_number": "BLOCK-31-608",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 251,
+  "fields": {
+    "block": 32,
+    "room_number": "BLOCK-32-102",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 252,
+  "fields": {
+    "block": 32,
+    "room_number": "BLOCK-32-107",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 253,
+  "fields": {
+    "block": 32,
+    "room_number": "BLOCK-32-303",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 254,
+  "fields": {
+    "block": 32,
+    "room_number": "BLOCK-32-307",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 255,
+  "fields": {
+    "block": 32,
+    "room_number": "BLOCK-32-407",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 256,
+  "fields": {
+    "block": 32,
+    "room_number": "BLOCK-32-503",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 257,
+  "fields": {
+    "block": 32,
+    "room_number": "BLOCK-32-507",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 258,
+  "fields": {
+    "block": 32,
+    "room_number": "BLOCK-32-602",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 259,
+  "fields": {
+    "block": 32,
+    "room_number": "BLOCK-32-605",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 260,
+  "fields": {
+    "block": 32,
+    "room_number": "BLOCK-32-609",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 261,
+  "fields": {
+    "block": 33,
+    "room_number": "BLOCK-33-107",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 262,
+  "fields": {
+    "block": 33,
+    "room_number": "BLOCK-33-109",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 263,
+  "fields": {
+    "block": 33,
+    "room_number": "BLOCK-33-204",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 264,
+  "fields": {
+    "block": 33,
+    "room_number": "BLOCK-33-206",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 265,
+  "fields": {
+    "block": 33,
+    "room_number": "BLOCK-33-308",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 266,
+  "fields": {
+    "block": 33,
+    "room_number": "BLOCK-33-404",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 267,
+  "fields": {
+    "block": 33,
+    "room_number": "BLOCK-33-505",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 268,
+  "fields": {
+    "block": 33,
+    "room_number": "BLOCK-33-507",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 269,
+  "fields": {
+    "block": 33,
+    "room_number": "BLOCK-33-602",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 270,
+  "fields": {
+    "block": 33,
+    "room_number": "BLOCK-33-605",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 271,
+  "fields": {
+    "block": 34,
+    "room_number": "BLOCK-34-105",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 272,
+  "fields": {
+    "block": 34,
+    "room_number": "BLOCK-34-202",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 273,
+  "fields": {
+    "block": 34,
+    "room_number": "BLOCK-34-209",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 274,
+  "fields": {
+    "block": 34,
+    "room_number": "BLOCK-34-302",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 275,
+  "fields": {
+    "block": 34,
+    "room_number": "BLOCK-34-306",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 276,
+  "fields": {
+    "block": 34,
+    "room_number": "BLOCK-34-307",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 277,
+  "fields": {
+    "block": 34,
+    "room_number": "BLOCK-34-310",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 278,
+  "fields": {
+    "block": 34,
+    "room_number": "BLOCK-34-402",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 279,
+  "fields": {
+    "block": 34,
+    "room_number": "BLOCK-34-403",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 280,
+  "fields": {
+    "block": 34,
+    "room_number": "BLOCK-34-502",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 281,
+  "fields": {
+    "block": 35,
+    "room_number": "BLOCK-35-103",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 282,
+  "fields": {
+    "block": 35,
+    "room_number": "BLOCK-35-204",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 283,
+  "fields": {
+    "block": 35,
+    "room_number": "BLOCK-35-208",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 284,
+  "fields": {
+    "block": 35,
+    "room_number": "BLOCK-35-307",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 285,
+  "fields": {
+    "block": 35,
+    "room_number": "BLOCK-35-309",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 286,
+  "fields": {
+    "block": 35,
+    "room_number": "BLOCK-35-401",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 287,
+  "fields": {
+    "block": 35,
+    "room_number": "BLOCK-35-408",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 288,
+  "fields": {
+    "block": 35,
+    "room_number": "BLOCK-35-505",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 289,
+  "fields": {
+    "block": 35,
+    "room_number": "BLOCK-35-601",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 290,
+  "fields": {
+    "block": 35,
+    "room_number": "BLOCK-35-602",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 291,
+  "fields": {
+    "block": 36,
+    "room_number": "BLOCK-36-103",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 292,
+  "fields": {
+    "block": 36,
+    "room_number": "BLOCK-36-106",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 293,
+  "fields": {
+    "block": 36,
+    "room_number": "BLOCK-36-108",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 294,
+  "fields": {
+    "block": 36,
+    "room_number": "BLOCK-36-109",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 295,
+  "fields": {
+    "block": 36,
+    "room_number": "BLOCK-36-110",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 296,
+  "fields": {
+    "block": 36,
+    "room_number": "BLOCK-36-202",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 297,
+  "fields": {
+    "block": 36,
+    "room_number": "BLOCK-36-207",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 298,
+  "fields": {
+    "block": 36,
+    "room_number": "BLOCK-36-210",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 299,
+  "fields": {
+    "block": 36,
+    "room_number": "BLOCK-36-609",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 300,
+  "fields": {
+    "block": 36,
+    "room_number": "BLOCK-36-610",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 301,
+  "fields": {
+    "block": 4,
+    "room_number": "BLOCK-4-101",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 302,
+  "fields": {
+    "block": 4,
+    "room_number": "BLOCK-4-110",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 303,
+  "fields": {
+    "block": 4,
+    "room_number": "BLOCK-4-205",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 304,
+  "fields": {
+    "block": 4,
+    "room_number": "BLOCK-4-207",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 305,
+  "fields": {
+    "block": 4,
+    "room_number": "BLOCK-4-306",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 306,
+  "fields": {
+    "block": 4,
+    "room_number": "BLOCK-4-307",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 307,
+  "fields": {
+    "block": 4,
+    "room_number": "BLOCK-4-310",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 308,
+  "fields": {
+    "block": 4,
+    "room_number": "BLOCK-4-509",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 309,
+  "fields": {
+    "block": 4,
+    "room_number": "BLOCK-4-603",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 310,
+  "fields": {
+    "block": 4,
+    "room_number": "BLOCK-4-608",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 311,
+  "fields": {
+    "block": 5,
+    "room_number": "BLOCK-5-101",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 312,
+  "fields": {
+    "block": 5,
+    "room_number": "BLOCK-5-106",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 313,
+  "fields": {
+    "block": 5,
+    "room_number": "BLOCK-5-109",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 314,
+  "fields": {
+    "block": 5,
+    "room_number": "BLOCK-5-202",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 315,
+  "fields": {
+    "block": 5,
+    "room_number": "BLOCK-5-204",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 316,
+  "fields": {
+    "block": 5,
+    "room_number": "BLOCK-5-207",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 317,
+  "fields": {
+    "block": 5,
+    "room_number": "BLOCK-5-309",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 318,
+  "fields": {
+    "block": 5,
+    "room_number": "BLOCK-5-508",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 319,
+  "fields": {
+    "block": 5,
+    "room_number": "BLOCK-5-509",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 320,
+  "fields": {
+    "block": 5,
+    "room_number": "BLOCK-5-604",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 321,
+  "fields": {
+    "block": 6,
+    "room_number": "BLOCK-6-103",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 322,
+  "fields": {
+    "block": 6,
+    "room_number": "BLOCK-6-110",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 323,
+  "fields": {
+    "block": 6,
+    "room_number": "BLOCK-6-201",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 324,
+  "fields": {
+    "block": 6,
+    "room_number": "BLOCK-6-204",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 325,
+  "fields": {
+    "block": 6,
+    "room_number": "BLOCK-6-208",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 326,
+  "fields": {
+    "block": 6,
+    "room_number": "BLOCK-6-310",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 327,
+  "fields": {
+    "block": 6,
+    "room_number": "BLOCK-6-405",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 328,
+  "fields": {
+    "block": 6,
+    "room_number": "BLOCK-6-501",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 329,
+  "fields": {
+    "block": 6,
+    "room_number": "BLOCK-6-509",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 330,
+  "fields": {
+    "block": 6,
+    "room_number": "BLOCK-6-607",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 331,
+  "fields": {
+    "block": 7,
+    "room_number": "BLOCK-7-105",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 332,
+  "fields": {
+    "block": 7,
+    "room_number": "BLOCK-7-107",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 333,
+  "fields": {
+    "block": 7,
+    "room_number": "BLOCK-7-203",
+    "capacity": 71,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 334,
+  "fields": {
+    "block": 7,
+    "room_number": "BLOCK-7-210",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 335,
+  "fields": {
+    "block": 7,
+    "room_number": "BLOCK-7-309",
+    "capacity": 75,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 336,
+  "fields": {
+    "block": 7,
+    "room_number": "BLOCK-7-310",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 337,
+  "fields": {
+    "block": 7,
+    "room_number": "BLOCK-7-404",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 338,
+  "fields": {
+    "block": 7,
+    "room_number": "BLOCK-7-506",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 339,
+  "fields": {
+    "block": 7,
+    "room_number": "BLOCK-7-508",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 340,
+  "fields": {
+    "block": 7,
+    "room_number": "BLOCK-7-609",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 341,
+  "fields": {
+    "block": 8,
+    "room_number": "BLOCK-8-101",
+    "capacity": 77,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 342,
+  "fields": {
+    "block": 8,
+    "room_number": "BLOCK-8-104",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 343,
+  "fields": {
+    "block": 8,
+    "room_number": "BLOCK-8-110",
+    "capacity": 63,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 344,
+  "fields": {
+    "block": 8,
+    "room_number": "BLOCK-8-209",
+    "capacity": 76,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 345,
+  "fields": {
+    "block": 8,
+    "room_number": "BLOCK-8-302",
+    "capacity": 74,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 346,
+  "fields": {
+    "block": 8,
+    "room_number": "BLOCK-8-402",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 347,
+  "fields": {
+    "block": 8,
+    "room_number": "BLOCK-8-501",
+    "capacity": 64,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 348,
+  "fields": {
+    "block": 8,
+    "room_number": "BLOCK-8-503",
+    "capacity": 70,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 349,
+  "fields": {
+    "block": 8,
+    "room_number": "BLOCK-8-510",
+    "capacity": 68,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 350,
+  "fields": {
+    "block": 8,
+    "room_number": "BLOCK-8-603",
+    "capacity": 61,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 351,
+  "fields": {
+    "block": 9,
+    "room_number": "BLOCK-9-105",
+    "capacity": 66,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 352,
+  "fields": {
+    "block": 9,
+    "room_number": "BLOCK-9-108",
+    "capacity": 69,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 353,
+  "fields": {
+    "block": 9,
+    "room_number": "BLOCK-9-109",
+    "capacity": 73,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 354,
+  "fields": {
+    "block": 9,
+    "room_number": "BLOCK-9-208",
+    "capacity": 65,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 355,
+  "fields": {
+    "block": 9,
+    "room_number": "BLOCK-9-402",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 356,
+  "fields": {
+    "block": 9,
+    "room_number": "BLOCK-9-405",
+    "capacity": 67,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 357,
+  "fields": {
+    "block": 9,
+    "room_number": "BLOCK-9-407",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 358,
+  "fields": {
+    "block": 9,
+    "room_number": "BLOCK-9-507",
+    "capacity": 62,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 359,
+  "fields": {
+    "block": 9,
+    "room_number": "BLOCK-9-607",
+    "capacity": 60,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.classroom",
+  "pk": 360,
+  "fields": {
+    "block": 9,
+    "room_number": "BLOCK-9-610",
+    "capacity": 72,
+    "room_type": "classroom",
+    "floor": null,
+    "has_projector": false,
+    "is_active": true
+  }
+},
+{
+  "model": "attendance.course",
+  "pk": 1,
+  "fields": {
+    "code": "CSE101",
+    "name": "Data Structures",
+    "year": 2,
+    "semester": 3
+  }
+},
+{
+  "model": "attendance.course",
+  "pk": 2,
+  "fields": {
+    "code": "CSE202",
+    "name": "Operating Systems",
+    "year": 2,
+    "semester": 4
+  }
+},
+{
+  "model": "attendance.course",
+  "pk": 3,
+  "fields": {
+    "code": "AIML301",
+    "name": "Machine Learning",
+    "year": 3,
+    "semester": 5
+  }
+},
+{
+  "model": "attendance.course",
+  "pk": 4,
+  "fields": {
+    "code": "ICE201",
+    "name": "Signals & Systems",
+    "year": 2,
+    "semester": 3
+  }
+},
+{
+  "model": "attendance.course",
+  "pk": 5,
+  "fields": {
+    "code": "FASH101",
+    "name": "Fashion Illustration",
+    "year": 1,
+    "semester": 2
+  }
+},
+{
+  "model": "attendance.course",
+  "pk": 6,
+  "fields": {
+    "code": "MBA101",
+    "name": "Principles of Management",
+    "year": 1,
+    "semester": 1
+  }
+},
+{
+  "model": "attendance.course",
+  "pk": 7,
+  "fields": {
+    "code": "PHY102",
+    "name": "Engineering Physics",
+    "year": 1,
+    "semester": 1
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 1,
+  "fields": {
+    "name": "Idli (2 pcs)",
+    "description": "Steamed rice cakes with chutney",
+    "price": "25.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1533089862017-5614ecb352ae?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 2,
+  "fields": {
+    "name": "Vada (2 pcs)",
+    "description": "Crispy medu vada with sambar",
+    "price": "30.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1610192249866-494c72c08227?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 3,
+  "fields": {
+    "name": "Idli Vada Combo",
+    "description": "2 idli + 1 vada with sambar",
+    "price": "35.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1589302168068-964664d93a06?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 4,
+  "fields": {
+    "name": "Plain Dosa",
+    "description": "Crispy plain dosa",
+    "price": "30.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1662116765994-54592e877d9e?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 5,
+  "fields": {
+    "name": "Masala Dosa",
+    "description": "Dosa stuffed with potato masala",
+    "price": "45.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 6,
+  "fields": {
+    "name": "Onion Dosa",
+    "description": "Dosa with onion topping",
+    "price": "50.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1615276510847-d851f3d7317d?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 7,
+  "fields": {
+    "name": "Rava Dosa",
+    "description": "Thin and crispy rava dosa",
+    "price": "55.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 8,
+  "fields": {
+    "name": "Set Dosa",
+    "description": "Soft set dosa (2 pcs)",
+    "price": "40.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1626202268668-8a1c24012d03?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 9,
+  "fields": {
+    "name": "Uttapam",
+    "description": "Vegetable uttapam",
+    "price": "55.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 10,
+  "fields": {
+    "name": "Pongal",
+    "description": "Ven pongal with ghee",
+    "price": "45.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 11,
+  "fields": {
+    "name": "Upma",
+    "description": "Classic vegetable upma",
+    "price": "35.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 12,
+  "fields": {
+    "name": "Lemon Rice",
+    "description": "South style lemon rice",
+    "price": "45.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1596560548464-f010549b84d7?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 13,
+  "fields": {
+    "name": "Curd Rice",
+    "description": "Comforting curd rice",
+    "price": "40.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 14,
+  "fields": {
+    "name": "Sambar Rice",
+    "description": "Rice mixed with sambar",
+    "price": "55.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1542361345-89e58247f2d5?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 15,
+  "fields": {
+    "name": "Filter Coffee",
+    "description": "Strong South Indian filter coffee",
+    "price": "20.00",
+    "is_active": true,
+    "stall": 1,
+    "stall_name": "34 Block Canteen",
+    "location": "34 Block",
+    "category": "Beverages",
+    "image_url": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 16,
+  "fields": {
+    "name": "Mini South Thali",
+    "description": "Rice, sambar, rasam, poriyal, curd",
+    "price": "85.00",
+    "is_active": true,
+    "stall": 2,
+    "stall_name": "Thali House",
+    "location": "33 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 17,
+  "fields": {
+    "name": "South Indian Thali",
+    "description": "Full South thali (veg)",
+    "price": "110.00",
+    "is_active": true,
+    "stall": 2,
+    "stall_name": "Thali House",
+    "location": "33 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1589302168068-964664d93a06?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 18,
+  "fields": {
+    "name": "Mini North Thali",
+    "description": "Roti, dal, sabzi, rice, salad",
+    "price": "95.00",
+    "is_active": true,
+    "stall": 2,
+    "stall_name": "Thali House",
+    "location": "33 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 19,
+  "fields": {
+    "name": "North Indian Thali",
+    "description": "Full North thali (veg)",
+    "price": "125.00",
+    "is_active": true,
+    "stall": 2,
+    "stall_name": "Thali House",
+    "location": "33 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1603133872878-684f208fb74b?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 20,
+  "fields": {
+    "name": "Executive Thali",
+    "description": "Premium thali with sweet",
+    "price": "150.00",
+    "is_active": true,
+    "stall": 2,
+    "stall_name": "Thali House",
+    "location": "33 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1626139573537-9410a8ebdf36?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 21,
+  "fields": {
+    "name": "Dal Tadka",
+    "description": "Yellow dal tempered with spices",
+    "price": "80.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 22,
+  "fields": {
+    "name": "Dal Makhani",
+    "description": "Creamy black lentils",
+    "price": "95.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 23,
+  "fields": {
+    "name": "Rajma",
+    "description": "Kidney bean curry",
+    "price": "85.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1626202268668-8a1c24012d03?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 24,
+  "fields": {
+    "name": "Chole",
+    "description": "Punjabi chole masala",
+    "price": "85.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 25,
+  "fields": {
+    "name": "Paneer Butter Masala",
+    "description": "Creamy paneer gravy",
+    "price": "120.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 26,
+  "fields": {
+    "name": "Paneer Tikka Masala",
+    "description": "Smoky paneer tikka gravy",
+    "price": "125.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 27,
+  "fields": {
+    "name": "Kadai Paneer",
+    "description": "Paneer with capsicum in kadai masala",
+    "price": "120.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 28,
+  "fields": {
+    "name": "Mix Veg",
+    "description": "Seasonal mixed vegetables",
+    "price": "90.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 29,
+  "fields": {
+    "name": "Aloo Gobi",
+    "description": "Potato and cauliflower curry",
+    "price": "80.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 30,
+  "fields": {
+    "name": "Jeera Rice",
+    "description": "Cumin flavored rice",
+    "price": "55.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 31,
+  "fields": {
+    "name": "Veg Pulao",
+    "description": "Mild vegetable pulao",
+    "price": "70.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 32,
+  "fields": {
+    "name": "Roti",
+    "description": "Whole wheat roti",
+    "price": "10.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1615276510847-d851f3d7317d?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 33,
+  "fields": {
+    "name": "Butter Roti",
+    "description": "Buttered roti",
+    "price": "12.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 34,
+  "fields": {
+    "name": "Plain Naan",
+    "description": "Soft naan",
+    "price": "18.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1626202268668-8a1c24012d03?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 35,
+  "fields": {
+    "name": "Butter Naan",
+    "description": "Buttered naan",
+    "price": "22.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 36,
+  "fields": {
+    "name": "Curd",
+    "description": "Fresh curd bowl",
+    "price": "25.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1570968905869-fec089bfe23d?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 37,
+  "fields": {
+    "name": "Papad",
+    "description": "Crispy papad",
+    "price": "15.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 38,
+  "fields": {
+    "name": "Gulab Jamun",
+    "description": "2 pcs gulab jamun",
+    "price": "35.00",
+    "is_active": true,
+    "stall": 3,
+    "stall_name": "Punjabi Tadka",
+    "location": "31 Block",
+    "category": "Desserts",
+    "image_url": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 39,
+  "fields": {
+    "name": "Veg Hakka Noodles",
+    "description": "Stir-fried noodles with vegetables",
+    "price": "85.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1552611052-33e04de081de?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 40,
+  "fields": {
+    "name": "Schezwan Noodles",
+    "description": "Spicy schezwan noodles (veg)",
+    "price": "95.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1610192249866-494c72c08227?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 41,
+  "fields": {
+    "name": "Veg Fried Rice",
+    "description": "Vegetable fried rice",
+    "price": "85.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1603133872878-684f208fb74b?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 42,
+  "fields": {
+    "name": "Schezwan Fried Rice",
+    "description": "Spicy fried rice",
+    "price": "95.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1552611052-33e04de081de?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 43,
+  "fields": {
+    "name": "Veg Manchurian (Dry)",
+    "description": "Crispy veg manchurian",
+    "price": "90.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1626139573537-9410a8ebdf36?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 44,
+  "fields": {
+    "name": "Veg Manchurian (Gravy)",
+    "description": "Manchurian in gravy",
+    "price": "95.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1626202268668-8a1c24012d03?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 45,
+  "fields": {
+    "name": "Chilli Paneer (Dry)",
+    "description": "Paneer tossed in chilli sauce",
+    "price": "120.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 46,
+  "fields": {
+    "name": "Chilli Paneer (Gravy)",
+    "description": "Chilli paneer with gravy",
+    "price": "125.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 47,
+  "fields": {
+    "name": "Honey Chilli Potato",
+    "description": "Crispy potato in honey chilli",
+    "price": "95.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 48,
+  "fields": {
+    "name": "Veg Spring Roll",
+    "description": "Crispy veg spring rolls",
+    "price": "70.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1625220194771-7eb6f34e9e7a?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 49,
+  "fields": {
+    "name": "Veg Momos (Steamed)",
+    "description": "Steamed veg momos",
+    "price": "70.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1533089862017-5614ecb352ae?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 50,
+  "fields": {
+    "name": "Veg Momos (Fried)",
+    "description": "Fried veg momos",
+    "price": "80.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1610192249866-494c72c08227?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 51,
+  "fields": {
+    "name": "Paneer Momos",
+    "description": "Paneer stuffed momos",
+    "price": "90.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1589302168068-964664d93a06?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 52,
+  "fields": {
+    "name": "Manchow Soup",
+    "description": "Hot veg manchow soup",
+    "price": "60.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 53,
+  "fields": {
+    "name": "Hot & Sour Soup",
+    "description": "Veg hot and sour soup",
+    "price": "60.00",
+    "is_active": true,
+    "stall": 4,
+    "stall_name": "Wok n Roll",
+    "location": "32 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1542361345-89e58247f2d5?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 54,
+  "fields": {
+    "name": "Veg Puff",
+    "description": "Fresh baked veg puff",
+    "price": "25.00",
+    "is_active": true,
+    "stall": 5,
+    "stall_name": "Oven Express",
+    "location": "Unimall",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1626139573537-9410a8ebdf36?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 55,
+  "fields": {
+    "name": "Paneer Puff",
+    "description": "Paneer puff",
+    "price": "30.00",
+    "is_active": true,
+    "stall": 5,
+    "stall_name": "Oven Express",
+    "location": "Unimall",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 56,
+  "fields": {
+    "name": "Cheese Sandwich",
+    "description": "Grilled cheese sandwich",
+    "price": "60.00",
+    "is_active": true,
+    "stall": 5,
+    "stall_name": "Oven Express",
+    "location": "Unimall",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 57,
+  "fields": {
+    "name": "Veg Grilled Sandwich",
+    "description": "Grilled sandwich with veggies",
+    "price": "55.00",
+    "is_active": true,
+    "stall": 5,
+    "stall_name": "Oven Express",
+    "location": "Unimall",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1554433607-66b5efe9d304?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 58,
+  "fields": {
+    "name": "Garlic Bread",
+    "description": "Toasted garlic bread",
+    "price": "50.00",
+    "is_active": true,
+    "stall": 5,
+    "stall_name": "Oven Express",
+    "location": "Unimall",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1573140247632-f519fd35b0e2?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 59,
+  "fields": {
+    "name": "Veg Burger",
+    "description": "Veg patty burger",
+    "price": "70.00",
+    "is_active": true,
+    "stall": 5,
+    "stall_name": "Oven Express",
+    "location": "Unimall",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 60,
+  "fields": {
+    "name": "French Fries",
+    "description": "Crispy fries",
+    "price": "60.00",
+    "is_active": true,
+    "stall": 5,
+    "stall_name": "Oven Express",
+    "location": "Unimall",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 61,
+  "fields": {
+    "name": "Cutting Chai",
+    "description": "Strong cutting chai",
+    "price": "12.00",
+    "is_active": true,
+    "stall": 6,
+    "stall_name": "25 Block Canteen",
+    "location": "25 Block",
+    "category": "Beverages",
+    "image_url": "https://images.unsplash.com/photo-1561336313-0bd5e0b27ec8?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 62,
+  "fields": {
+    "name": "Ginger Tea",
+    "description": "Adrak wali chai",
+    "price": "15.00",
+    "is_active": true,
+    "stall": 6,
+    "stall_name": "25 Block Canteen",
+    "location": "25 Block",
+    "category": "Beverages",
+    "image_url": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 63,
+  "fields": {
+    "name": "Elaichi Tea",
+    "description": "Cardamom tea",
+    "price": "15.00",
+    "is_active": true,
+    "stall": 6,
+    "stall_name": "25 Block Canteen",
+    "location": "25 Block",
+    "category": "Beverages",
+    "image_url": "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 64,
+  "fields": {
+    "name": "Hot Coffee",
+    "description": "Classic hot coffee",
+    "price": "20.00",
+    "is_active": true,
+    "stall": 6,
+    "stall_name": "25 Block Canteen",
+    "location": "25 Block",
+    "category": "Beverages",
+    "image_url": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 65,
+  "fields": {
+    "name": "Badam Milk",
+    "description": "Warm badam milk",
+    "price": "30.00",
+    "is_active": true,
+    "stall": 6,
+    "stall_name": "25 Block Canteen",
+    "location": "25 Block",
+    "category": "Beverages",
+    "image_url": "https://images.unsplash.com/photo-1570968905869-fec089bfe23d?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 66,
+  "fields": {
+    "name": "Lassi",
+    "description": "Sweet lassi",
+    "price": "35.00",
+    "is_active": true,
+    "stall": 6,
+    "stall_name": "25 Block Canteen",
+    "location": "25 Block",
+    "category": "Beverages",
+    "image_url": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 67,
+  "fields": {
+    "name": "Veg Biryani",
+    "description": "Aromatic veg biryani",
+    "price": "110.00",
+    "is_active": true,
+    "stall": 7,
+    "stall_name": "Kitchen Ette",
+    "location": "BH-1",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 68,
+  "fields": {
+    "name": "Paneer Biryani",
+    "description": "Paneer biryani",
+    "price": "125.00",
+    "is_active": true,
+    "stall": 7,
+    "stall_name": "Kitchen Ette",
+    "location": "BH-1",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 69,
+  "fields": {
+    "name": "Veg Meal (Rice)",
+    "description": "Rice + dal + sabzi + curd",
+    "price": "100.00",
+    "is_active": true,
+    "stall": 7,
+    "stall_name": "Kitchen Ette",
+    "location": "BH-1",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 70,
+  "fields": {
+    "name": "Paneer Roll",
+    "description": "Paneer wrap roll",
+    "price": "80.00",
+    "is_active": true,
+    "stall": 8,
+    "stall_name": "Campus Bites",
+    "location": "29 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 71,
+  "fields": {
+    "name": "Veg Frankie",
+    "description": "Veg frankie roll",
+    "price": "70.00",
+    "is_active": true,
+    "stall": 8,
+    "stall_name": "Campus Bites",
+    "location": "29 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 72,
+  "fields": {
+    "name": "Veg Sandwich",
+    "description": "Fresh veg sandwich",
+    "price": "50.00",
+    "is_active": true,
+    "stall": 8,
+    "stall_name": "Campus Bites",
+    "location": "29 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 73,
+  "fields": {
+    "name": "Pav Bhaji",
+    "description": "Butter pav bhaji",
+    "price": "90.00",
+    "is_active": true,
+    "stall": 8,
+    "stall_name": "Campus Bites",
+    "location": "29 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 74,
+  "fields": {
+    "name": "Chole Bhature",
+    "description": "Chole with bhature",
+    "price": "110.00",
+    "is_active": true,
+    "stall": 8,
+    "stall_name": "Campus Bites",
+    "location": "29 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1626139573537-9410a8ebdf36?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 75,
+  "fields": {
+    "name": "Poha",
+    "description": "Indori style poha",
+    "price": "40.00",
+    "is_active": true,
+    "stall": 9,
+    "stall_name": "Block 27 Canteen",
+    "location": "27 Block",
+    "category": "All Items",
+    "image_url": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 76,
+  "fields": {
+    "name": "Dhokla",
+    "description": "Soft khaman dhokla",
+    "price": "45.00",
+    "is_active": true,
+    "stall": 9,
+    "stall_name": "Block 27 Canteen",
+    "location": "27 Block",
+    "category": "All Items",
+    "image_url": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 77,
+  "fields": {
+    "name": "Veg Maggi",
+    "description": "Masala veg maggi",
+    "price": "50.00",
+    "is_active": true,
+    "stall": 10,
+    "stall_name": "Studio Snacks",
+    "location": "Boys studios-9",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 78,
+  "fields": {
+    "name": "Cheese Maggi",
+    "description": "Cheesy maggi",
+    "price": "60.00",
+    "is_active": true,
+    "stall": 10,
+    "stall_name": "Studio Snacks",
+    "location": "Boys studios-9",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1626202268668-8a1c24012d03?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 79,
+  "fields": {
+    "name": "Corn Cup",
+    "description": "Butter masala corn",
+    "price": "35.00",
+    "is_active": true,
+    "stall": 10,
+    "stall_name": "Studio Snacks",
+    "location": "Boys studios-9",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 80,
+  "fields": {
+    "name": "Bhel Puri",
+    "description": "Chatpata bhel puri",
+    "price": "45.00",
+    "is_active": true,
+    "stall": 11,
+    "stall_name": "GH-2 Cafe",
+    "location": "Near Gh-2",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 81,
+  "fields": {
+    "name": "Pani Puri",
+    "description": "6 pcs pani puri",
+    "price": "45.00",
+    "is_active": true,
+    "stall": 11,
+    "stall_name": "GH-2 Cafe",
+    "location": "Near Gh-2",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 82,
+  "fields": {
+    "name": "Dahi Puri",
+    "description": "6 pcs dahi puri",
+    "price": "55.00",
+    "is_active": true,
+    "stall": 11,
+    "stall_name": "GH-2 Cafe",
+    "location": "Near Gh-2",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1596560548464-f010549b84d7?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 83,
+  "fields": {
+    "name": "Salad Bowl",
+    "description": "Fresh seasonal salad bowl",
+    "price": "70.00",
+    "is_active": true,
+    "stall": 12,
+    "stall_name": "Green Bowl",
+    "location": "Uni Hospital",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 84,
+  "fields": {
+    "name": "Fruit Bowl",
+    "description": "Assorted fruit bowl",
+    "price": "75.00",
+    "is_active": true,
+    "stall": 12,
+    "stall_name": "Green Bowl",
+    "location": "Uni Hospital",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1519996529931-28324d5a630e?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 85,
+  "fields": {
+    "name": "Fresh Juice",
+    "description": "Seasonal fresh juice",
+    "price": "50.00",
+    "is_active": true,
+    "stall": 12,
+    "stall_name": "Green Bowl",
+    "location": "Uni Hospital",
+    "category": "Beverages",
+    "image_url": "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 86,
+  "fields": {
+    "name": "Soup of the Day",
+    "description": "Hot vegetable soup",
+    "price": "55.00",
+    "is_active": true,
+    "stall": 12,
+    "stall_name": "Green Bowl",
+    "location": "Uni Hospital",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 87,
+  "fields": {
+    "name": "Sprouts Chaat",
+    "description": "Sprouts with lemon and masala",
+    "price": "60.00",
+    "is_active": true,
+    "stall": 12,
+    "stall_name": "Green Bowl",
+    "location": "Uni Hospital",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 88,
+  "fields": {
+    "name": "Aloo Paratha",
+    "description": "Aloo paratha with curd",
+    "price": "70.00",
+    "is_active": true,
+    "stall": 13,
+    "stall_name": "Night Mess",
+    "location": "37 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 89,
+  "fields": {
+    "name": "Paneer Paratha",
+    "description": "Paneer paratha with curd",
+    "price": "85.00",
+    "is_active": true,
+    "stall": 13,
+    "stall_name": "Night Mess",
+    "location": "37 Block",
+    "category": "North Indian",
+    "image_url": "https://images.unsplash.com/photo-1626202268668-8a1c24012d03?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 90,
+  "fields": {
+    "name": "Veg Khichdi",
+    "description": "Moong dal khichdi",
+    "price": "80.00",
+    "is_active": true,
+    "stall": 14,
+    "stall_name": "Apartment Canteen",
+    "location": "41 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 91,
+  "fields": {
+    "name": "Vegetable Upma",
+    "description": "Light vegetable upma",
+    "price": "40.00",
+    "is_active": true,
+    "stall": 14,
+    "stall_name": "Apartment Canteen",
+    "location": "41 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 92,
+  "fields": {
+    "name": "Rice + Dal + Sabzi",
+    "description": "Simple home-style meal",
+    "price": "95.00",
+    "is_active": true,
+    "stall": 14,
+    "stall_name": "Apartment Canteen",
+    "location": "41 Block",
+    "category": "Healthy",
+    "image_url": "https://images.unsplash.com/photo-1589302168068-964664d93a06?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 93,
+  "fields": {
+    "name": "Water Bottle",
+    "description": "500ml purified water",
+    "price": "20.00",
+    "is_active": true,
+    "stall": 6,
+    "stall_name": "25 Block Canteen",
+    "location": "25 Block",
+    "category": "Beverages",
+    "image_url": "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 94,
+  "fields": {
+    "name": "Soft Drink",
+    "description": "300ml soft drink",
+    "price": "30.00",
+    "is_active": true,
+    "stall": 8,
+    "stall_name": "Campus Bites",
+    "location": "29 Block",
+    "category": "Fast Food",
+    "image_url": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.fooditem",
+  "pk": 95,
+  "fields": {
+    "name": "Ice Cream",
+    "description": "Vanilla ice cream cup",
+    "price": "35.00",
+    "is_active": true,
+    "stall": 15,
+    "stall_name": "Creamstone",
+    "location": "Unimall",
+    "category": "Desserts",
+    "image_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 1,
+  "fields": {
+    "name": "34 Block Canteen",
+    "location": "34 Block",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.550Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 2,
+  "fields": {
+    "name": "Thali House",
+    "location": "33 Block",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.554Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 3,
+  "fields": {
+    "name": "Punjabi Tadka",
+    "location": "31 Block",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.555Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 4,
+  "fields": {
+    "name": "Wok n Roll",
+    "location": "32 Block",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.559Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 5,
+  "fields": {
+    "name": "Oven Express",
+    "location": "Unimall",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.562Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 6,
+  "fields": {
+    "name": "25 Block Canteen",
+    "location": "25 Block",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.563Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 7,
+  "fields": {
+    "name": "Kitchen Ette",
+    "location": "BH-1",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.564Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 8,
+  "fields": {
+    "name": "Campus Bites",
+    "location": "29 Block",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.565Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 9,
+  "fields": {
+    "name": "Block 27 Canteen",
+    "location": "27 Block",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.566Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 10,
+  "fields": {
+    "name": "Studio Snacks",
+    "location": "Boys studios-9",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.567Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 11,
+  "fields": {
+    "name": "GH-2 Cafe",
+    "location": "Near Gh-2",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.568Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 12,
+  "fields": {
+    "name": "Green Bowl",
+    "location": "Uni Hospital",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.568Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 13,
+  "fields": {
+    "name": "Night Mess",
+    "location": "37 Block",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.569Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 14,
+  "fields": {
+    "name": "Apartment Canteen",
+    "location": "41 Block",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.570Z"
+  }
+},
+{
+  "model": "food.stall",
+  "pk": 15,
+  "fields": {
+    "name": "Creamstone",
+    "location": "Unimall",
+    "is_active": true,
+    "description": "",
+    "created_at": "2026-02-21T12:00:30.571Z"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 1,
+  "fields": {
+    "name": "8am - 9am",
+    "start_time": "08:00:00",
+    "end_time": "09:00:00"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 2,
+  "fields": {
+    "name": "9am - 10am",
+    "start_time": "09:00:00",
+    "end_time": "10:00:00"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 3,
+  "fields": {
+    "name": "10am - 11am",
+    "start_time": "10:00:00",
+    "end_time": "11:00:00"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 4,
+  "fields": {
+    "name": "11am - 12pm",
+    "start_time": "11:00:00",
+    "end_time": "12:00:00"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 5,
+  "fields": {
+    "name": "12pm - 1pm",
+    "start_time": "12:00:00",
+    "end_time": "13:00:00"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 6,
+  "fields": {
+    "name": "1pm - 2pm",
+    "start_time": "13:00:00",
+    "end_time": "14:00:00"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 7,
+  "fields": {
+    "name": "2pm - 3pm",
+    "start_time": "14:00:00",
+    "end_time": "15:00:00"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 8,
+  "fields": {
+    "name": "3pm - 4pm",
+    "start_time": "15:00:00",
+    "end_time": "16:00:00"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 9,
+  "fields": {
+    "name": "4pm - 5pm",
+    "start_time": "16:00:00",
+    "end_time": "17:00:00"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 10,
+  "fields": {
+    "name": "5pm - 6pm",
+    "start_time": "17:00:00",
+    "end_time": "18:00:00"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 11,
+  "fields": {
+    "name": "6pm - 7pm",
+    "start_time": "18:00:00",
+    "end_time": "19:00:00"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 12,
+  "fields": {
+    "name": "7pm - 8pm",
+    "start_time": "19:00:00",
+    "end_time": "20:00:00"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 13,
+  "fields": {
+    "name": "8pm - 9pm",
+    "start_time": "20:00:00",
+    "end_time": "21:00:00"
+  }
+},
+{
+  "model": "food.breakslot",
+  "pk": 14,
+  "fields": {
+    "name": "9pm - 10pm",
+    "start_time": "21:00:00",
+    "end_time": "22:00:00"
+  }
+},
+{
+  "model": "food.stallowner",
+  "pk": 1,
+  "fields": {
+    "user": 3,
+    "stall": 4,
+    "phone": "",
+    "is_active": true,
+    "created_at": "2026-02-21T15:59:44.021Z"
+  }
+},
+{
+  "model": "food.userprofile",
+  "pk": 1,
+  "fields": {
+    "user": 3,
+    "owner_status": false,
+    "created_at": "2026-02-21T15:59:44.011Z",
+    "updated_at": "2026-02-21T15:59:44.011Z"
+  }
+}
+]
