@@ -2740,7 +2740,7 @@ def makeup_class_attendance(request: HttpRequest, makeup_class_id: int) -> HttpR
                 if student.email:
                     subject = f"Attendance Alert: {makeup_class.course.code} Make-Up Class"
                     message = (
-                        f"Dear {student.name},\n\n"
+                        f"Dear {student.full_name},\n\n"
                         f"You were marked ABSENT for the make-up class on {makeup_class.session_date}.\n\n"
                         f"Course: {makeup_class.course.code} - {makeup_class.course.name}\n"
                         f"Date: {makeup_class.session_date}\n"

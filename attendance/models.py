@@ -87,10 +87,12 @@ class AttendanceSession(models.Model):
 class AttendanceRecord(models.Model):
     STATUS_PRESENT = "present"
     STATUS_ABSENT = "absent"
+    STATUS_EXCUSED = "excused"
 
     STATUS_CHOICES = [
         (STATUS_PRESENT, "Present"),
         (STATUS_ABSENT, "Absent"),
+        (STATUS_EXCUSED, "Excused"),
     ]
 
     session = models.ForeignKey(AttendanceSession, on_delete=models.CASCADE)
