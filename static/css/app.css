@@ -148,7 +148,8 @@
 @media (min-width: 992px) {
   .content {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
   }
 }
 

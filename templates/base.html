@@ -204,8 +204,8 @@
     </aside>
     {% endblock %}
 
-    <main class="content">
-      <div class="content-inner">
+    <main class="content d-flex flex-column min-vh-100">
+      <div class="content-inner flex-grow-1">
         {% if emergency_alerts %}
         <div class="mb-3">
           {% for a in emergency_alerts %}
@@ -229,7 +229,7 @@
 
         {% block content %}{% endblock %}
       </div>
-      <div class="text-center py-3 mt-4 border-top">
+      <div class="text-center py-3 mt-auto border-top">
         <small class="text-muted" style="font-size: 12px; opacity: 0.6;">
           Created by <strong>Arjun Varma</strong>
         </small>
