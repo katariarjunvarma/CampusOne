@@ -329,3 +329,83 @@ class Schedule(models.Model):
             "8pm-9pm": 13, "9pm-10pm": 14,
         }
         return slot_map.get(self.time_slot, 0)
+
+
+class MakeUpClass(models.Model):
+    """Make-up class sessions with remedial code for attendance."""
+    
+    STATUS_SCHEDULED = "scheduled"
+    STATUS_IN_PROGRESS = "in_progress"
+    STATUS_COMPLETED = "completed"
+    STATUS_CANCELLED = "cancelled"
+    
+    STATUS_CHOICES = [
+        (STATUS_SCHEDULED, "Scheduled"),
+        (STATUS_IN_PROGRESS, "In Progress"),
+        (STATUS_COMPLETED, "Completed"),
+        (STATUS_CANCELLED, "Cancelled"),
+    ]
+    
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="makeup_classes")
+    faculty = models.ForeignKey(FacultyProfile, on_delete=models.CASCADE, related_name="makeup_classes")
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name="makeup_classes")
+    classroom = models.ForeignKey(Classroom, on_delete=models.PROTECT, related_name="makeup_classes")
+    
+    session_date = models.DateField()
+    time_slot = models.CharField(max_length=20, choices=Schedule.TIME_SLOT_CHOICES)
+    
+    remedial_code = models.CharField(max_length=8, unique=True)
+    reason = models.TextField(help_text="Reason for make-up class")
+    
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=STATUS_SCHEDULED)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ["-session_date", "time_slot"]
+    
+    def __str__(self) -> str:
+        return f"Make-up: {self.course.code} - {self.session_date} - Code: {self.remedial_code}"
+    
+    def save(self, *args, **kwargs):
+        if not self.remedial_code:
+            self.remedial_code = self._generate_remedial_code()
+        super().save(*args, **kwargs)
+    
+    def _generate_remedial_code(self) -> str:
+        """Generate unique 6-character alphanumeric remedial code."""
+        import random
+        import string
+        
+        while True:
+            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+            if not MakeUpClass.objects.filter(remedial_code=code).exists():
+                return code
+
+
+class MakeUpAttendanceRecord(models.Model):
+    """Separate attendance records for make-up classes."""
+    
+    VIA_FACULTY = "faculty"
+    VIA_STUDENT = "student"
+    VIA_AUTO = "auto"
+    
+    MARKED_VIA_CHOICES = [
+        (VIA_FACULTY, "Faculty"),
+        (VIA_STUDENT, "Student (Self)"),
+        (VIA_AUTO, "Auto-marked"),
+    ]
+    
+    makeup_class = models.ForeignKey(MakeUpClass, on_delete=models.CASCADE, related_name="attendance_records")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    status = models.CharField(max_length=16, choices=AttendanceRecord.STATUS_CHOICES)
+    marked_at = models.DateTimeField(auto_now_add=True)
+    marked_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    marked_via = models.CharField(max_length=16, choices=MARKED_VIA_CHOICES, default=VIA_FACULTY)
+    
+    class Meta:
+        unique_together = ("makeup_class", "student")
+    
+    def __str__(self) -> str:
+        return f"{self.student.registration_number} - {self.makeup_class.course.code} - {self.status}"

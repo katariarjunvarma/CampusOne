@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Class Rush Prediction{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-1"><i class="bi bi-graph-up-arrow"></i> Class Rush Prediction</h1>
+      <p class="text-muted mb-0">AI-powered congestion analysis and peak hour predictions</p>
+    </div>
+    <a href="{% url 'faculty_makeup_classes' %}" class="btn btn-outline-secondary">Back to Make-Up Classes</a>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card text-center h-100">
+        <div class="card-body">
+          <div class="display-4 text-primary">{{ today|date:"l" }}</div>
+          <div class="text-muted">{{ today|date:"F d, Y" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center h-100">
+        <div class="card-body">
+          <div class="display-4 text-danger">{{ peak_slots|length }}</div>
+          <div class="text-muted">Peak Hours Today</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center h-100">
+        <div class="card-body">
+          <div class="display-4 text-success">{{ off_peak_slots|length }}</div>
+          <div class="text-muted">Off-Peak Hours Today</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center h-100">
+        <div class="card-body">
+          <div class="display-4 text-info">
+            {% if traffic_analysis %}
+            {{ traffic_analysis.values|length }}
+            {% else %}0{% endif %}
+          </div>
+          <div class="text-muted">Time Slots Analyzed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0"><i class="bi bi-fire"></i> Peak Hours (High Traffic)</h5>
+        </div>
+        <div class="card-body">
+          {% if peak_slots %}
+          <div class="list-group list-group-flush">
+            {% for slot_code, data in peak_slots %}
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1">
+                  {% for code, display in time_slots %}
+                  {% if code == slot_code %}{{ display }}{% endif %}
+                  {% endfor %}
+                </h6>
+                <small class="text-muted">
+                  Regular: {{ data.actual_regular }} classes
+                  {% if data.actual_makeup > 0 %}
+                  + {{ data.actual_makeup }} make-up
+                  {% endif %}
+                </small>
+              </div>
+              <span class="badge bg-danger rounded-pill">Rush: {{ data.predicted|floatformat:0 }}%</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center py-3 text-muted">No peak hours detected today</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="bi bi-snow"></i> Off-Peak Hours (Low Traffic)</h5>
+        </div>
+        <div class="card-body">
+          {% if off_peak_slots %}
+          <div class="list-group list-group-flush">
+            {% for slot_code, data in off_peak_slots %}
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1">
+                  {% for code, display in time_slots %}
+                  {% if code == slot_code %}{{ display }}{% endif %}
+                  {% endfor %}
+                </h6>
+                <small class="text-muted">
+                  Regular: {{ data.actual_regular }} classes
+                  {% if data.actual_makeup > 0 %}
+                  + {{ data.actual_makeup }} make-up
+                  {% endif %}
+                </small>
+              </div>
+              <span class="badge bg-success rounded-pill">Calm: {{ data.predicted|floatformat:0 }}%</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center py-3 text-muted">No off-peak hours detected today</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Today's Traffic Analysis by Time Slot</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Time Slot</th>
+              <th>AI Rush Score</th>
+              <th>Regular Classes</th>
+              <th>Make-Up Classes</th>
+              <th>Total Activity</th>
+              <th>Recommendation</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for slot_code, data in today_rush.items %}
+            <tr>
+              <td>
+                {% for code, display in time_slots %}
+                {% if code == slot_code %}{{ display }}{% endif %}
+                {% endfor %}
+              </td>
+              <td>
+                <div class="progress" style="height: 20px;">
+                  <div class="progress-bar 
+                    {% if data.predicted < 30 %}bg-success{% elif data.predicted < 60 %}bg-warning{% else %}bg-danger{% endif %}" 
+                    role="progressbar" 
+                    style="width: {{ data.predicted }}%">
+                    {{ data.predicted|floatformat:0 }}%
+                  </div>
+                </div>
+              </td>
+              <td>{{ data.actual_regular }}</td>
+              <td>{{ data.actual_makeup }}</td>
+              <td><strong>{{ data.total_actual }}</strong></td>
+              <td>
+                {% if data.predicted < 30 %}
+                <span class="badge bg-success">Ideal for make-up</span>
+                {% elif data.predicted < 60 %}
+                <span class="badge bg-warning">Acceptable</span>
+                {% else %}
+                <span class="badge bg-danger">Avoid if possible</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card-footer text-muted small">
+      <i class="bi bi-info-circle"></i> Rush scores are calculated based on regular class schedules, make-up class bookings, and historical campus traffic patterns during food break times.
+    </div>
+  </div>
+
+  <div class="alert alert-info mt-4">
+    <h6><i class="bi bi-lightbulb"></i> Scheduling Tips</h6>
+    <ul class="mb-0">
+      <li><strong>Avoid Peak Hours:</strong> Schedule make-up classes during off-peak times for better student attendance</li>
+      <li><strong>Food Break Conflict:</strong> 12pm-2pm slots may conflict with lunch breaks - consider early morning or late afternoon</li>
+      <li><strong>Classroom Availability:</strong> Low traffic slots have higher chance of getting preferred classrooms</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

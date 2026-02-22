@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin - Make-Up Class Details{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3"><i class="bi bi-eye"></i> Make-Up Class Details</h1>
+    <div>
+      <a href="{% url 'admin_makeup_classes' %}" class="btn btn-outline-secondary">Back to Monitor</a>
+      {% if makeup_class.status == 'scheduled' or makeup_class.status == 'in_progress' %}
+      <a href="{% url 'admin_makeup_class_cancel' makeup_class.id %}" class="btn btn-outline-danger">Cancel Class</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- Class Information -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Class Information</span>
+          <span class="badge {% if makeup_class.status == 'scheduled' %}bg-primary{% elif makeup_class.status == 'in_progress' %}bg-success{% elif makeup_class.status == 'completed' %}bg-secondary{% else %}bg-danger{% endif %}">
+            {{ makeup_class.get_status_display }}
+          </span>
+        </div>
+        <div class="card-body">
+          <table class="table table-borderless">
+            <tr>
+              <td class="text-muted" style="width: 30%">Faculty:</td>
+              <td class="fw-semibold">{{ makeup_class.faculty.user.get_full_name|default:makeup_class.faculty.user.username }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted">Email:</td>
+              <td>{{ makeup_class.faculty.user.email }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted">Course:</td>
+              <td>{{ makeup_class.course.code }} - {{ makeup_class.course.name }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted">Section:</td>
+              <td>{{ makeup_class.section.name }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted">Date & Time:</td>
+              <td>{{ makeup_class.session_date|date:"F d, Y (l)" }} at {{ makeup_class.get_time_slot_display }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted">Classroom:</td>
+              <td>{{ makeup_class.classroom.block.code }}-{{ makeup_class.classroom.room_number }} (Capacity: {{ makeup_class.classroom.capacity }})</td>
+            </tr>
+            <tr>
+              <td class="text-muted">Reason:</td>
+              <td>{{ makeup_class.reason }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted">Created:</td>
+              <td>{{ makeup_class.created_at|date:"F d, Y H:i" }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Attendance Records -->
+      <div class="card">
+        <div class="card-header">
+          <i class="bi bi-people"></i> Attendance Records
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>Reg. No</th>
+                  <th>Student Name</th>
+                  <th>Status</th>
+                  <th>Marked At</th>
+                  <th>Marked By</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for record in attendance_records %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ record.student.registration_number }}</td>
+                  <td>{{ record.student.name }}</td>
+                  <td>
+                    <span class="badge {% if record.status == 'present' %}bg-success{% elif record.status == 'absent' %}bg-danger{% else %}bg-warning{% endif %}">
+                      {{ record.get_status_display }}
+                    </span>
+                  </td>
+                  <td>{{ record.marked_at|date:"M d, H:i"|default:"-" }}</td>
+                  <td>{{ record.marked_by.user.username|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center py-3 text-muted">No attendance records yet</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <!-- Remedial Code -->
+      <div class="card mb-4 border-warning">
+        <div class="card-header bg-warning text-dark">
+          <i class="bi bi-key-fill"></i> Remedial Code
+        </div>
+        <div class="card-body text-center">
+          {% if makeup_class.status == 'scheduled' or makeup_class.status == 'in_progress' %}
+          <code class="fs-1 d-block mb-2" style="letter-spacing: 4px;">{{ makeup_class.remedial_code }}</code>
+          <small class="text-muted">Share this code with students for attendance</small>
+          {% else %}
+          <span class="text-muted">Code expired</span>
+          <code class="fs-1 d-block mb-2 text-muted" style="letter-spacing: 4px;">{{ makeup_class.remedial_code }}</code>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Attendance Summary -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-pie-chart"></i> Attendance Summary
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-3">
+              <div class="display-6">{{ attendance_summary.total }}</div>
+              <small class="text-muted">Total</small>
+            </div>
+            <div class="col-3">
+              <div class="display-6 text-success">{{ attendance_summary.total_present }}</div>
+              <small class="text-muted">Present</small>
+            </div>
+            <div class="col-3">
+              <div class="display-6 text-danger">{{ attendance_summary.total_absent }}</div>
+              <small class="text-muted">Absent</small>
+            </div>
+            <div class="col-3">
+              <div class="display-6 text-warning">{{ attendance_summary.total_excused }}</div>
+              <small class="text-muted">Excused</small>
+            </div>
+          </div>
+          
+          {% if attendance_summary.total > 0 %}
+          <div class="mt-3">
+            <div class="progress" style="height: 25px;">
+              {% with present_pct=attendance_summary.total_present|div:attendance_summary.total|mul:100 %}
+              <div class="progress-bar bg-success" style="width: {{ present_pct }}%">
+                {{ attendance_summary.total_present }}
+              </div>
+              {% endwith %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card">
+        <div class="card-header">Quick Actions</div>
+        <div class="card-body">
+          <a href="{% url 'faculty_timetable' %}?faculty={{ makeup_class.faculty.id }}" class="btn btn-outline-info w-100 mb-2">
+            <i class="bi bi-calendar"></i> View Faculty Timetable
+          </a>
+          <a href="{% url 'section_timetable' makeup_class.section.id %}" class="btn btn-outline-info w-100">
+            <i class="bi bi-calendar"></i> View Section Timetable
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

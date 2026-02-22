@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+{% block title %}CampusOne - Make-Up Class Details{% endblock %}
+
+{% block content %}
+<style>
+  .detail-page {
+    padding: 24px 32px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .page-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  .info-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    border-left: 4px solid #3b82f6;
+  }
+  .info-card.in-progress {
+    border-left-color: #10b981;
+  }
+  .info-card.completed {
+    border-left-color: #64748b;
+  }
+  .info-card.cancelled {
+    border-left-color: #ef4444;
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  .status-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .status-badge.scheduled {
+    background: #dbeafe;
+    color: #2563eb;
+  }
+  .status-badge.in-progress {
+    background: #d1fae5;
+    color: #059669;
+  }
+  .status-badge.completed {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  .status-badge.cancelled {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .info-item {
+    display: flex;
+    flex-direction: column;
+  }
+  .info-label {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 4px;
+  }
+  .info-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1e293b;
+  }
+  .remedial-card {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .remedial-label {
+    font-size: 12px;
+    color: #92400e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .remedial-value {
+    font-family: 'Courier New', monospace;
+    font-size: 36px;
+    font-weight: 700;
+    color: #b45309;
+    letter-spacing: 8px;
+  }
+  .summary-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    text-align: center;
+  }
+  .summary-item {
+    padding: 16px;
+  }
+  .summary-value {
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .summary-value.present {
+    color: #10b981;
+  }
+  .summary-value.absent {
+    color: #ef4444;
+  }
+  .summary-value.excused {
+    color: #f59e0b;
+  }
+  .summary-label {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  .actions-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-success {
+    background: #10b981;
+    color: white;
+  }
+  .btn-success:hover {
+    background: #059669;
+  }
+  .btn-danger {
+    background: #ef4444;
+    color: white;
+  }
+  .btn-danger:hover {
+    background: #dc2626;
+  }
+  .btn-secondary {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  .btn-secondary:hover {
+    background: #e2e8f0;
+  }
+  .btn-primary {
+    background: #3b82f6;
+    color: white;
+  }
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+  .btn-info {
+    background: #0ea5e9;
+    color: white;
+  }
+  .btn-info:hover {
+    background: #0284c7;
+  }
+  .btn-outline {
+    background: white;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+  }
+  .btn-outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
+</style>
+
+<div class="detail-page">
+  <div class="page-header">
+    <h1>Make-Up Class Details</h1>
+    <a href="{% url 'faculty_makeup_classes' %}" class="btn btn-outline">Back to List</a>
+  </div>
+
+  <div class="info-card {{ makeup_class.status }}">
+    <div class="card-header">
+      <span class="card-title">{{ makeup_class.course.code }} - {{ makeup_class.course.name }}</span>
+      <span class="status-badge {{ makeup_class.status }}">{{ makeup_class.get_status_display }}</span>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="info-label">Section</span>
+        <span class="info-value">{{ makeup_class.section.name }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Date</span>
+        <span class="info-value">{{ makeup_class.session_date|date:"F d, Y" }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Time</span>
+        <span class="info-value">{{ makeup_class.get_time_slot_display }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Classroom</span>
+        <span class="info-value">{{ makeup_class.classroom.block.code }}-{{ makeup_class.classroom.room_number }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Capacity</span>
+        <span class="info-value">{{ makeup_class.classroom.capacity }} students</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Reason</span>
+        <span class="info-value">{{ makeup_class.reason }}</span>
+      </div>
+    </div>
+  </div>
+
+  {% if makeup_class.status == 'scheduled' or makeup_class.status == 'in_progress' %}
+  <div class="remedial-card">
+    <div class="remedial-label">Remedial Code</div>
+    <div class="remedial-value">{{ makeup_class.remedial_code }}</div>
+  </div>
+  {% endif %}
+
+  <div class="summary-card">
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-value present">{{ attendance_summary.total_present }}</div>
+        <div class="summary-label">Present</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-value absent">{{ attendance_summary.total_absent }}</div>
+        <div class="summary-label">Absent</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-value excused">{{ attendance_summary.total_excused }}</div>
+        <div class="summary-label">Excused</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions-bar">
+    {% if makeup_class.status == 'scheduled' %}
+    <a href="{% url 'makeup_class_start' makeup_class.id %}" class="btn btn-success">Start Class</a>
+    <a href="{% url 'makeup_class_cancel' makeup_class.id %}" class="btn btn-danger">Cancel</a>
+    <a href="{% url 'makeup_class_send_reminder' makeup_class.id %}" class="btn btn-info">Send Reminder</a>
+    {% elif makeup_class.status == 'in_progress' %}
+    <a href="{% url 'makeup_class_mark_attendance' makeup_class.id %}" class="btn btn-primary">Mark Attendance</a>
+    <a href="{% url 'makeup_class_complete' makeup_class.id %}" class="btn btn-secondary">Complete</a>
+    {% endif %}
+    
+    <a href="{% url 'makeup_class_attendance_records' makeup_class.id %}" class="btn btn-outline">View Records</a>
+    <a href="{% url 'makeup_class_export_report' makeup_class.id %}" class="btn btn-outline">Export</a>
+  </div>
+</div>
+{% endblock %}

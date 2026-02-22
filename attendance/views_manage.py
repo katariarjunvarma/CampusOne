@@ -37,6 +37,7 @@ from .forms import (
     AttendanceSessionCreateForm,
     BlockForm,
     CourseCreateForm,
+    MakeUpClassForm,
     SectionCourseFacultyForm,
     EnrollmentForm,
     FaceSampleMultiForm,
@@ -44,6 +45,7 @@ from .forms import (
     FacultyProfileForm,
     ClassroomForm,
     ScheduleForm,
+    SmartSchedulingForm,
     StudentForm,
     UserPermissionsForm,
     SectionForm,
@@ -59,6 +61,8 @@ from .models import (
     Enrollment,
     FaceSample,
     FacultyProfile,
+    MakeUpAttendanceRecord,
+    MakeUpClass,
     Notification,
     Schedule,
     Student,
@@ -958,13 +962,28 @@ def super_admin_view_attendance(request: HttpRequest) -> HttpResponse:
                 pass # Just show not found message in template
 
     if student:
-        # Get all records for calculating overall stats
+        # Get all regular attendance records
         all_records = AttendanceRecord.objects.select_related("session", "session__course").filter(student=student)
         
-        # Overall Stats
-        total_sessions = all_records.count()
-        present = all_records.filter(status=AttendanceRecord.STATUS_PRESENT).count()
-        absent = all_records.filter(status=AttendanceRecord.STATUS_ABSENT).count()
+        # Get makeup class attendance records and convert to similar format
+        makeup_records = MakeUpAttendanceRecord.objects.filter(
+            student=student,
+            makeup_class__status=MakeUpClass.STATUS_COMPLETED
+        ).select_related("makeup_class", "makeup_class__course", "makeup_class__faculty")
+        
+        # Overall Stats (including makeup classes)
+        total_regular_sessions = all_records.count()
+        total_makeup_sessions = makeup_records.count()
+        total_sessions = total_regular_sessions + total_makeup_sessions
+        
+        present_regular = all_records.filter(status=AttendanceRecord.STATUS_PRESENT).count()
+        present_makeup = makeup_records.filter(status=AttendanceRecord.STATUS_PRESENT).count()
+        present = present_regular + present_makeup
+        
+        absent_regular = all_records.filter(status=AttendanceRecord.STATUS_ABSENT).count()
+        absent_makeup = makeup_records.filter(status=AttendanceRecord.STATUS_ABSENT).count()
+        absent = absent_regular + absent_makeup
+        
         percentage = (present / total_sessions * 100) if total_sessions > 0 else 0
 
         stats = {
@@ -972,20 +991,38 @@ def super_admin_view_attendance(request: HttpRequest) -> HttpResponse:
             "present": present,
             "absent": absent,
             "percentage": round(percentage, 1),
+            "makeup_count": total_makeup_sessions,
         }
 
         if course_id:
-            # Course Detail View
-            records = all_records.filter(session__course_id=course_id).order_by("-session__session_date", "-session__created_at")
-            if records.exists():
-                selected_course = records.first().session.course
+            # Course Detail View - combine regular and makeup records
+            regular_records = all_records.filter(session__course_id=course_id).order_by("-session__session_date", "-session__created_at")
+            makeup_course_records = makeup_records.filter(makeup_class__course_id=course_id).order_by("-makeup_class__session_date")
+            
+            # Convert makeup records to display format
+            records = list(regular_records)
+            for mr in makeup_course_records:
+                # Create a synthetic record-like object for template
+                mr.session_date = mr.makeup_class.session_date
+                mr.course_name = mr.makeup_class.course.name
+                mr.course_code = mr.makeup_class.course.code
+                mr.is_makeup = True
+                mr.faculty_name = mr.makeup_class.faculty.user.get_full_name() or mr.makeup_class.faculty.user.username
+                records.append(mr)
+            
+            # Sort by date
+            records.sort(key=lambda x: x.session_date if hasattr(x, 'session_date') else x.session.session_date, reverse=True)
+            
+            if regular_records.exists():
+                selected_course = regular_records.first().session.course
+            elif makeup_course_records.exists():
+                selected_course = makeup_course_records.first().makeup_class.course
             else:
-                # Handle case where ID is valid but no records exist (e.g. wiped)
                 selected_course = Course.objects.filter(id=course_id).first()
         else:
-            # Course Summary View
-            # Group by course
+            # Course Summary View - include makeup classes
             courses = {}
+            # Process regular records
             for record in all_records:
                 c = record.session.course
                 if c.id not in courses:
@@ -994,9 +1031,28 @@ def super_admin_view_attendance(request: HttpRequest) -> HttpResponse:
                         "total": 0,
                         "present": 0,
                         "absent": 0,
+                        "makeup_count": 0,
                     }
                 courses[c.id]["total"] += 1
                 if record.status == AttendanceRecord.STATUS_PRESENT:
+                    courses[c.id]["present"] += 1
+                else:
+                    courses[c.id]["absent"] += 1
+            
+            # Process makeup records
+            for mr in makeup_records:
+                c = mr.makeup_class.course
+                if c.id not in courses:
+                    courses[c.id] = {
+                        "course": c,
+                        "total": 0,
+                        "present": 0,
+                        "absent": 0,
+                        "makeup_count": 0,
+                    }
+                courses[c.id]["total"] += 1
+                courses[c.id]["makeup_count"] += 1
+                if mr.status == AttendanceRecord.STATUS_PRESENT:
                     courses[c.id]["present"] += 1
                 else:
                     courses[c.id]["absent"] += 1
@@ -2119,4 +2175,734 @@ def faculty_book_room(request: HttpRequest) -> HttpResponse:
         "classroom_id": classroom_id,
         "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
         "time_slots": Schedule.TIME_SLOT_CHOICES,
+    })
+
+
+# ==================== MAKE-UP CLASS & REMEDIAL CODE MODULE ====================
+
+
+@login_required
+def faculty_makeup_classes(request: HttpRequest) -> HttpResponse:
+    """Faculty dashboard for managing make-up classes."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    makeup_classes = MakeUpClass.objects.filter(
+        faculty=faculty
+    ).select_related("course", "section", "classroom", "classroom__block").order_by("-session_date", "time_slot")
+    
+    assigned_courses = SectionCourseFaculty.objects.filter(
+        faculty=faculty
+    ).select_related("course", "section")
+    
+    return render(request, "attendance/faculty_makeup_classes.html", {
+        "makeup_classes": makeup_classes,
+        "assigned_courses": assigned_courses,
+    })
+
+
+@login_required
+def makeup_class_create(request: HttpRequest) -> HttpResponse:
+    """Faculty schedules a new make-up class with remedial code generation."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    if request.method == "POST":
+        form = MakeUpClassForm(request.POST, faculty=faculty)
+        if form.is_valid():
+            makeup_class = form.save(commit=False)
+            makeup_class.faculty = faculty
+            makeup_class.save()
+            messages.success(request, f"Make-up class scheduled! Remedial Code: {makeup_class.remedial_code}")
+            return redirect("faculty_makeup_classes")
+    else:
+        form = MakeUpClassForm(faculty=faculty)
+    
+    return render(request, "attendance/makeup_class_form.html", {
+        "form": form,
+        "title": "Schedule Make-Up Class",
+        "cancel_url": reverse("faculty_makeup_classes"),
+    })
+
+
+@login_required
+def makeup_class_detail(request: HttpRequest, makeup_class_id: int) -> HttpResponse:
+    """View make-up class details including remedial code."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    makeup_class = get_object_or_404(
+        MakeUpClass.objects.select_related("course", "section", "classroom", "classroom__block"),
+        id=makeup_class_id, faculty=faculty
+    )
+    
+    attendance_summary = {
+        "total_present": MakeUpAttendanceRecord.objects.filter(
+            makeup_class=makeup_class, status=AttendanceRecord.STATUS_PRESENT
+        ).count(),
+        "total_absent": MakeUpAttendanceRecord.objects.filter(
+            makeup_class=makeup_class, status=AttendanceRecord.STATUS_ABSENT
+        ).count(),
+    }
+    
+    return render(request, "attendance/makeup_class_detail.html", {
+        "makeup_class": makeup_class,
+        "attendance_summary": attendance_summary,
+    })
+
+
+@login_required
+def makeup_class_cancel(request: HttpRequest, makeup_class_id: int) -> HttpResponse:
+    """Cancel a scheduled make-up class."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    makeup_class = get_object_or_404(
+        MakeUpClass, id=makeup_class_id, faculty=faculty,
+        status__in=[MakeUpClass.STATUS_SCHEDULED, MakeUpClass.STATUS_IN_PROGRESS]
+    )
+    
+    if request.method == "POST":
+        makeup_class.status = MakeUpClass.STATUS_CANCELLED
+        makeup_class.save()
+        messages.success(request, "Make-up class cancelled.")
+        return redirect("faculty_makeup_classes")
+    
+    return render(request, "attendance/makeup_class_cancel.html", {"makeup_class": makeup_class})
+
+
+@login_required
+def makeup_class_start(request: HttpRequest, makeup_class_id: int) -> HttpResponse:
+    """Start a make-up class session."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    makeup_class = get_object_or_404(
+        MakeUpClass, id=makeup_class_id, faculty=faculty, status=MakeUpClass.STATUS_SCHEDULED
+    )
+    
+    makeup_class.status = MakeUpClass.STATUS_IN_PROGRESS
+    makeup_class.save()
+    messages.success(request, f"Class started! Remedial Code: {makeup_class.remedial_code}")
+    return redirect("makeup_class_detail", makeup_class_id=makeup_class.id)
+
+
+@login_required
+def makeup_class_complete(request: HttpRequest, makeup_class_id: int) -> HttpResponse:
+    """Complete a make-up class session."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    makeup_class = get_object_or_404(
+        MakeUpClass, id=makeup_class_id, faculty=faculty,
+        status__in=[MakeUpClass.STATUS_SCHEDULED, MakeUpClass.STATUS_IN_PROGRESS]
+    )
+    
+    makeup_class.status = MakeUpClass.STATUS_COMPLETED
+    makeup_class.save()
+    messages.success(request, "Make-up class completed.")
+    return redirect("faculty_makeup_classes")
+
+
+# ==================== AI SMART SCHEDULING ====================
+
+
+@login_required
+def smart_scheduling_recommendations(request: HttpRequest) -> HttpResponse:
+    """AI-powered scheduling recommendations for faculty."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    recommendations = []
+    if request.method == "POST":
+        form = SmartSchedulingForm(request.POST)
+        if form.is_valid():
+            recommendations = _generate_smart_recommendations(
+                faculty,
+                form.cleaned_data.get("preferred_date"),
+                form.cleaned_data.get("preferred_time_slot"),
+                form.cleaned_data.get("prioritize_low_traffic", True)
+            )
+    else:
+        form = SmartSchedulingForm()
+    
+    return render(request, "attendance/smart_scheduling.html", {
+        "form": form,
+        "recommendations": recommendations,
+    })
+
+
+def _generate_smart_recommendations(faculty, preferred_date=None, preferred_slot=None, prioritize_low_traffic=True):
+    """Generate AI scheduling recommendations."""
+    from datetime import timedelta
+    
+    recommendations = []
+    base_date = timezone.localdate()
+    days_to_check = [base_date + timedelta(days=i) for i in range(1, 8)]
+    
+    faculty_schedule = Schedule.objects.filter(
+        section_course_faculty__faculty=faculty
+    ).values_list("day_of_week", "time_slot")
+    faculty_schedule_dict = {}
+    for day, slot in faculty_schedule:
+        faculty_schedule_dict.setdefault(day, set()).add(slot)
+    
+    traffic_analysis = _analyze_traffic_patterns()
+    
+    for day in days_to_check:
+        day_name = day.strftime("%A")
+        if day_name not in [c[0] for c in Schedule.DAY_CHOICES]:
+            continue
+        
+        for slot_code, slot_display in Schedule.TIME_SLOT_CHOICES:
+            if preferred_slot and slot_code != preferred_slot:
+                continue
+            if day_name in faculty_schedule_dict and slot_code in faculty_schedule_dict.get(day_name, set()):
+                continue
+            
+            busy = Schedule.objects.filter(day_of_week=day_name, time_slot=slot_code).values_list("classroom_id", flat=True)
+            makeup_busy = MakeUpClass.objects.filter(
+                session_date=day, time_slot=slot_code,
+                status__in=[MakeUpClass.STATUS_SCHEDULED, MakeUpClass.STATUS_IN_PROGRESS]
+            ).values_list("classroom_id", flat=True)
+            
+            available = Classroom.objects.exclude(id__in=list(busy) + list(makeup_busy)).filter(is_active=True)
+            if not available.exists():
+                continue
+            
+            rush_score = traffic_analysis.get(slot_code, 50)
+            score = (100 - rush_score) if prioritize_low_traffic else 50
+            days_until = (day - base_date).days
+            score += max(0, 10 - days_until)
+            
+            recommendations.append({
+                "date": day,
+                "day_name": day_name,
+                "time_slot": slot_code,
+                "time_display": slot_display,
+                "rush_score": rush_score,
+                "available_classrooms": list(available[:3]),
+                "score": round(score, 1),
+                "reason": f"In {days_until} days, {'low' if rush_score < 30 else 'moderate' if rush_score < 60 else 'high'} traffic",
+            })
+    
+    recommendations.sort(key=lambda x: x["score"], reverse=True)
+    return recommendations[:10]
+
+
+def _analyze_traffic_patterns():
+    """Analyze traffic patterns for rush prediction."""
+    schedule_counts = Schedule.objects.values("time_slot").annotate(count=Count("id"))
+    max_count = max([s["count"] for s in schedule_counts], default=1)
+    
+    traffic_scores = {}
+    for slot in Schedule.TIME_SLOT_CHOICES:
+        slot_code = slot[0]
+        count = next((s["count"] for s in schedule_counts if s["time_slot"] == slot_code), 0)
+        score = (count / max_count) * 60 if max_count > 0 else 0
+        
+        if slot_code in ["9am-10am", "10am-11am", "11am-12pm", "2pm-3pm"]:
+            score += 20
+        if slot_code in ["12pm-1pm", "1pm-2pm"]:
+            score += 40
+        
+        traffic_scores[slot_code] = min(100, score)
+    
+    return traffic_scores
+
+
+@login_required
+def class_rush_prediction(request: HttpRequest) -> HttpResponse:
+    """View class rush prediction and congestion analysis."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    traffic_analysis = _analyze_traffic_patterns()
+    today = timezone.localdate()
+    today_name = today.strftime("%A")
+    
+    today_regular = Schedule.objects.filter(day_of_week=today_name).values("time_slot").annotate(count=Count("id"))
+    today_makeup = MakeUpClass.objects.filter(
+        session_date=today,
+        status__in=[MakeUpClass.STATUS_SCHEDULED, MakeUpClass.STATUS_IN_PROGRESS]
+    ).values("time_slot").annotate(count=Count("id"))
+    
+    today_rush = {}
+    for slot in Schedule.TIME_SLOT_CHOICES:
+        slot_code = slot[0]
+        regular = next((s["count"] for s in today_regular if s["time_slot"] == slot_code), 0)
+        makeup = next((s["count"] for s in today_makeup if s["time_slot"] == slot_code), 0)
+        today_rush[slot_code] = {
+            "predicted": traffic_analysis.get(slot_code, 0),
+            "actual_regular": regular,
+            "actual_makeup": makeup,
+            "total_actual": regular + makeup,
+        }
+    
+    sorted_slots = sorted(today_rush.items(), key=lambda x: x[1]["total_actual"], reverse=True)
+    peak_slots = sorted_slots[:3]
+    off_peak_slots = sorted_slots[-3:]
+    
+    return render(request, "attendance/class_rush_prediction.html", {
+        "traffic_analysis": traffic_analysis,
+        "today_rush": today_rush,
+        "peak_slots": peak_slots,
+        "off_peak_slots": off_peak_slots,
+        "today": today,
+        "time_slots": Schedule.TIME_SLOT_CHOICES,
+    })
+
+
+# ==================== ADMIN MAKE-UP CLASS MANAGEMENT ====================
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def admin_makeup_classes(request: HttpRequest) -> HttpResponse:
+    """Admin monitor for all make-up classes across faculty."""
+    status_filter = request.GET.get("status", "")
+    faculty_id = request.GET.get("faculty_id", "")
+    date_from = request.GET.get("date_from", "")
+    date_to = request.GET.get("date_to", "")
+    
+    makeup_classes = MakeUpClass.objects.all().select_related(
+        "faculty", "faculty__user", "course", "section", "classroom", "classroom__block"
+    ).order_by("-session_date", "time_slot")
+    
+    if status_filter:
+        makeup_classes = makeup_classes.filter(status=status_filter)
+    if faculty_id and faculty_id.isdigit():
+        makeup_classes = makeup_classes.filter(faculty_id=int(faculty_id))
+    if date_from:
+        makeup_classes = makeup_classes.filter(session_date__gte=date_from)
+    if date_to:
+        makeup_classes = makeup_classes.filter(session_date__lte=date_to)
+    
+    # Statistics
+    total_classes = MakeUpClass.objects.count()
+    scheduled_count = MakeUpClass.objects.filter(status=MakeUpClass.STATUS_SCHEDULED).count()
+    in_progress_count = MakeUpClass.objects.filter(status=MakeUpClass.STATUS_IN_PROGRESS).count()
+    completed_count = MakeUpClass.objects.filter(status=MakeUpClass.STATUS_COMPLETED).count()
+    cancelled_count = MakeUpClass.objects.filter(status=MakeUpClass.STATUS_CANCELLED).count()
+    
+    # Today's classes
+    today = timezone.localdate()
+    today_classes = MakeUpClass.objects.filter(
+        session_date=today
+    ).select_related("faculty", "faculty__user", "course", "section").order_by("time_slot")
+    
+    faculty_list = FacultyProfile.objects.filter(is_active=True).select_related("user").order_by("user__username")
+    
+    return render(request, "attendance/manage/admin_makeup_classes.html", {
+        "makeup_classes": makeup_classes,
+        "faculty_list": faculty_list,
+        "filters": {
+            "status": status_filter,
+            "faculty_id": faculty_id,
+            "date_from": date_from,
+            "date_to": date_to,
+        },
+        "stats": {
+            "total": total_classes,
+            "scheduled": scheduled_count,
+            "in_progress": in_progress_count,
+            "completed": completed_count,
+            "cancelled": cancelled_count,
+        },
+        "today_classes": today_classes,
+        "today": today,
+    })
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def admin_makeup_class_detail(request: HttpRequest, makeup_class_id: int) -> HttpResponse:
+    """Admin view for make-up class details."""
+    makeup_class = get_object_or_404(
+        MakeUpClass.objects.select_related(
+            "faculty", "faculty__user", "course", "section", "classroom", "classroom__block"
+        ),
+        id=makeup_class_id
+    )
+    
+    # Get attendance records
+    attendance_records = MakeUpAttendanceRecord.objects.filter(
+        makeup_class=makeup_class
+    ).select_related("student").order_by("student__registration_number")
+    
+    attendance_summary = {
+        "total_present": attendance_records.filter(status=AttendanceRecord.STATUS_PRESENT).count(),
+        "total_absent": attendance_records.filter(status=AttendanceRecord.STATUS_ABSENT).count(),
+        "total_excused": attendance_records.filter(status=AttendanceRecord.STATUS_EXCUSED).count(),
+        "total": attendance_records.count(),
+    }
+    
+    return render(request, "attendance/manage/admin_makeup_class_detail.html", {
+        "makeup_class": makeup_class,
+        "attendance_records": attendance_records,
+        "attendance_summary": attendance_summary,
+    })
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def admin_makeup_class_cancel(request: HttpRequest, makeup_class_id: int) -> HttpResponse:
+    """Admin cancels a make-up class."""
+    makeup_class = get_object_or_404(
+        MakeUpClass,
+        id=makeup_class_id,
+        status__in=[MakeUpClass.STATUS_SCHEDULED, MakeUpClass.STATUS_IN_PROGRESS]
+    )
+    
+    if request.method == "POST":
+        reason = request.POST.get("reason", "")
+        makeup_class.status = MakeUpClass.STATUS_CANCELLED
+        makeup_class.save()
+        
+        # Send notification to faculty
+        Notification.objects.create(
+            recipient_faculty=makeup_class.faculty,
+            title="Make-Up Class Cancelled by Admin",
+            message=f"Your make-up class for {makeup_class.course.code} on {makeup_class.session_date} has been cancelled by admin. Reason: {reason}",
+        )
+        
+        messages.success(request, f"Make-up class cancelled. Faculty notified.")
+        return redirect("admin_makeup_classes")
+    
+    return render(request, "attendance/manage/admin_makeup_class_cancel.html", {
+        "makeup_class": makeup_class,
+    })
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def admin_makeup_class_stats(request: HttpRequest) -> HttpResponse:
+    """Statistics report for make-up classes."""
+    from django.db.models import Count, Q
+    
+    # Faculty-wise statistics
+    faculty_stats = []
+    for faculty in FacultyProfile.objects.filter(is_active=True).select_related("user"):
+        classes = MakeUpClass.objects.filter(faculty=faculty)
+        faculty_stats.append({
+            "faculty": faculty,
+            "total": classes.count(),
+            "scheduled": classes.filter(status=MakeUpClass.STATUS_SCHEDULED).count(),
+            "in_progress": classes.filter(status=MakeUpClass.STATUS_IN_PROGRESS).count(),
+            "completed": classes.filter(status=MakeUpClass.STATUS_COMPLETED).count(),
+            "cancelled": classes.filter(status=MakeUpClass.STATUS_CANCELLED).count(),
+        })
+    
+    # Sort by total classes
+    faculty_stats.sort(key=lambda x: x["total"], reverse=True)
+    
+    # Time slot popularity
+    time_slot_stats = MakeUpClass.objects.values("time_slot").annotate(
+        count=Count("id")
+    ).order_by("-count")
+    
+    # Add display names
+    for stat in time_slot_stats:
+        stat["display"] = dict(Schedule.TIME_SLOT_CHOICES).get(stat["time_slot"], stat["time_slot"])
+    
+    # Course-wise statistics
+    course_stats = MakeUpClass.objects.values("course__code", "course__name").annotate(
+        count=Count("id")
+    ).order_by("-count")[:10]
+    
+    # Monthly trend (last 6 months)
+    from datetime import timedelta
+    monthly_stats = []
+    for i in range(5, -1, -1):
+        month_start = (timezone.localdate() - timedelta(days=30*i)).replace(day=1)
+        month_end = (month_start + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+        count = MakeUpClass.objects.filter(
+            created_at__date__gte=month_start,
+            created_at__date__lte=month_end
+        ).count()
+        monthly_stats.append({
+            "month": month_start.strftime("%b %Y"),
+            "count": count,
+        })
+    
+    return render(request, "attendance/manage/admin_makeup_stats.html", {
+        "faculty_stats": faculty_stats,
+        "time_slot_stats": time_slot_stats,
+        "course_stats": course_stats,
+        "monthly_stats": monthly_stats,
+    })
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def admin_remedial_code_audit(request: HttpRequest) -> HttpResponse:
+    """Audit view for remedial codes."""
+    status_filter = request.GET.get("status", "active")
+    
+    if status_filter == "active":
+        makeup_classes = MakeUpClass.objects.filter(
+            status__in=[MakeUpClass.STATUS_SCHEDULED, MakeUpClass.STATUS_IN_PROGRESS]
+        )
+    elif status_filter == "expired":
+        makeup_classes = MakeUpClass.objects.filter(
+            status__in=[MakeUpClass.STATUS_COMPLETED, MakeUpClass.STATUS_CANCELLED]
+        )
+    else:
+        makeup_classes = MakeUpClass.objects.all()
+    
+    makeup_classes = makeup_classes.select_related(
+        "faculty", "faculty__user", "course", "section"
+    ).order_by("-session_date")
+    
+    return render(request, "attendance/manage/admin_remedial_audit.html", {
+        "makeup_classes": makeup_classes,
+        "status_filter": status_filter,
+    })
+
+
+# ==================== FACULTY MAKE-UP CLASS ATTENDANCE ====================
+
+
+@login_required
+def makeup_class_attendance(request: HttpRequest, makeup_class_id: int) -> HttpResponse:
+    """Faculty marks attendance for make-up class."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    makeup_class = get_object_or_404(
+        MakeUpClass.objects.select_related("section", "course"),
+        id=makeup_class_id,
+        faculty=faculty,
+        status__in=[MakeUpClass.STATUS_SCHEDULED, MakeUpClass.STATUS_IN_PROGRESS]
+    )
+    
+    # Get students in the section
+    students = Student.objects.filter(
+        section_mapping__section=makeup_class.section
+    ).order_by("registration_number")
+    
+    if request.method == "POST":
+        attendance_data = request.POST.getlist("attendance")
+        absent_students = []  # Track absent students for email notification
+        
+        for student in students:
+            status_key = f"status_{student.id}"
+            status = request.POST.get(status_key, AttendanceRecord.STATUS_ABSENT)
+            
+            MakeUpAttendanceRecord.objects.update_or_create(
+                makeup_class=makeup_class,
+                student=student,
+                defaults={
+                    "status": status,
+                    "marked_by": faculty.user,
+                    "marked_via": MakeUpAttendanceRecord.VIA_FACULTY,
+                }
+            )
+            
+            # Track absent students for email notification
+            if status == AttendanceRecord.STATUS_ABSENT:
+                absent_students.append(student)
+        
+        # Send email notifications to absent students
+        if absent_students:
+            from django.core.mail import send_mass_mail
+            from django.conf import settings
+            
+            email_messages = []
+            for student in absent_students:
+                if student.email:
+                    subject = f"Attendance Alert: {makeup_class.course.code} Make-Up Class"
+                    message = (
+                        f"Dear {student.name},\n\n"
+                        f"You were marked ABSENT for the make-up class on {makeup_class.session_date}.\n\n"
+                        f"Course: {makeup_class.course.code} - {makeup_class.course.name}\n"
+                        f"Date: {makeup_class.session_date}\n"
+                        f"Time: {makeup_class.get_time_slot_display()}\n"
+                        f"Faculty: {faculty.user.get_full_name() or faculty.user.username}\n\n"
+                        f"Please contact your faculty if you believe this is an error.\n\n"
+                        f"Best regards,\nCampusOne Team"
+                    )
+                    email_messages.append((subject, message, settings.DEFAULT_FROM_EMAIL, [student.email]))
+            
+            if email_messages:
+                try:
+                    send_mass_mail(email_messages, fail_silently=True)
+                    messages.success(request, f"Attendance marked and {len(absent_students)} absentee notification emails sent.")
+                except Exception as e:
+                    messages.success(request, f"Attendance marked for {len(students)} students. (Email error: {str(e)})")
+            else:
+                messages.success(request, f"Attendance marked for {len(students)} students.")
+        else:
+            messages.success(request, f"Attendance marked for {len(students)} students.")
+        
+        return redirect("makeup_class_detail", makeup_class_id=makeup_class.id)
+    
+    # Get existing attendance records
+    existing_records = {
+        r.student_id: r.status
+        for r in MakeUpAttendanceRecord.objects.filter(makeup_class=makeup_class)
+    }
+    
+    # Add status to each student for template use
+    students_with_status = []
+    for student in students:
+        status = existing_records.get(student.id, "absent")
+        students_with_status.append({
+            "student": student,
+            "status": status,
+            "is_present": status == "present",
+            "is_absent": status == "absent",
+            "is_excused": status == "excused",
+        })
+    
+    return render(request, "attendance/makeup_class_attendance.html", {
+        "makeup_class": makeup_class,
+        "students_with_status": students_with_status,
+    })
+
+
+@login_required
+def makeup_class_attendance_records(request: HttpRequest, makeup_class_id: int) -> HttpResponse:
+    """View attendance records for a make-up class."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    makeup_class = get_object_or_404(
+        MakeUpClass.objects.select_related("section", "course", "classroom", "classroom__block"),
+        id=makeup_class_id,
+        faculty=faculty
+    )
+    
+    attendance_records = MakeUpAttendanceRecord.objects.filter(
+        makeup_class=makeup_class
+    ).select_related("student").order_by("student__registration_number")
+    
+    summary = {
+        "present": attendance_records.filter(status=AttendanceRecord.STATUS_PRESENT).count(),
+        "absent": attendance_records.filter(status=AttendanceRecord.STATUS_ABSENT).count(),
+        "excused": attendance_records.filter(status=AttendanceRecord.STATUS_EXCUSED).count(),
+        "total": attendance_records.count(),
+    }
+    
+    return render(request, "attendance/makeup_class_records.html", {
+        "makeup_class": makeup_class,
+        "attendance_records": attendance_records,
+        "summary": summary,
+    })
+
+
+@login_required
+def makeup_class_export_report(request: HttpRequest, makeup_class_id: int) -> HttpResponse:
+    """Export attendance report as CSV."""
+    import csv
+    
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    makeup_class = get_object_or_404(
+        MakeUpClass.objects.select_related("section", "course"),
+        id=makeup_class_id,
+        faculty=faculty
+    )
+    
+    attendance_records = MakeUpAttendanceRecord.objects.filter(
+        makeup_class=makeup_class
+    ).select_related("student").order_by("student__registration_number")
+    
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = f'attachment; filename="makeup_attendance_{makeup_class.id}.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow([
+        "Registration Number", "Student Name", "Status", 
+        "Marked At", "Marked By", "Section", "Course"
+    ])
+    
+    for record in attendance_records:
+        writer.writerow([
+            record.student.registration_number,
+            record.student.name,
+            record.get_status_display(),
+            record.marked_at.strftime("%Y-%m-%d %H:%M") if record.marked_at else "",
+            record.marked_by.user.username if record.marked_by else "",
+            makeup_class.section.name,
+            makeup_class.course.code,
+        ])
+    
+    return response
+
+
+@login_required
+def makeup_class_send_reminder(request: HttpRequest, makeup_class_id: int) -> HttpResponse:
+    """Send reminder notification to students about make-up class."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    makeup_class = get_object_or_404(
+        MakeUpClass.objects.select_related("section", "course", "classroom", "classroom__block"),
+        id=makeup_class_id,
+        faculty=faculty,
+        status=MakeUpClass.STATUS_SCHEDULED
+    )
+    
+    if request.method == "POST":
+        # Get students in section
+        students = Student.objects.filter(section_mapping__section=makeup_class.section)
+        
+        # Create notifications
+        notification_count = 0
+        for student in students:
+            Notification.objects.create(
+                recipient_student=student,
+                title=f"Make-Up Class Reminder: {makeup_class.course.code}",
+                message=(
+                    f"Reminder: Make-up class for {makeup_class.course.name} "
+                    f"scheduled on {makeup_class.session_date} at {makeup_class.get_time_slot_display()}. "
+                    f"Location: {makeup_class.classroom.block.code}-{makeup_class.classroom.room_number}. "
+                    f"Remedial Code: {makeup_class.remedial_code}"
+                ),
+            )
+            notification_count += 1
+        
+        messages.success(request, f"Reminder sent to {notification_count} students.")
+        return redirect("makeup_class_detail", makeup_class_id=makeup_class.id)
+    
+    return render(request, "attendance/makeup_class_reminder.html", {
+        "makeup_class": makeup_class,
     })

@@ -93,6 +93,12 @@
               <div class="hint">Mark Attendance</div>
             </div>
           </a>
+          <a href="{% url 'faculty_makeup_classes' %}">
+            <div class="nav-text">
+              <div class="nav-title">Make-Up Classes</div>
+              <div class="hint">Schedule & Manage</div>
+            </div>
+          </a>
           <a href="{% url 'food:create_order' %}">
             <div class="nav-text">
               <div class="nav-title">Food Orders</div>
@@ -194,6 +200,11 @@
             {% endif %}
           </div>
         </div>
+        <div class="text-center mt-3 pt-2 border-top">
+          <small class="text-muted" style="font-size: 11px; opacity: 0.6;">
+            Created by <strong>Arjun Varma</strong>
+          </small>
+        </div>
       </div>
     </aside>
     {% endblock %}
@@ -222,6 +233,11 @@
         {% endif %}
 
         {% block content %}{% endblock %}
+      </div>
+      <div class="text-center py-3 mt-4 border-top">
+        <small class="text-muted" style="font-size: 12px; opacity: 0.6;">
+          CampusOne - Created by <strong>Arjun Varma</strong>
+        </small>
       </div>
     </main>
   </div>

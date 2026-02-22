@@ -190,4 +190,25 @@ urlpatterns = [
     path("faculty/book-slot/", views_manage.book_room, name="book_room"),
     path("check-room/", views_manage.check_room_availability, name="check_room_availability"),
     path("book-room-ajax/", views_manage.book_room_ajax, name="book_room_ajax"),
+    # Make-Up Class & Remedial Code Module
+    path("faculty/makeup-classes/", views_manage.faculty_makeup_classes, name="faculty_makeup_classes"),
+    path("faculty/makeup-classes/create/", views_manage.makeup_class_create, name="makeup_class_create"),
+    path("faculty/makeup-classes/<int:makeup_class_id>/", views_manage.makeup_class_detail, name="makeup_class_detail"),
+    path("faculty/makeup-classes/<int:makeup_class_id>/start/", views_manage.makeup_class_start, name="makeup_class_start"),
+    path("faculty/makeup-classes/<int:makeup_class_id>/complete/", views_manage.makeup_class_complete, name="makeup_class_complete"),
+    path("faculty/makeup-classes/<int:makeup_class_id>/cancel/", views_manage.makeup_class_cancel, name="makeup_class_cancel"),
+    # Faculty Attendance Management
+    path("faculty/makeup-classes/<int:makeup_class_id>/attendance/", views_manage.makeup_class_attendance, name="makeup_class_mark_attendance"),
+    path("faculty/makeup-classes/<int:makeup_class_id>/attendance/records/", views_manage.makeup_class_attendance_records, name="makeup_class_attendance_records"),
+    path("faculty/makeup-classes/<int:makeup_class_id>/attendance/export/", views_manage.makeup_class_export_report, name="makeup_class_export_report"),
+    path("faculty/makeup-classes/<int:makeup_class_id>/reminder/", views_manage.makeup_class_send_reminder, name="makeup_class_send_reminder"),
+    # Admin Make-Up Class Management
+    path("admin/makeup-classes/", views_manage.admin_makeup_classes, name="admin_makeup_classes"),
+    path("admin/makeup-classes/<int:makeup_class_id>/", views_manage.admin_makeup_class_detail, name="admin_makeup_class_detail"),
+    path("admin/makeup-classes/<int:makeup_class_id>/cancel/", views_manage.admin_makeup_class_cancel, name="admin_makeup_class_cancel"),
+    path("admin/makeup-classes/stats/", views_manage.admin_makeup_class_stats, name="admin_makeup_class_stats"),
+    path("admin/makeup-classes/audit/", views_manage.admin_remedial_code_audit, name="admin_remedial_code_audit"),
+    # AI Smart Scheduling & Rush Prediction
+    path("faculty/smart-scheduling/", views_manage.smart_scheduling_recommendations, name="smart_scheduling"),
+    path("faculty/class-rush-prediction/", views_manage.class_rush_prediction, name="class_rush_prediction"),
 ]

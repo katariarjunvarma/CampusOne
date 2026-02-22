@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin - Make-Up Class Statistics{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3"><i class="bi bi-bar-chart-line"></i> Make-Up Class Statistics</h1>
+    <a href="{% url 'admin_makeup_classes' %}" class="btn btn-outline-secondary">Back to Monitor</a>
+  </div>
+
+  <div class="row mb-4">
+    <!-- Faculty Statistics -->
+    <div class="col-lg-6 mb-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-person-badge"></i> Faculty-wise Statistics</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Faculty</th>
+                  <th class="text-center">Total</th>
+                  <th class="text-center text-primary">Sched</th>
+                  <th class="text-center text-success">InProg</th>
+                  <th class="text-center text-secondary">Comp</th>
+                  <th class="text-center text-danger">Canc</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for stat in faculty_stats %}
+                <tr>
+                  <td>{{ stat.faculty.user.get_full_name|default:stat.faculty.user.username }}</td>
+                  <td class="text-center fw-bold">{{ stat.total }}</td>
+                  <td class="text-center">{{ stat.scheduled }}</td>
+                  <td class="text-center">{{ stat.in_progress }}</td>
+                  <td class="text-center">{{ stat.completed }}</td>
+                  <td class="text-center">{{ stat.cancelled }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center py-3 text-muted">No data available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time Slot Popularity -->
+    <div class="col-lg-6 mb-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-clock"></i> Time Slot Popularity</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Time Slot</th>
+                  <th class="text-center">Count</th>
+                  <th>Distribution</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for stat in time_slot_stats %}
+                <tr>
+                  <td>{{ stat.display }}</td>
+                  <td class="text-center fw-bold">{{ stat.count }}</td>
+                  <td style="width: 50%">
+                    <div class="progress" style="height: 20px;">
+                      <div class="progress-bar" style="width: {% widthratio stat.count time_slot_stats.0.count 100 %}%"></div>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="3" class="text-center py-3 text-muted">No data available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Course Statistics -->
+    <div class="col-lg-6 mb-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-book"></i> Top Courses by Make-Up Classes</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Course</th>
+                  <th class="text-center">Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for stat in course_stats %}
+                <tr>
+                  <td>{{ stat.course__code }} - {{ stat.course__name }}</td>
+                  <td class="text-center"><span class="badge bg-primary">{{ stat.count }}</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="2" class="text-center py-3 text-muted">No data available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Trend -->
+    <div class="col-lg-6 mb-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-graph-up"></i> Monthly Trend (Last 6 Months)</h5>
+        </div>
+        <div class="card-body">
+          {% for stat in monthly_stats %}
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span>{{ stat.month }}</span>
+            <div class="d-flex align-items-center" style="width: 60%">
+              <div class="progress flex-grow-1 me-2" style="height: 20px;">
+                {% if monthly_stats %}
+                <div class="progress-bar bg-info" style="width: {% widthratio stat.count monthly_stats|length 100 %}%"></div>
+                {% endif %}
+              </div>
+              <span class="badge bg-secondary">{{ stat.count }}</span>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center py-3 text-muted">No data available</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -70,6 +70,11 @@
                             {{ stats.percentage }}%
                         </div>
                         <div class="small text-muted">Overall Attendance</div>
+                        {% if stats.makeup_count > 0 %}
+                        <div class="small text-info mt-2">
+                            <span class="badge bg-info">{{ stats.makeup_count }} Make-up Classes</span>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -97,35 +102,58 @@
                         <th>Date</th>
                         <th>Time</th>
                         <th>Status</th>
-                        <th>Source</th>
+                        <th>Type</th>
+                        <th>Faculty</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for record in records %}
                     <tr>
-                        <td>{{ record.session.session_date|date:"M d, Y" }}</td>
-                        <td>{{ record.session.time_slot|default:"-" }}</td>
+                        <td>
+                            {% if record.is_makeup %}
+                                {{ record.session_date|date:"M d, Y" }}
+                            {% else %}
+                                {{ record.session.session_date|date:"M d, Y" }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.is_makeup %}
+                                {{ record.makeup_class.get_time_slot_display }}
+                            {% else %}
+                                {{ record.session.time_slot|default:"-" }}
+                            {% endif %}
+                        </td>
                         <td>
                             {% if record.status == 'present' %}
                             <span
                                 class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">Present</span>
+                            {% elif record.status == 'excused' %}
+                            <span
+                                class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill">Excused</span>
                             {% else %}
                             <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">Absent</span>
                             {% endif %}
                         </td>
                         <td>
-                            {% if record.source == 'face' %}
-                            <span class="badge bg-primary bg-opacity-10 text-primary">Face Scan</span>
-                            {% elif record.source == 'manual' %}
-                            <span class="badge bg-secondary bg-opacity-10 text-secondary">Manual</span>
+                            {% if record.is_makeup %}
+                            <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill">
+                                <i class="bi bi-magic"></i> Make-up
+                            </span>
                             {% else %}
-                            <span class="text-muted small">-</span>
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill">Regular</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.is_makeup %}
+                                {{ record.faculty_name }}
+                            {% else %}
+                                {{ record.session.faculty.user.get_full_name|default:record.session.faculty.user.username }}
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4" class="text-center py-4 text-muted">No attendance records found for this course.
+                        <td colspan="5" class="text-center py-4 text-muted">No attendance records found for this course.
                         </td>
                     </tr>
                     {% endfor %}
@@ -141,6 +169,7 @@
                         <th class="text-center">Total Classes</th>
                         <th class="text-center">Present</th>
                         <th class="text-center">Absent</th>
+                        <th class="text-center">Make-up</th>
                         <th class="text-center">Attendance %</th>
                         <th class="text-end">Action</th>
                     </tr>
@@ -155,6 +184,13 @@
                         <td class="text-center text-success fw-semibold">{{ summary.present }}</td>
                         <td class="text-center text-danger fw-semibold">{{ summary.absent }}</td>
                         <td class="text-center">
+                            {% if summary.makeup_count > 0 %}
+                            <span class="badge bg-info">{{ summary.makeup_count }}</span>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
                             <span
                                 class="badge {% if summary.percentage >= 75 %}bg-success{% elif summary.percentage >= 60 %}bg-warning{% else %}bg-danger{% endif %}">
                                 {{ summary.percentage }}%
@@ -167,7 +203,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">No course attendance data found for this
+                        <td colspan="8" class="text-center py-4 text-muted">No course attendance data found for this
                             student.</td>
                     </tr>
                     {% endfor %}

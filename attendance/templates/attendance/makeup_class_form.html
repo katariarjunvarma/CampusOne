@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% block title %}CampusOne - {{ title }}{% endblock %}
+
+{% block content %}
+<style>
+  .form-page {
+    padding: 24px 32px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .page-header {
+    margin-bottom: 24px;
+  }
+  .page-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  .form-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e293b;
+    margin-bottom: 6px;
+  }
+  .form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  .form-control:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .form-text {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  .error-text {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .alert-error {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  .alert-info {
+    background: #dbeafe;
+    border: 1px solid #bfdbfe;
+    color: #1e40af;
+    padding: 16px;
+    border-radius: 8px;
+  }
+  .alert-info h6 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .alert-info ul {
+    margin: 0;
+    padding-left: 16px;
+  }
+  .alert-info li {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .btn-primary {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+  .btn-outline {
+    padding: 10px 20px;
+    background: white;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+</style>
+
+<div class="form-page">
+  <div class="page-header">
+    <h1>{{ title }}</h1>
+  </div>
+
+  <div class="form-card">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      {% if form.non_field_errors %}
+      <div class="alert-error">
+        {{ form.non_field_errors }}
+      </div>
+      {% endif %}
+      
+      <div class="form-group">
+        <label class="form-label">Course</label>
+        {{ form.course }}
+        {% if form.course.errors %}
+        <div class="error-text">{{ form.course.errors }}</div>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Section</label>
+        {{ form.section }}
+        {% if form.section.errors %}
+        <div class="error-text">{{ form.section.errors }}</div>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Classroom</label>
+        {{ form.classroom }}
+        {% if form.classroom.errors %}
+        <div class="error-text">{{ form.classroom.errors }}</div>
+        {% endif %}
+        <div class="form-text">Select an available classroom for your make-up class</div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          {{ form.session_date }}
+          {% if form.session_date.errors %}
+          <div class="error-text">{{ form.session_date.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Time Slot</label>
+          {{ form.time_slot }}
+          {% if form.time_slot.errors %}
+          <div class="error-text">{{ form.time_slot.errors }}</div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Reason for Make-Up Class</label>
+        {{ form.reason }}
+        {% if form.reason.errors %}
+        <div class="error-text">{{ form.reason.errors }}</div>
+        {% endif %}
+        <div class="form-text">Explain why this make-up class is needed (e.g., "Missed class due to holiday", "Syllabus completion")</div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Schedule Make-Up Class</button>
+        <a href="{% url 'faculty_makeup_classes' %}" class="btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+  
+  <div class="alert-info">
+    <h6><i class="bi bi-magic"></i> Smart Scheduling Tips</h6>
+    <ul>
+      <li>Use <a href="{% url 'smart_scheduling' %}">Smart Scheduling</a> to get AI recommendations for optimal time slots</li>
+      <li>Check <a href="{% url 'class_rush_prediction' %}">Rush Prediction</a> to avoid high-traffic periods</li>
+      <li>Early morning (8-9 AM) and late afternoon (5-6 PM) slots typically have lower traffic</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

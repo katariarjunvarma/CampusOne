@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
+from django.utils import timezone
 
 from .models import (
     AttendanceSession,
@@ -11,6 +12,8 @@ from .models import (
     Enrollment,
     FaceSample,
     FacultyProfile,
+    MakeUpAttendanceRecord,
+    MakeUpClass,
     Schedule,
     Student,
     Section,
@@ -423,3 +426,152 @@ class ScheduleForm(forms.ModelForm):
                 raise forms.ValidationError("Section already has another class at this time.")
         
         return cleaned_data
+
+
+class MakeUpClassForm(forms.ModelForm):
+    """Form for faculty to schedule make-up classes with smart scheduling."""
+    
+    class Meta:
+        model = MakeUpClass
+        fields = ["course", "section", "classroom", "session_date", "time_slot", "reason"]
+        widgets = {
+            "course": forms.Select(attrs={"class": "form-select"}),
+            "section": forms.Select(attrs={"class": "form-select"}),
+            "classroom": forms.Select(attrs={"class": "form-select"}),
+            "session_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "time_slot": forms.Select(attrs={"class": "form-select"}),
+            "reason": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+        }
+    
+    def __init__(self, *args, faculty=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.faculty = faculty
+        
+        # Filter sections by faculty's assigned courses
+        if faculty:
+            assigned_section_ids = SectionCourseFaculty.objects.filter(
+                faculty=faculty
+            ).values_list("section_id", flat=True).distinct()
+            self.fields["section"].queryset = Section.objects.filter(
+                id__in=assigned_section_ids
+            ).order_by("name")
+            
+            assigned_course_ids = SectionCourseFaculty.objects.filter(
+                faculty=faculty
+            ).values_list("course_id", flat=True).distinct()
+            self.fields["course"].queryset = Course.objects.filter(
+                id__in=assigned_course_ids
+            ).order_by("code")
+        
+        # Order classrooms
+        self.fields["classroom"].queryset = Classroom.objects.select_related(
+            "block"
+        ).filter(is_active=True).order_by("block__code", "room_number")
+        
+        # Set minimum date to today
+        self.fields["session_date"].widget.attrs["min"] = str(timezone.localdate())
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        classroom = cleaned_data.get("classroom")
+        session_date = cleaned_data.get("session_date")
+        time_slot = cleaned_data.get("time_slot")
+        course = cleaned_data.get("course")
+        section = cleaned_data.get("section")
+        
+        if not all([classroom, session_date, time_slot, course, section]):
+            return cleaned_data
+        
+        # Check classroom availability
+        existing = MakeUpClass.objects.filter(
+            classroom=classroom,
+            session_date=session_date,
+            time_slot=time_slot,
+            status__in=[MakeUpClass.STATUS_SCHEDULED, MakeUpClass.STATUS_IN_PROGRESS]
+        )
+        if self.instance.pk:
+            existing = existing.exclude(pk=self.instance.pk)
+        if existing.exists():
+            raise forms.ValidationError(
+                f"Classroom {classroom} is already booked for this date and time slot."
+            )
+        
+        # Check faculty availability
+        if self.faculty:
+            faculty_clash = MakeUpClass.objects.filter(
+                faculty=self.faculty,
+                session_date=session_date,
+                time_slot=time_slot,
+                status__in=[MakeUpClass.STATUS_SCHEDULED, MakeUpClass.STATUS_IN_PROGRESS]
+            )
+            if self.instance.pk:
+                faculty_clash = faculty_clash.exclude(pk=self.instance.pk)
+            if faculty_clash.exists():
+                raise forms.ValidationError(
+                    "You already have a make-up class scheduled at this time."
+                )
+            
+            # Check regular schedule clash
+            day_name = session_date.strftime("%A")
+            if day_name in [choice[0] for choice in Schedule.DAY_CHOICES]:
+                schedule_clash = Schedule.objects.filter(
+                    section_course_faculty__faculty=self.faculty,
+                    day_of_week=day_name,
+                    time_slot=time_slot
+                )
+                if schedule_clash.exists():
+                    raise forms.ValidationError(
+                        "You have a regular class scheduled at this time."
+                    )
+        
+        # Check section availability
+        section_clash = MakeUpClass.objects.filter(
+            section=section,
+            session_date=session_date,
+            time_slot=time_slot,
+            status__in=[MakeUpClass.STATUS_SCHEDULED, MakeUpClass.STATUS_IN_PROGRESS]
+        )
+        if self.instance.pk:
+            section_clash = section_clash.exclude(pk=self.instance.pk)
+        if section_clash.exists():
+            raise forms.ValidationError(
+                "This section already has a make-up class at this time."
+            )
+        
+        # Validate course belongs to section
+        if course and section:
+            if not section.courses.filter(id=course.id).exists():
+                raise forms.ValidationError(
+                    "Selected course is not assigned to this section."
+                )
+        
+        return cleaned_data
+
+
+class SmartSchedulingForm(forms.Form):
+    """Form for AI-powered smart scheduling recommendations."""
+    
+    preferred_date = forms.DateField(
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+        required=False,
+        help_text="Leave blank for any date recommendation"
+    )
+    preferred_time_slot = forms.ChoiceField(
+        choices=Schedule.TIME_SLOT_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        help_text="Leave blank for any time recommendation"
+    )
+    duration_hours = forms.IntegerField(
+        min_value=1,
+        max_value=3,
+        initial=1,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        help_text="Estimated class duration in hours"
+    )
+    prioritize_low_traffic = forms.BooleanField(
+        initial=True,
+        required=False,
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        help_text="Recommend low-traffic time slots"
+    )

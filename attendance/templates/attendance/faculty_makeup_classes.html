@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% block title %}CampusOne - My Make-Up Classes{% endblock %}
+
+{% block content %}
+<style>
+  .makeup-page {
+    padding: 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .page-header {
+    margin-bottom: 24px;
+  }
+  .page-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  .page-header p {
+    color: #64748b;
+    margin: 4px 0 0 0;
+  }
+  .action-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+  .btn-outline {
+    padding: 10px 20px;
+    background: white;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #3b82f6;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  .classes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 16px;
+  }
+  .class-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border-left: 4px solid #3b82f6;
+  }
+  .class-card.scheduled {
+    border-left-color: #3b82f6;
+  }
+  .class-card.in-progress {
+    border-left-color: #10b981;
+  }
+  .class-card.completed {
+    border-left-color: #64748b;
+  }
+  .class-card.cancelled {
+    border-left-color: #ef4444;
+  }
+  .class-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .class-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  .status-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .status-badge.scheduled {
+    background: #dbeafe;
+    color: #2563eb;
+  }
+  .status-badge.in-progress {
+    background: #d1fae5;
+    color: #059669;
+  }
+  .status-badge.completed {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  .status-badge.cancelled {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+  .class-details {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.6;
+  }
+  .class-details strong {
+    color: #1e293b;
+  }
+  .remedial-code {
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 12px 0;
+    text-align: center;
+  }
+  .remedial-code-label {
+    font-size: 11px;
+    color: #92400e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .remedial-code-value {
+    font-family: monospace;
+    font-size: 24px;
+    font-weight: 700;
+    color: #b45309;
+    letter-spacing: 4px;
+  }
+  .class-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .btn-success {
+    background: #10b981;
+    color: white;
+  }
+  .btn-success:hover {
+    background: #059669;
+  }
+  .btn-secondary {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  .btn-secondary:hover {
+    background: #e2e8f0;
+  }
+  .btn-danger {
+    background: #ef4444;
+    color: white;
+  }
+  .btn-danger:hover {
+    background: #dc2626;
+  }
+  .btn-info {
+    background: #0ea5e9;
+    color: white;
+  }
+  .btn-info:hover {
+    background: #0284c7;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+  }
+  .empty-state svg {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    color: #cbd5e1;
+  }
+  .empty-state h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #64748b;
+    margin: 0 0 8px 0;
+  }
+  .empty-state p {
+    font-size: 14px;
+    color: #94a3b8;
+    margin: 0;
+  }
+</style>
+
+<div class="makeup-page">
+  <div class="page-header">
+    <h1>My Make-Up Classes</h1>
+    <p>Schedule and manage make-up classes with remedial codes</p>
+  </div>
+
+  <div class="action-bar">
+    <a href="{% url 'smart_scheduling' %}" class="btn-outline">
+      <i class="bi bi-magic"></i> Smart Scheduling
+    </a>
+    <a href="{% url 'class_rush_prediction' %}" class="btn-outline">
+      <i class="bi bi-graph-up"></i> Rush Prediction
+    </a>
+    <a href="{% url 'makeup_class_create' %}" class="btn-primary">
+      <i class="bi bi-plus-lg"></i> Schedule Make-Up Class
+    </a>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value">{{ scheduled_count }}</div>
+      <div class="stat-label">Scheduled</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: #10b981;">{{ in_progress_count }}</div>
+      <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: #64748b;">{{ completed_count }}</div>
+      <div class="stat-label">Completed</div>
+    </div>
+  </div>
+
+  {% if makeup_classes %}
+  <div class="classes-grid">
+    {% for mc in makeup_classes %}
+    <div class="class-card {{ mc.status }}">
+      <div class="class-header">
+        <h3 class="class-title">{{ mc.course.code }} - {{ mc.course.name }}</h3>
+        <span class="status-badge {{ mc.status }}">{{ mc.get_status_display }}</span>
+      </div>
+      
+      <div class="class-details">
+        <div><strong>Section:</strong> {{ mc.section.name }}</div>
+        <div><strong>Time:</strong> {{ mc.get_time_slot_display }}</div>
+        <div><strong>Classroom:</strong> {{ mc.classroom.block.code }}-{{ mc.classroom.room_number }}</div>
+        <div><strong>Reason:</strong> {{ mc.reason }}</div>
+      </div>
+
+      {% if mc.status == 'scheduled' or mc.status == 'in_progress' %}
+      <div class="remedial-code">
+        <div class="remedial-code-label">Remedial Code</div>
+        <div class="remedial-code-value">{{ mc.remedial_code }}</div>
+      </div>
+      {% endif %}
+
+      <div class="class-actions">
+        <a href="{% url 'makeup_class_detail' mc.id %}" class="btn-sm btn-secondary">Details</a>
+        
+        {% if mc.status == 'scheduled' %}
+        <a href="{% url 'makeup_class_start' mc.id %}" class="btn-sm btn-success">Start</a>
+        <a href="{% url 'makeup_class_cancel' mc.id %}" class="btn-sm btn-danger">Cancel</a>
+        {% elif mc.status == 'in_progress' %}
+        <a href="{% url 'makeup_class_mark_attendance' mc.id %}" class="btn-sm btn-info">Attendance</a>
+        <a href="{% url 'makeup_class_complete' mc.id %}" class="btn-sm btn-secondary">Complete</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+    </svg>
+    <h3>No Make-Up Classes</h3>
+    <p>Schedule your first make-up class to get started</p>
+    <a href="{% url 'makeup_class_create' %}" class="btn btn-primary">Schedule Your First Make-Up Class</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin - Cancel Make-Up Class{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Cancel Make-Up Class</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-light border mb-3">
+            <strong>Faculty:</strong> {{ makeup_class.faculty.user.get_full_name|default:makeup_class.faculty.user.username }}<br>
+            <strong>Course:</strong> {{ makeup_class.course.code }} - {{ makeup_class.course.name }}<br>
+            <strong>Section:</strong> {{ makeup_class.section.name }}<br>
+            <strong>Date:</strong> {{ makeup_class.session_date|date:"F d, Y (l)" }}<br>
+            <strong>Time:</strong> {{ makeup_class.get_time_slot_display }}<br>
+            <strong>Remedial Code:</strong> <code>{{ makeup_class.remedial_code }}</code>
+          </div>
+          
+          <div class="alert alert-warning">
+            <small>
+              <strong>Warning:</strong> Cancelling this class will:
+              <ul class="mb-0 mt-1">
+                <li>Invalidate the remedial code</li>
+                <li>Notify the faculty member</li>
+                <li>Prevent students from marking attendance</li>
+              </ul>
+            </small>
+          </div>
+          
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="reason" class="form-label">Cancellation Reason (Optional)</label>
+              <textarea name="reason" id="reason" class="form-control" rows="3" placeholder="Enter reason for cancellation..."></textarea>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-danger">Yes, Cancel Class</button>
+              <a href="{% url 'admin_makeup_class_detail' makeup_class.id %}" class="btn btn-outline-secondary">Go Back</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
