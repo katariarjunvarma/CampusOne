@@ -163,10 +163,10 @@ if _smtp_user and _smtp_password:
     EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "1") in {"1", "true", "True"}
     EMAIL_HOST_USER = _smtp_user
     EMAIL_HOST_PASSWORD = _smtp_password
-    DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", f"SmartLPU <{_smtp_user}>")
+    DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", f"CampusOne <{_smtp_user}>")
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-    DEFAULT_FROM_EMAIL = "SmartLPU <no-reply@smartlpu.local>"
+    DEFAULT_FROM_EMAIL = "CampusOne <no-reply@campusone.local>"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

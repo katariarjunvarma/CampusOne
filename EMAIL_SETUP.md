@@ -1,4 +1,4 @@
-# Email Setup for Smart LPU
+# Email Setup for CampusOne
 
 This guide will help you configure Gmail SMTP for sending real email notifications to students when they are marked absent.
 
@@ -16,13 +16,13 @@ This guide will help you configure Gmail SMTP for sending real email notificatio
 
 ## Step 2: Generate an App Password
 
-After enabling 2FA, you need to create an App Password for Smart LPU:
+After enabling 2FA, you need to create an App Password for CampusOne:
 
 1. Go back to [myaccount.google.com/security](https://myaccount.google.com/security)
 2. In the **Signing in to Google** section, click on **App passwords**
 3. You may need to sign in again
 4. Under **Select app**, choose **Other (Custom name)**
-5. Enter "Smart LPU" as the app name
+5. Enter "CampusOne" as the app name
 6. Click **Generate**
 7. Copy the 16-character password (it will look like: `xxxx xxxx xxxx xxxx`)
 8. **Important**: Save this password securely. You won't see it again.
@@ -49,7 +49,7 @@ After enabling 2FA, you need to create an App Password for Smart LPU:
    EMAIL_HOST_PASSWORD=xxxxxxxxxxxxxxxx
    
    # Optional: Custom from email
-   DEFAULT_FROM_EMAIL=Smart LPU <your-actual-email@gmail.com>
+   DEFAULT_FROM_EMAIL=CampusOne <your-actual-email@gmail.com>
    ```
 
 4. Save the file and exit the editor
@@ -74,7 +74,7 @@ pip install -r requirements.txt
    python manage.py runserver
    ```
 
-2. Log in to Smart LPU and mark a student as absent
+2. Log in to CampusOne and mark a student as absent
 
 3. Check if:
    - The student receives a real email at their registered email address

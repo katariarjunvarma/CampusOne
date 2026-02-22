@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.contrib.auth.models import Group, Permission
+from django.db.models import Q
 
 from .models import (
     BreakSlot,
@@ -11,10 +13,55 @@ from .models import (
     PreOrder,
     Stall,
     StallOwner,
+    UserProfile,
 )
 
 
 User = get_user_model()
+
+
+def setup_groups():
+    """
+    Create Teacher and StallOwner groups with required permissions.
+    Call this on startup or when needed.
+    """
+    # Teacher Group
+    teacher_group, _ = Group.objects.get_or_create(name="Teacher")
+    teacher_perms = Permission.objects.filter(
+        Q(codename__in=[
+            # Attendance permissions
+            'view_student',
+            'view_course',
+            'view_section',
+            'view_courseoffering',
+            'add_attendancesession',
+            'change_attendancesession',
+            'view_attendancesession',
+            'add_attendancerecord',
+            'change_attendancerecord',
+            'view_attendancerecord',
+        ]) |
+        Q(content_type__app_label='attendance', codename__startswith='view_')
+    )
+    teacher_group.permissions.set(teacher_perms)
+
+    # StallOwner Group
+    stallowner_group, _ = Group.objects.get_or_create(name="StallOwner")
+    stallowner_perms = Permission.objects.filter(
+        Q(codename__in=[
+            # Food module permissions
+            'view_stall',
+            'add_fooditem',
+            'change_fooditem',
+            'view_fooditem',
+            'view_preorder',
+            'view_bulkorder',
+            'view_breakslot',
+        ])
+    )
+    stallowner_group.permissions.set(stallowner_perms)
+
+    return teacher_group, stallowner_group
 
 
 class StallOwnerInline(admin.StackedInline):
@@ -23,8 +70,15 @@ class StallOwnerInline(admin.StackedInline):
     extra = 0
 
 
+class UserProfileInline(admin.StackedInline):
+    model = UserProfile
+    can_delete = False
+    extra = 0
+    fields = ('owner_status',)
+
+
 class UserAdmin(DjangoUserAdmin):
-    inlines = [StallOwnerInline]
+    inlines = [UserProfileInline, StallOwnerInline]
 
     def is_stall_owner(self, obj):
         return StallOwner.objects.filter(user=obj).exists()
@@ -32,7 +86,66 @@ class UserAdmin(DjangoUserAdmin):
     is_stall_owner.boolean = True
     is_stall_owner.short_description = "Stall owner"
 
-    list_display = tuple(getattr(DjangoUserAdmin, "list_display", ())) + ("is_stall_owner",)
+    def get_owner_status(self, obj):
+        try:
+            return obj.profile.owner_status
+        except UserProfile.DoesNotExist:
+            return False
+
+    get_owner_status.boolean = True
+    get_owner_status.short_description = "Owner Status"
+
+    def get_role(self, obj):
+        if obj.is_superuser:
+            return "Admin"
+        elif hasattr(obj, 'profile') and obj.profile.owner_status:
+            return "Stall Owner"
+        elif obj.is_staff:
+            return "Teacher"
+        return "Student"
+
+    get_role.short_description = "Role"
+
+    list_display = tuple(getattr(DjangoUserAdmin, "list_display", ())) + ("get_role", "is_stall_owner", "get_owner_status")
+
+    # Hide manual permission selection, show only groups
+    filter_horizontal = ()
+
+    def save_model(self, request, obj, form, change):
+        """
+        Auto-assign groups based on user role:
+        - Superuser: No group needed (all permissions)
+        - Staff + Owner Status: StallOwner group
+        - Staff only (no owner_status): Teacher group
+        """
+        # First save the user
+        super().save_model(request, obj, form, change)
+
+        # Ensure profile exists
+        UserProfile.objects.get_or_create(user=obj)
+
+        # Setup groups if they don't exist
+        teacher_group, stallowner_group = setup_groups()
+
+        # Clear existing groups (to prevent duplicate/conflicting assignments)
+        obj.groups.clear()
+
+        # Clear user-specific permissions (they should come from groups)
+        obj.user_permissions.clear()
+
+        # Assign group based on role
+        if obj.is_superuser:
+            # Superusers don't need any groups - they have all permissions
+            pass
+        elif obj.profile.owner_status:
+            # Stall Owner role
+            obj.groups.add(stallowner_group)
+        elif obj.is_staff:
+            # Teacher role (staff but not owner)
+            obj.groups.add(teacher_group)
+
+        # Save again to persist group changes
+        obj.save()
 
 
 try:
@@ -41,6 +154,13 @@ except Exception:
     pass
 
 admin.site.register(User, UserAdmin)
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'owner_status', 'created_at')
+    list_filter = ('owner_status',)
+    search_fields = ('user__username', 'user__email')
 
 
 @admin.register(FoodItem)

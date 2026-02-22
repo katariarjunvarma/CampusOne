@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Smart LPU - Course Offerings{% endblock %}
+{% block title %}CampusOne - Course Offerings{% endblock %}
 
 {% block content %}
 <style>
@@ -177,7 +177,7 @@
     <div class="header-content">
       <div class="header-title">
         <h1>Course Offerings</h1>
-        <div class="header-subtitle">Assign course + faculty + classroom and time schedule.</div>
+        <div class="header-subtitle">Assign course + faculty + section.</div>
       </div>
       <div class="header-actions">
         <a href="{% url 'manage_course_offering_create' %}" class="btn-primary">Add Offering</a>
@@ -190,24 +190,22 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th style="width: 140px;">Course</th>
-          <th style="width: 180px;">Faculty</th>
-          <th style="width: 160px;">Classroom</th>
-          <th style="width: 120px;">Day</th>
-          <th style="width: 160px;">Time</th>
-          <th style="width: 120px;">Status</th>
-          <th class="actions-cell" style="width: 200px;">Actions</th>
+          <th style="width: 200px;">Course</th>
+          <th style="width: 200px;">Faculty</th>
+          <th style="width: 120px;">Section</th>
+          <th style="width: 100px;">Status</th>
+          <th class="actions-cell" style="width: 160px;">Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for o in offerings %}
         <tr>
-          <td><span class="badge-soft">{{ o.course.code }}</span></td>
+          <td><span class="badge-soft">{{ o.course.code }}</span> {{ o.course.name }}</td>
           <td class="muted">{{ o.faculty.user.username }}</td>
-          <td class="muted">{{ o.classroom.block.code }}-{{ o.classroom.room_number }}</td>
-          <td class="muted">{{ o.get_day_of_week_display }}</td>
-          <td class="muted">{{ o.start_time }} - {{ o.end_time }}</td>
-          <td class="muted">{% if o.is_active %}Active{% else %}Inactive{% endif %}</td>
+          <td class="muted">{{ o.section.name }}</td>
+          <td>
+            <span style="padding: 4px 10px; background: #dcfce7; color: #166534; border-radius: 999px; font-size: 12px; font-weight: 600;">Active</span>
+          </td>
           <td class="actions-cell">
             <a class="btn-edit" href="{% url 'manage_course_offering_edit' o.id %}">Edit</a>
             <a class="btn-delete" href="{% url 'manage_course_offering_delete' o.id %}">Delete</a>
@@ -215,7 +213,7 @@
         </tr>
         {% empty %}
         <tr>
-          <td colspan="7" class="empty-state">No course offerings yet.</td>
+          <td colspan="5" class="empty-state">No course offerings yet.</td>
         </tr>
         {% endfor %}
       </tbody>

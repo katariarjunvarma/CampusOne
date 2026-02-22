@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+{% load attendance_extras %}
+{% block title %}CampusOne - My Timetable{% endblock %}
+
+{% block content %}
+<style>
+  .timetable-page {
+    padding: 24px 32px;
+  }
+  .timetable-header {
+    margin-bottom: 24px;
+  }
+  .timetable-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  .timetable-header p {
+    color: #64748b;
+    margin: 4px 0 0 0;
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .summary-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .summary-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .summary-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #3b82f6;
+  }
+  .summary-detail {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+  .day-breakdown {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .day-badge {
+    padding: 4px 10px;
+    background: #f1f5f9;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #64748b;
+  }
+  .day-badge strong {
+    color: #3b82f6;
+  }
+  .room-checker {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 24px;
+  }
+  .room-checker h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 16px 0;
+  }
+  .checker-form {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: end;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .form-group label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+  }
+  .form-group select {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    min-width: 150px;
+  }
+  .btn-check {
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    height: fit-content;
+  }
+  .btn-check:hover {
+    background: #2563eb;
+  }
+  .availability-result {
+    margin-top: 16px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+  }
+  .availability-result h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 12px 0;
+  }
+  .room-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .room-tag {
+    padding: 4px 10px;
+    background: #dcfce7;
+    color: #16a34a;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .timetable-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .day-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .day-header {
+    font-weight: 600;
+    color: #3b82f6;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .day-count {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+  }
+  .class-entry {
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 3px solid #3b82f6;
+  }
+  .class-entry:last-child {
+    margin-bottom: 0;
+  }
+  .class-time {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+  }
+  .class-course {
+    font-weight: 600;
+    color: #1e293b;
+    margin: 4px 0;
+  }
+  .class-details {
+    font-size: 13px;
+    color: #64748b;
+  }
+  .class-room {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 6px;
+  }
+  .no-classes {
+    color: #94a3b8;
+    font-size: 13px;
+    font-style: italic;
+    padding: 12px;
+    text-align: center;
+  }
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  .nav-link:hover {
+    background: #2563eb;
+  }
+</style>
+
+<div class="timetable-page">
+  <a href="{% url 'faculty_dashboard' %}" class="nav-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Back to Dashboard
+  </a>
+
+  <div class="timetable-header">
+    <h1>My Timetable</h1>
+    <p>Weekly schedule with classroom allocations</p>
+  </div>
+
+  <!-- Weekly Load Summary -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-title">Total Classes This Week</div>
+      <div class="summary-value">{{ weekly_load.total_classes }}</div>
+      <div class="summary-detail">Across all sections</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-title">Classes Per Day</div>
+      <div class="day-breakdown">
+        {% for day, count in weekly_load.classes_per_day.items %}
+        <span class="day-badge">{{ day|slice:":3" }}: <strong>{{ count }}</strong></span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Room Availability Checker -->
+  <div class="room-checker">
+    <h3>Check Room Availability</h3>
+    <form method="get" action="{% url 'faculty_timetable' %}" class="checker-form">
+      <div class="form-group">
+        <label for="check_day">Day</label>
+        <select name="check_day" id="check_day">
+          <option value="">Select Day</option>
+          {% for day in days %}
+          <option value="{{ day }}" {% if request.GET.check_day == day %}selected{% endif %}>{{ day }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="check_slot">Time Slot</label>
+        <select name="check_slot" id="check_slot">
+          <option value="">Select Time</option>
+          {% for slot_value, slot_label in time_slots %}
+          <option value="{{ slot_value }}" {% if request.GET.check_slot == slot_value %}selected{% endif %}>{{ slot_label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="check_room">Classroom</label>
+        <select name="check_room" id="check_room">
+          <option value="">Select Room</option>
+          {% for room in classrooms %}
+          <option value="{{ room.id }}">{{ room.block.code }}-{{ room.room_number }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn-check">Check Availability</button>
+    </form>
+
+    <div id="availability_result" class="availability-result" style="margin-top: 16px; display: none;"></div>
+
+    <form id="booking_form" method="post" action="{% url 'book_room' %}" style="display:none; margin-top: 12px; overflow: visible;">
+      {% csrf_token %}
+      <input type="hidden" name="day" id="book_day">
+      <input type="hidden" name="slot" id="book_slot">
+      <input type="hidden" name="room" id="book_room">
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label>Select Your Course:</label>
+        <select name="course_offering" id="book_offering" required>
+          <option value="">-- Choose Course --</option>
+          {% for off in course_offerings %}
+          <option value="{{ off.id }}">{{ off.course.code }} - {{ off.course.name }} ({{ off.section.name }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="display: block; margin-top: 12px; min-height: 40px; position: relative; z-index: 100;">
+        <input type="submit" value="Book Slot" style="background:#3b82f6; color:#fff; display:inline-block; padding:12px 24px; border:none; border-radius:6px; cursor:pointer; font-size:14px; font-weight:600; pointer-events:auto;">
+      </div>
+    </form>
+  </div>
+
+  <script>
+    (function () {
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+
+      const dayEl = document.getElementById('check_day');
+      const slotEl = document.getElementById('check_slot');
+      const roomEl = document.getElementById('check_room');
+      const resultEl = document.getElementById('availability_result');
+      const bookingForm = document.getElementById('booking_form');
+      const bookDay = document.getElementById('book_day');
+      const bookSlot = document.getElementById('book_slot');
+      const bookRoom = document.getElementById('book_room');
+
+      function setResult(html) {
+        resultEl.style.display = 'block';
+        resultEl.innerHTML = html;
+      }
+
+      async function refreshAvailability() {
+        const day = dayEl.value;
+        const slot = slotEl.value;
+        const room = roomEl.value;
+
+        if (!day || !slot || !room) {
+          resultEl.style.display = 'none';
+          resultEl.innerHTML = '';
+          bookingForm.style.display = 'none';
+          return;
+        }
+
+        setResult('<p style="color:#64748b;font-size:14px;">Checking...</p>');
+
+        const url = `{% url 'check_room_availability' %}?day=${encodeURIComponent(day)}&slot=${encodeURIComponent(slot)}&room=${encodeURIComponent(room)}`;
+        const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        const data = await resp.json();
+
+        if (!resp.ok || !data.ok) {
+          setResult(`<p style="color:#ef4444;font-size:14px;">${data.error || 'Error checking availability'}</p>`);
+          bookingForm.style.display = 'none';
+          return;
+        }
+
+        if (!data.available) {
+          const b = data.booked;
+          setResult(`
+            <h4>Booked Class</h4>
+            <div style="font-size:14px; color:#1e293b; font-weight:600;">${b.course_code} - ${b.course_name}</div>
+            <div style="font-size:13px; color:#64748b; margin-top:4px;">Section: ${b.section}</div>
+            <div style="font-size:13px; color:#64748b;">Faculty: ${b.faculty}</div>
+            <div style="font-size:13px; color:#64748b;">Room: ${b.room}</div>
+          `);
+          bookingForm.style.display = 'none';
+          return;
+        }
+
+        setResult(`
+          <h4><span style="display:inline-block;padding:4px 10px;background:#dcfce7;color:#16a34a;border-radius:6px;font-size:12px;font-weight:600;">Room Available</span></h4>
+        `);
+
+        bookDay.value = day;
+        bookSlot.value = slot;
+        bookRoom.value = room;
+        bookingForm.style.display = 'block';
+      }
+
+      dayEl.addEventListener('change', refreshAvailability);
+      slotEl.addEventListener('change', refreshAvailability);
+      roomEl.addEventListener('change', refreshAvailability);
+    })();
+  </script>
+
+  <div class="timetable-grid">
+    {% for day in days %}
+    <div class="day-card">
+      <div class="day-header">
+        {{ day }}
+        <span class="day-count">{{ weekly_load.classes_per_day|get_item:day }} classes</span>
+      </div>
+      {% if timetable|get_item:day %}
+        {% for class in timetable|get_item:day %}
+        <div class="class-entry">
+          <div class="class-time">{{ class.time_slot }}</div>
+          <div class="class-course">{{ class.course_code }} - {{ class.course_name }}</div>
+          <div class="class-details">Section: {{ class.section }}</div>
+          <span class="class-room">{{ class.classroom }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-classes">No classes scheduled</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="room-checker" style="margin-top: 24px;">
+    <h3>Booking History</h3>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="text-align: left; color: #64748b;">
+            <th style="padding: 10px 8px;">Date Booked</th>
+            <th style="padding: 10px 8px;">Day</th>
+            <th style="padding: 10px 8px;">Time</th>
+            <th style="padding: 10px 8px;">Course</th>
+            <th style="padding: 10px 8px;">Section</th>
+            <th style="padding: 10px 8px;">Classroom</th>
+            <th style="padding: 10px 8px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in booking_history %}
+          <tr style="border-top: 1px solid #e2e8f0;">
+            <td style="padding: 10px 8px;">{{ b.created_at }}</td>
+            <td style="padding: 10px 8px;">{{ b.day_of_week }}</td>
+            <td style="padding: 10px 8px;">{{ b.get_time_slot_display }}</td>
+            <td style="padding: 10px 8px;">{{ b.section_course_faculty.course.code }} - {{ b.section_course_faculty.course.name }}</td>
+            <td style="padding: 10px 8px;">{{ b.section_course_faculty.section.name }}</td>
+            <td style="padding: 10px 8px;">{{ b.classroom.block.code }}-{{ b.classroom.room_number }}</td>
+            <td style="padding: 10px 8px; color: #16a34a; font-weight: 600;">Active</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" style="padding: 12px 8px; color: #94a3b8;">No bookings yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

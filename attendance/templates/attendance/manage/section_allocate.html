@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+{% block title %}CampusOne - Allocate Section{% endblock %}
+
+{% block content %}
+<style>
+  .manage-page {
+    padding: 24px 32px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .page-header {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .header-title h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .header-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+
+  .btn-secondary {
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .btn-secondary:hover {
+    background: #eff6ff;
+  }
+
+  .form-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .section-selector {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .section-selector label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+  }
+
+  .section-selector select {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #374151;
+    background: #ffffff;
+    cursor: pointer;
+  }
+
+  .section-selector select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .students-section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 12px 0;
+  }
+
+  .students-count {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 400;
+  }
+
+  .students-list {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .student-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background 0.15s;
+  }
+
+  .student-item:hover {
+    background: #f9fafb;
+  }
+
+  .student-item:last-child {
+    border-bottom: none;
+  }
+
+  .student-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
+    cursor: pointer;
+    accent-color: #3b82f6;
+  }
+
+  .student-info {
+    flex: 1;
+  }
+
+  .student-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1e293b;
+  }
+
+  .student-meta {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #f3f4f6;
+  }
+
+  .empty-students {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-size: 14px;
+  }
+
+  .select-all-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .select-all-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
+    cursor: pointer;
+    accent-color: #3b82f6;
+  }
+</style>
+
+<div class="manage-page">
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-title">
+        <h1>Allocate Section</h1>
+        <div class="header-subtitle">Select a section and assign students to it.</div>
+      </div>
+      <div class="header-actions">
+        <a href="{% url 'manage_sections' %}" class="btn-secondary">Create New Section</a>
+        <a href="{% url 'manage_students' %}" class="btn-secondary">Back</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="section-selector">
+        <label for="{{ form.section.id_for_label }}">Select Section</label>
+        {{ form.section }}
+      </div>
+
+      <div class="students-section">
+        <h3>Students <span class="students-count">(Select students to allocate)</span></h3>
+        <div class="students-list">
+          <div class="select-all-row">
+            <input type="checkbox" id="select-all" onchange="toggleAllStudents(this)">
+            <label for="select-all" style="cursor: pointer; margin: 0;">Select All Students</label>
+          </div>
+          {% for student in form.students.field.queryset %}
+          <div class="student-item">
+            <input type="checkbox" name="students" value="{{ student.id }}" id="student_{{ student.id }}" class="student-checkbox">
+            <div class="student-info">
+              <div class="student-name">{{ student.full_name }}</div>
+              <div class="student-meta">{{ student.registration_number }}{% if student.department %} • {{ student.department }}{% endif %}{% if student.year %} • Year {{ student.year }}{% endif %}</div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="empty-students">No students available to allocate.</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button type="submit" class="btn-primary">Allocate Section</button>
+        <a href="{% url 'manage_students' %}" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function toggleAllStudents(source) {
+    const checkboxes = document.querySelectorAll('.student-checkbox');
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = source.checked;
+    });
+  }
+</script>
+{% endblock %}

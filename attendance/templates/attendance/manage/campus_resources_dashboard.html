@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Smart LPU - Campus Resources{% endblock %}
+{% block title %}CampusOne - Campus Resources{% endblock %}
 
 {% block content %}
 <style>
@@ -141,14 +141,86 @@
   <div class="manage-header">
     <div class="header-title">
       <h1>Campus Resources</h1>
-      <div class="header-subtitle">Blocks, classrooms, faculty, offerings and reports</div>
+      <div class="header-subtitle">Operations Dashboard - View, Monitor & Report</div>
     </div>
     <div class="d-flex align-items-center" style="gap: 12px;">
-      <a href="{% url 'campus_resources_dashboard' %}" class="btn-secondary" style="box-shadow: none;">Back</a>
+      <a href="{% url 'manage_dashboard' %}" class="btn-secondary" style="box-shadow: none;">Back to Manage</a>
     </div>
   </div>
 
-  <h2 class="section-title">Resources</h2>
+  <!-- Reports & Analytics - MOVED TO TOP -->
+  <h2 class="section-title" style="color: #dc2626;">Reports & Analytics</h2>
+  <div class="cards-grid two-col">
+    <div class="manage-card" style="border-left: 4px solid #0e7490;">
+      <div class="card-header">
+        <div class="card-icon" style="background: #ecfeff; color: #0e7490;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 3v18h18"></path>
+            <path d="M19 9l-5 5-4-4-3 3"></path>
+          </svg>
+        </div>
+        <span class="card-title">Block Utilization</span>
+      </div>
+      <div class="card-description">Aggregated capacity and utilization by campus block.</div>
+      <div class="card-actions">
+        <a href="{% url 'report_block_utilization' %}" class="btn-primary">View Report</a>
+      </div>
+    </div>
+
+    <div class="manage-card" style="border-left: 4px solid #0e7490;">
+      <div class="card-header">
+        <div class="card-icon" style="background: #ecfeff; color: #0e7490;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 3v18h18"></path>
+            <path d="M19 9l-5 5-4-4-3 3"></path>
+          </svg>
+        </div>
+        <span class="card-title">Capacity Utilization</span>
+      </div>
+      <div class="card-description">Enrollment vs classroom capacity per offering.</div>
+      <div class="card-actions">
+        <a href="{% url 'report_capacity_utilization' %}" class="btn-primary">View Report</a>
+      </div>
+    </div>
+
+    <div class="manage-card" style="border-left: 4px solid #dc2626;">
+      <div class="card-header">
+        <div class="card-icon" style="background: #fef2f2; color: #dc2626;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20v-6"></path>
+            <path d="M6 20V10"></path>
+            <path d="M18 20V4"></path>
+          </svg>
+        </div>
+        <span class="card-title">Workload Distribution</span>
+      </div>
+      <div class="card-description">Sessions per week per faculty.</div>
+      <div class="card-actions">
+        <a href="{% url 'report_workload_distribution' %}" class="btn-primary">View Report</a>
+      </div>
+    </div>
+
+    <div class="manage-card" style="border-left: 4px solid #2563eb;">
+      <div class="card-header">
+        <div class="card-icon" style="background: #dbeafe; color: #2563eb;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <span class="card-title">Attendance Reports</span>
+      </div>
+      <div class="card-description">View attendance statistics and trends.</div>
+      <div class="card-actions">
+        <a href="{% url 'super_admin_view_attendance' %}" class="btn-primary">View Reports</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- A. Infrastructure Overview -->
+  <h2 class="section-title">Infrastructure Overview</h2>
   <div class="cards-grid">
     <div class="manage-card">
       <div class="card-header">
@@ -163,7 +235,7 @@
         <span class="card-title">Blocks</span>
         <span class="card-badge">{{ stats.blocks }} Total</span>
       </div>
-      <div class="card-description">Add and manage campus blocks.</div>
+      <div class="card-description">View and manage campus blocks.</div>
       <div class="card-actions">
         <a href="{% url 'manage_blocks' %}" class="btn-primary">Open Blocks</a>
         <a href="{% url 'manage_block_create' %}" class="btn-secondary">Add Block</a>
@@ -184,7 +256,7 @@
         <span class="card-title">Classrooms</span>
         <span class="card-badge">{{ stats.classrooms }} Total</span>
       </div>
-      <div class="card-description">Set room capacities for utilization reporting.</div>
+      <div class="card-description">View room capacities and utilization.</div>
       <div class="card-actions">
         <a href="{% url 'manage_classrooms' %}" class="btn-primary">Open Rooms</a>
         <a href="{% url 'manage_classroom_create' %}" class="btn-secondary">Add Room</a>
@@ -202,13 +274,17 @@
         <span class="card-title">Faculty</span>
         <span class="card-badge">{{ stats.faculty }} Total</span>
       </div>
-      <div class="card-description">Create faculty profiles and assignments.</div>
+      <div class="card-description">View faculty profiles and assignments.</div>
       <div class="card-actions">
         <a href="{% url 'manage_faculty' %}" class="btn-primary">Open Faculty</a>
         <a href="{% url 'manage_faculty_create' %}" class="btn-secondary">Add Faculty</a>
       </div>
     </div>
+  </div>
 
+  <!-- B. Course Operations -->
+  <h2 class="section-title">Course Operations</h2>
+  <div class="cards-grid">
     <div class="manage-card">
       <div class="card-header">
         <div class="card-icon" style="background: #fff7ed; color: #ea580c;">
@@ -220,46 +296,28 @@
         <span class="card-title">Course Offerings</span>
         <span class="card-badge">{{ stats.offerings }} Total</span>
       </div>
-      <div class="card-description">Assign course + faculty + classroom + schedule.</div>
+      <div class="card-description">Manage course + faculty + section assignments.</div>
       <div class="card-actions">
         <a href="{% url 'manage_course_offerings' %}" class="btn-primary">Open Offerings</a>
         <a href="{% url 'manage_course_offering_create' %}" class="btn-secondary">Add Offering</a>
       </div>
     </div>
-  </div>
-
-  <h2 class="section-title">Reports</h2>
-  <div class="cards-grid two-col">
-    <div class="manage-card">
-      <div class="card-header">
-        <div class="card-icon" style="background: #ecfeff; color: #0e7490;">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 3v18h18"></path>
-            <path d="M19 9l-5 5-4-4-3 3"></path>
-          </svg>
-        </div>
-        <span class="card-title">Capacity Utilization</span>
-      </div>
-      <div class="card-description">Enrollment vs classroom capacity per offering.</div>
-      <div class="card-actions">
-        <a href="{% url 'report_capacity_utilization' %}" class="btn-primary">View Report</a>
-      </div>
-    </div>
 
     <div class="manage-card">
       <div class="card-header">
-        <div class="card-icon" style="background: #fef2f2; color: #dc2626;">
+        <div class="card-icon" style="background: #fef3c7; color: #d97706;">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 20v-6"></path>
-            <path d="M6 20V10"></path>
-            <path d="M18 20V4"></path>
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
           </svg>
         </div>
-        <span class="card-title">Workload Distribution</span>
+        <span class="card-title">Section Allocation</span>
       </div>
-      <div class="card-description">Sessions per week per faculty.</div>
+      <div class="card-description">Assign students to sections and courses.</div>
       <div class="card-actions">
-        <a href="{% url 'report_workload_distribution' %}" class="btn-primary">View Report</a>
+        <a href="{% url 'manage_section_allocate_students' %}" class="btn-primary">Open Allocation</a>
+        <a href="{% url 'manage_sections' %}" class="btn-secondary">Manage Sections</a>
       </div>
     </div>
   </div>

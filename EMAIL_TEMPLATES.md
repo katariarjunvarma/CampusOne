@@ -1,6 +1,6 @@
-# Email Templates for Smart LPU
+# Email Templates for CampusOne
 
-This document describes the email templates available in the Smart LPU attendance system.
+This document describes the email templates available in the CampusOne attendance system.
 
 ## Available Templates
 
@@ -9,7 +9,7 @@ This document describes the email templates available in the Smart LPU attendanc
 - **Text Template**: `attendance/templates/attendance/email/absence_notification.txt`
 - **Trigger**: When a student is marked absent (only on status change to absent)
 - **Features**:
-  - Professional design with Smart LPU branding
+  - Professional design with CampusOne branding
   - Student information display
   - Course and session details
   - Contact information for parents

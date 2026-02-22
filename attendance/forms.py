@@ -11,7 +11,10 @@ from .models import (
     Enrollment,
     FaceSample,
     FacultyProfile,
+    Schedule,
     Student,
+    Section,
+    SectionCourseFaculty,
 )
 
 
@@ -34,6 +37,92 @@ class MultipleFileField(forms.FileField):
             data = [data]
         cleaned = [super().clean(d, initial) for d in data]
         return cleaned
+
+
+class SectionForm(forms.ModelForm):
+    class Meta:
+        model = Section
+        fields = ["name", "courses", "year", "semester"]
+        labels = {
+            "name": "Section Code",
+            "courses": "Linked Courses",
+        }
+        help_texts = {
+            "name": "This code will be used to identify the section everywhere (e.g., A, B, CSE-A, etc.)",
+            "courses": "Optional: Link this section to one or more courses",
+        }
+        widgets = {
+            "courses": forms.CheckboxSelectMultiple(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["name"].widget.attrs.update({"placeholder": "Enter section code (e.g., A, B, CSE-A)", "class": "form-control"})
+        self.fields["year"].widget.attrs.update({"class": "form-select"})
+        self.fields["semester"].widget.attrs.update({"class": "form-select"})
+        self.fields["courses"].required = False
+        self.fields["courses"].queryset = Course.objects.order_by("code")
+
+
+class SectionCourseFacultyForm(forms.ModelForm):
+    class Meta:
+        model = SectionCourseFaculty
+        fields = [
+            "section",
+            "course",
+            "faculty",
+        ]
+        widgets = {
+            "section": forms.Select(attrs={"class": "form-select"}),
+            "course": forms.Select(attrs={"class": "form-select"}),
+            "faculty": forms.Select(attrs={"class": "form-select"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["section"].queryset = Section.objects.order_by("name")
+
+        section = None
+        if self.is_bound:
+            section_id = (self.data.get("section") or "").strip()
+            if section_id.isdigit():
+                section = Section.objects.filter(id=int(section_id)).first()
+        elif getattr(self.instance, "section_id", None):
+            section = Section.objects.filter(id=int(self.instance.section_id)).first()
+
+        if section is not None:
+            self.fields["course"].queryset = section.courses.order_by("code")
+        else:
+            self.fields["course"].queryset = Course.objects.none()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        section = cleaned_data.get("section")
+        course = cleaned_data.get("course")
+
+        if section and course:
+            # Ensure chosen course belongs to the section
+            if not section.courses.filter(id=course.id).exists():
+                raise forms.ValidationError("Selected course does not belong to this section.")
+
+            existing = SectionCourseFaculty.objects.filter(section=section, course=course)
+            if self.instance.pk:
+                existing = existing.exclude(pk=self.instance.pk)
+
+            if existing.exists():
+                raise forms.ValidationError(
+                    "This course is already assigned to a faculty for this section."
+                )
+
+        return cleaned_data
+
+
+class StudentSectionAllocationForm(forms.Form):
+    section = forms.ModelChoiceField(queryset=Section.objects.order_by("name"))
+    students = forms.ModelMultipleChoiceField(
+        queryset=Student.objects.order_by("registration_number"),
+        widget=forms.SelectMultiple(attrs={"class": "form-select", "size": "12"}),
+    )
 
 
 class AttendanceSessionCreateForm(forms.ModelForm):
@@ -76,7 +165,7 @@ class AttendanceSessionCreateForm(forms.ModelForm):
 class CourseCreateForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ["code", "name"]
+        fields = ["code", "name", "year", "semester"]
 
 
 class AttendancePhotoUploadForm(forms.Form):
@@ -90,13 +179,39 @@ class AttendancePhotoUploadForm(forms.Form):
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ["registration_number", "full_name", "email", "parent_email", "parent_phone"]
+        fields = [
+            "registration_number",
+            "full_name",
+            "department",
+            "year",
+            "semester",
+            "email",
+            "student_phone",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Mandatory inputs when adding/updating students
+        self.fields["department"].required = True
+        self.fields["year"].required = True
+        self.fields["semester"].required = True
+        self.fields["student_phone"].required = True
+        self.fields["student_phone"].label = "Student Phone Number"
 
 
 class EnrollmentForm(forms.ModelForm):
     class Meta:
         model = Enrollment
         fields = ["student", "course"]
+
+    def clean(self):
+        cleaned = super().clean()
+        student = cleaned.get("student")
+        course = cleaned.get("course")
+        if student and course:
+            if Enrollment.objects.filter(student=student, course=course).exists():
+                raise forms.ValidationError("This student is already enrolled in this course.")
+        return cleaned
 
 
 class FaceSampleForm(forms.ModelForm):
@@ -171,78 +286,140 @@ class CourseOfferingForm(forms.ModelForm):
         fields = [
             "course",
             "faculty",
-            "classroom",
             "section",
-            "semester",
-            "academic_year",
-            "expected_strength",
-            "mode",
-            "day_of_week",
-            "start_time",
-            "end_time",
             "is_active",
         ]
         widgets = {
-            "start_time": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
-            "end_time": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
             "course": forms.Select(attrs={"class": "form-select"}),
             "faculty": forms.Select(attrs={"class": "form-select"}),
-            "classroom": forms.Select(attrs={"class": "form-select"}),
-            "section": forms.TextInput(attrs={"class": "form-control"}),
-            "semester": forms.NumberInput(attrs={"class": "form-control"}),
-            "academic_year": forms.TextInput(attrs={"class": "form-control"}),
-            "expected_strength": forms.NumberInput(attrs={"class": "form-control"}),
-            "mode": forms.Select(attrs={"class": "form-select"}),
-            "day_of_week": forms.Select(attrs={"class": "form-select"}),
+            "section": forms.Select(attrs={"class": "form-select"}),
             "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Order sections by name for the dropdown
+        self.fields["section"].queryset = Section.objects.order_by("name")
+        self.fields["section"].required = False
+        self.fields["section"].empty_label = "---------"
+
+        # Filter course options by selected section -> courses
+        if "section" in self.data:
+            try:
+                section_id = int(self.data.get("section") or 0)
+                section = Section.objects.get(id=section_id)
+                self.fields["course"].queryset = section.courses.order_by("code")
+            except Exception:
+                self.fields["course"].queryset = Course.objects.none()
+        elif getattr(self.instance, "pk", None) and getattr(self.instance, "section_id", None):
+            try:
+                section = self.instance.section
+                if section is not None:
+                    self.fields["course"].queryset = section.courses.order_by("code")
+                else:
+                    self.fields["course"].queryset = Course.objects.none()
+            except Exception:
+                self.fields["course"].queryset = Course.objects.none()
+        else:
+            self.fields["course"].queryset = Course.objects.none()
+
     def clean(self):
         cleaned_data = super().clean()
-        classroom = cleaned_data.get("classroom")
+        course = cleaned_data.get("course")
         faculty = cleaned_data.get("faculty")
-        day = cleaned_data.get("day_of_week")
-        start = cleaned_data.get("start_time")
-        end = cleaned_data.get("end_time")
-        pk = self.instance.pk
+        section = cleaned_data.get("section")
 
-        # Check 1: Time validation
-        if start and end and start >= end:
-            self.add_error("end_time", "End time must be after start time.")
+        if course and section:
+            if not section.courses.filter(id=course.id).exists():
+                raise forms.ValidationError("Selected course does not belong to this section.")
 
-        if not (classroom and faculty and day is not None and start and end):
-             return cleaned_data
+            # Check for duplicate (course + section) - only one faculty allowed per course+section
+            existing = CourseOffering.objects.filter(
+                course=course,
+                section=section
+            )
+            # Exclude current instance when editing
+            if self.instance.pk:
+                existing = existing.exclude(pk=self.instance.pk)
 
-        # Check 2: Classroom Clash
-        # Find any other active offering in same room, same day, overlapping time
-        room_clash = CourseOffering.objects.filter(
+            if existing.exists():
+                raise forms.ValidationError(
+                    "Course already assigned to this section."
+                )
+
+        return cleaned_data
+
+
+class ScheduleForm(forms.ModelForm):
+    """Form for creating and editing academic schedules with clash prevention."""
+    
+    class Meta:
+        model = Schedule
+        fields = ["section_course_faculty", "classroom", "day_of_week", "time_slot"]
+        widgets = {
+            "section_course_faculty": forms.Select(attrs={"class": "form-select"}),
+            "classroom": forms.Select(attrs={"class": "form-select"}),
+            "day_of_week": forms.Select(attrs={"class": "form-select"}),
+            "time_slot": forms.Select(attrs={"class": "form-select"}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Order section_course_faculty for dropdown
+        self.fields["section_course_faculty"].queryset = SectionCourseFaculty.objects.select_related(
+            "course", "faculty__user", "section"
+        ).order_by("course__code", "section__name")
+        
+        # Order classrooms for dropdown
+        self.fields["classroom"].queryset = Classroom.objects.select_related("block").order_by(
+            "block__code", "room_number"
+        )
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        section_course_faculty = cleaned_data.get("section_course_faculty")
+        classroom = cleaned_data.get("classroom")
+        day_of_week = cleaned_data.get("day_of_week")
+        time_slot = cleaned_data.get("time_slot")
+        
+        if not all([section_course_faculty, classroom, day_of_week, time_slot]):
+            return cleaned_data
+        
+        faculty = section_course_faculty.faculty
+        section = section_course_faculty.section
+        
+        # Check for room clash (excluding current instance when editing)
+        room_clash = Schedule.objects.filter(
             classroom=classroom,
-            day_of_week=day,
-            is_active=True,
-            start_time__lt=end,
-            end_time__gt=start,
-        ).exclude(pk=pk)
-
+            day_of_week=day_of_week,
+            time_slot=time_slot
+        )
+        if self.instance.pk:
+            room_clash = room_clash.exclude(pk=self.instance.pk)
         if room_clash.exists():
-            clash = room_clash.first()
-            msg = f"Room {classroom} is already booked for {clash.course.code} ({clash.start_time}-{clash.end_time})"
-            self.add_error("classroom", msg)
-            self.add_error("start_time", "Time clash in this room")
-
-        # Check 3: Faculty Clash
-        # Find any other active offering for same faculty, same day, overlapping time
-        faculty_clash = CourseOffering.objects.filter(
-            faculty=faculty,
-            day_of_week=day,
-            is_active=True,
-            start_time__lt=end,
-            end_time__gt=start,
-        ).exclude(pk=pk)
-
+            raise forms.ValidationError("Room already booked for this time slot.")
+        
+        # Check for faculty clash
+        faculty_clash = Schedule.objects.filter(
+            section_course_faculty__faculty=faculty,
+            day_of_week=day_of_week,
+            time_slot=time_slot
+        )
+        if self.instance.pk:
+            faculty_clash = faculty_clash.exclude(pk=self.instance.pk)
         if faculty_clash.exists():
-            clash = faculty_clash.first()
-            msg = f"Faculty {faculty} is already teaching {clash.course.code} ({clash.start_time}-{clash.end_time})"
-            self.add_error("faculty", msg)
-            self.add_error("start_time", "Faculty is busy at this time")
+            raise forms.ValidationError("Faculty already assigned to another class at this time.")
+        
+        # Check for section clash (only if section exists)
+        if section:
+            section_clash = Schedule.objects.filter(
+                section_course_faculty__section=section,
+                day_of_week=day_of_week,
+                time_slot=time_slot
+            )
+            if self.instance.pk:
+                section_clash = section_clash.exclude(pk=self.instance.pk)
+            if section_clash.exists():
+                raise forms.ValidationError("Section already has another class at this time.")
         
         return cleaned_data

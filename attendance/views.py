@@ -14,7 +14,7 @@ from .views_attendance import (
     session_view,
 )
 from .views_manage import (
-    campus_resources_dashboard,
+    faculty_dashboard,
     manage_block_create,
     manage_block_delete,
     manage_block_edit,
@@ -41,6 +41,7 @@ from .views_manage import (
     manage_emergency_alert_toggle,
     manage_emergency_alerts,
     manage_enrollment_create,
+    manage_enrollment_delete,
     manage_enrollments,
     manage_faculty,
     manage_faculty_create,
@@ -67,6 +68,7 @@ from .views_manage import (
     manage_student_delete,
     manage_student_edit,
     manage_students,
+    manage_system,
     manage_user_create,
     manage_user_edit,
     manage_users,

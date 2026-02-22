@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% block title %}CampusOne - Teacher Dashboard{% endblock %}
+
+{% block content %}
+<style>
+  .teacher-container {
+    padding: 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .teacher-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+  }
+  
+  .header-title h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .header-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  
+  .welcome-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #dbeafe;
+    color: #3b82f6;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #374151;
+    margin: 32px 0 16px 0;
+  }
+  
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background: #dbeafe;
+    color: #3b82f6;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  
+  .section-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .course-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .course-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .course-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .course-code {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  .course-name {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+  
+  .btn-mark-attendance {
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-mark-attendance:hover {
+    background: #2563eb;
+  }
+  
+  .btn-view-records {
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-view-records:hover {
+    background: #eff6ff;
+  }
+  
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  
+  .quick-action {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  
+  .quick-action:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .quick-action-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    color: #3b82f6;
+  }
+  
+  .quick-action-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  .quick-action-hint {
+    font-size: 12px;
+    color: #64748b;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-size: 14px;
+  }
+  
+  @media (max-width: 900px) {
+    .quick-actions {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .quick-actions {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="teacher-container">
+  <div class="teacher-header">
+    <div class="header-title">
+      <h1>Teacher Dashboard</h1>
+      <div class="header-subtitle">Welcome back, {{ faculty.user.get_full_name|default:faculty.user.username }}</div>
+    </div>
+    <div class="welcome-badge">
+      <span>{{ faculty.designation|default:"Faculty" }}</span>
+    </div>
+  </div>
+  
+  <!-- Quick Actions -->
+  <h2 class="section-title">Quick Actions</h2>
+  <div class="quick-actions">
+    <a href="{% url 'faculty_dashboard' %}" class="quick-action">
+      <div class="quick-action-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        </svg>
+      </div>
+      <span class="quick-action-title">My Sections</span>
+      <span class="quick-action-hint">View assigned courses</span>
+    </a>
+    
+    <a href="{% url 'attendance_home' %}" class="quick-action">
+      <div class="quick-action-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </div>
+      <span class="quick-action-title">Mark Attendance</span>
+      <span class="quick-action-hint">Create attendance session</span>
+    </a>
+    
+    <a href="{% url 'food:create_order' %}" class="quick-action">
+      <div class="quick-action-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      </div>
+      <span class="quick-action-title">Food Orders</span>
+      <span class="quick-action-hint">Pre-order meals</span>
+    </a>
+  </div>
+  
+  <!-- My Sections -->
+  <h2 class="section-title">My Sections & Courses</h2>
+  {% for section_name, section_data in sections %}
+  <div class="section-card">
+    <div class="section-badge">{{ section_name }}</div>
+    <div class="course-list">
+      {% for course_data in section_data.courses %}
+      <div class="course-item">
+        <div class="course-info">
+          <span class="course-code">{{ course_data.course.code }}</span>
+          <span class="course-name">{{ course_data.course.name }}</span>
+        </div>
+        <div class="card-actions">
+          <a href="{% url 'create_session' %}" class="btn-mark-attendance">Mark Attendance</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% empty %}
+  <div class="section-card">
+    <div class="empty-state">
+      No course assignments yet. Please contact admin.
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

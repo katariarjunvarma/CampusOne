@@ -194,3 +194,8 @@ cython_debug/
 
 # Media files (uploaded images)
 media/
+face_data/
+uploads/
+
+# Fixtures with real data (keep demo fixture)
+# fixtures/full_system_data.json  # This is our safe demo fixture

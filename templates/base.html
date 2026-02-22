@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% block title %}Smart LPU{% endblock %}</title>
+  <title>{% block title %}CampusOne{% endblock %}</title>
 
   <link rel="icon" type="image/png" href="{% static 'img/lpu-logo.png' %}" />
   <link rel="apple-touch-icon" href="{% static 'img/lpu-logo.png' %}" />
@@ -23,14 +23,14 @@
     <aside class="sidebar">
       <div class="sidebar-card p-3 mb-3">
         <div class="brand-pill">
-          <img src="{% static 'img/lpu-logo.png' %}" alt="LPU" />
+          <img src="{% static 'img/lpu-logo.png' %}" alt="CampusOne" />
           <div>
             {% if is_stall_owner and stall_name %}
             <div class="title">{{ stall_name }}</div>
             <div class="subtitle">Vendor Dashboard</div>
             {% else %}
-            <div class="title">Smart LPU</div>
-            <div class="subtitle">Campus Management System</div>
+            <div class="title">CampusOne</div>
+            <div class="subtitle">CampusOne – Integrated Academic & Operations Platform</div>
             {% endif %}
           </div>
         </div>
@@ -39,45 +39,85 @@
       <div class="sidebar-card p-3 mb-3">
         <div class="fw-semibold mb-2">Navigation</div>
         <div class="nav-soft d-grid gap-1">
-          {% if not is_stall_owner_only %}
+          
+          <!-- Admin Navigation -->
+          {% if user.is_authenticated and user.is_superuser %}
+          <a href="{% url 'home' %}">
+            <div class="nav-text">
+              <div class="nav-title">Dashboard</div>
+              <div class="hint">Overview</div>
+            </div>
+          </a>
+          <a href="{% url 'manage_system' %}">
+            <div class="nav-text">
+              <div class="nav-title">Manage System</div>
+              <div class="hint">Admin Console</div>
+            </div>
+          </a>
+          <a href="{% url 'super_admin_view_attendance' %}">
+            <div class="nav-text">
+              <div class="nav-title">Reports & Analytics</div>
+              <div class="hint">View Reports</div>
+            </div>
+          </a>
+          <a href="{% url 'food:create_order' %}">
+            <div class="nav-text">
+              <div class="nav-title">Food Orders</div>
+              <div class="hint">Pre-Order Meals</div>
+            </div>
+          </a>
+          
+          <!-- Teacher Navigation -->
+          {% elif user.is_authenticated and user.is_staff and not user.is_superuser %}
+          <a href="{% url 'home' %}">
+            <div class="nav-text">
+              <div class="nav-title">Dashboard</div>
+              <div class="hint">My Overview</div>
+            </div>
+          </a>
+          <a href="{% url 'faculty_dashboard' %}">
+            <div class="nav-text">
+              <div class="nav-title">My Sections</div>
+              <div class="hint">Assigned Courses</div>
+            </div>
+          </a>
+          <a href="{% url 'faculty_timetable' %}">
+            <div class="nav-text">
+              <div class="nav-title">My Timetable</div>
+              <div class="hint">Weekly Schedule</div>
+            </div>
+          </a>
+          <a href="{% url 'attendance_home' %}">
+            <div class="nav-text">
+              <div class="nav-title">Attendance</div>
+              <div class="hint">Mark Attendance</div>
+            </div>
+          </a>
+          <a href="{% url 'food:create_order' %}">
+            <div class="nav-text">
+              <div class="nav-title">Food Orders</div>
+              <div class="hint">Pre-Order Meals</div>
+            </div>
+          </a>
+          
+          <!-- Student/Regular User Navigation -->
+          {% elif not is_stall_owner_only %}
           <a href="{% url 'home' %}">
             <div class="nav-text">
               <div class="nav-title">Dashboard</div>
               <div class="hint">Sessions</div>
             </div>
           </a>
-          {% if not user.is_superuser %}
           <a href="{% url 'attendance_home' %}">
             <div class="nav-text">
               <div class="nav-title">Student Attendance</div>
               <div class="hint">Create / Mark</div>
             </div>
           </a>
-          {% endif %}
           <a href="{% url 'food:create_order' %}">
             <div class="nav-text">
-              <div class="nav-title">Food Order</div>
+              <div class="nav-title">Food Orders</div>
               <div class="hint">Pre-Order Meals</div>
-            </div>
-          </a>
-          {% endif %}
-          {% if user.is_authenticated and user.is_superuser %}
-          <a href="{% url 'super_admin_view_attendance' %}">
-            <div class="nav-text">
-              <div class="nav-title">View Attendance</div>
-              <div class="hint">Student History</div>
-            </div>
-          </a>
-          <a href="{% url 'campus_resources_dashboard' %}">
-            <div class="nav-text">
-              <div class="nav-title">Campus Resources</div>
-              <div class="hint">Blocks, Rooms, Faculty</div>
-            </div>
-          </a>
-          <a href="{% url 'manage_dashboard' %}">
-            <div class="nav-text">
-              <div class="nav-title">Manage Data</div>
-              <div class="hint">Admin Console</div>
             </div>
           </a>
           {% endif %}

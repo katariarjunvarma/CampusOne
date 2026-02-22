@@ -10,9 +10,26 @@ class Student(models.Model):
         validators=[RegexValidator(r'^\d{6}$', 'Registration number must be 6 digits')]
     )
     full_name = models.CharField(max_length=128)
+    year = models.PositiveSmallIntegerField(null=True, blank=True)
+    semester = models.PositiveSmallIntegerField(null=True, blank=True)
+    department = models.CharField(max_length=64, blank=True)
     email = models.EmailField(blank=True)
     parent_email = models.EmailField(blank=True)
-    parent_phone = models.CharField(max_length=32, blank=True)
+    student_phone = models.CharField(max_length=32, blank=True)
+
+    enrolled_courses = models.ManyToManyField(
+        "Course",
+        through="Enrollment",
+        related_name="enrolled_students",
+    )
+
+
+    @property
+    def section(self):
+        mapping = getattr(self, "section_mapping", None)
+        if mapping is None:
+            return None
+        return mapping.section
 
     def __str__(self) -> str:
         return f"{self.registration_number} - {self.full_name}"
@@ -21,9 +38,27 @@ class Student(models.Model):
 class Course(models.Model):
     code = models.CharField(max_length=32, unique=True)
     name = models.CharField(max_length=128)
+    year = models.PositiveSmallIntegerField(null=True, blank=True)
+    semester = models.PositiveSmallIntegerField(null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.code} - {self.name}"
+
+
+class Section(models.Model):
+    name = models.CharField(max_length=32, unique=True)
+    courses = models.ManyToManyField(Course, related_name="sections", blank=True)
+    year = models.PositiveSmallIntegerField(null=True, blank=True)
+    semester = models.PositiveSmallIntegerField(null=True, blank=True)
+
+    @property
+    def students(self):
+        return Student.objects.filter(section_mapping__section=self).order_by(
+            "registration_number"
+        )
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class Enrollment(models.Model):
@@ -153,54 +188,144 @@ class FacultyProfile(models.Model):
 
 
 class CourseOffering(models.Model):
-    MODE_OFFLINE = "offline"
-    MODE_ONLINE = "online"
-    MODE_HYBRID = "hybrid"
-
-    MODE_CHOICES = [
-        (MODE_OFFLINE, "Offline"),
-        (MODE_ONLINE, "Online"),
-        (MODE_HYBRID, "Hybrid"),
-    ]
-    DOW_MON = 0
-    DOW_TUE = 1
-    DOW_WED = 2
-    DOW_THU = 3
-    DOW_FRI = 4
-    DOW_SAT = 5
-    DOW_SUN = 6
-
-    DAY_OF_WEEK_CHOICES = [
-        (DOW_MON, "Mon"),
-        (DOW_TUE, "Tue"),
-        (DOW_WED, "Wed"),
-        (DOW_THU, "Thu"),
-        (DOW_FRI, "Fri"),
-        (DOW_SAT, "Sat"),
-        (DOW_SUN, "Sun"),
-    ]
-
-    course = models.ForeignKey(Course, on_delete=models.PROTECT)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="offerings")
     faculty = models.ForeignKey(FacultyProfile, on_delete=models.PROTECT, related_name="offerings")
-    classroom = models.ForeignKey(Classroom, on_delete=models.PROTECT, related_name="offerings")
-    section = models.CharField(max_length=32, blank=True)
-    semester = models.PositiveSmallIntegerField(null=True, blank=True)
-    academic_year = models.CharField(max_length=16, blank=True)
-    expected_strength = models.PositiveIntegerField(null=True, blank=True)
-    mode = models.CharField(max_length=16, choices=MODE_CHOICES, default=MODE_OFFLINE)
-    day_of_week = models.IntegerField(choices=DAY_OF_WEEK_CHOICES)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, null=True, blank=True, related_name="offerings")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["day_of_week", "start_time"]
+        unique_together = ("course", "section")
+        ordering = ["course__code", "section__name"]
 
     def __str__(self) -> str:
-        return f"{self.course.code} {self.get_day_of_week_display()} {self.start_time}-{self.end_time}"
+        section_name = self.section.name if self.section else 'No Section'
+        return f"{self.course.code} - {section_name} - {self.faculty.user.username}"
 
-    def clean(self):
-        super().clean()
-        if self.end_time and self.start_time and self.end_time <= self.start_time:
-            raise ValidationError({"end_time": "End time must be after start time."})
+
+class SectionCourseFaculty(models.Model):
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name="course_faculty_allocations")
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="section_faculty_allocations")
+    faculty = models.ForeignKey(FacultyProfile, on_delete=models.PROTECT, related_name="section_course_allocations")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("section", "course")
+        ordering = ["section__name", "course__code"]
+
+    def __str__(self) -> str:
+        return f"{self.course.code} - {self.course.name} - {self.faculty.user.username} - {self.section.name}"
+
+
+class StudentSection(models.Model):
+    student = models.OneToOneField(
+        Student, on_delete=models.CASCADE, related_name="section_mapping"
+    )
+    section = models.ForeignKey(
+        Section, on_delete=models.CASCADE, related_name="student_sections"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("student", "section")
+        ordering = ["section__name", "student__registration_number"]
+
+    def __str__(self) -> str:
+        return f"{self.student.registration_number} -> {self.section.name}"
+
+
+class Schedule(models.Model):
+    """Academic schedule for course offerings - assigns classroom and time slots."""
+    
+    DAY_CHOICES = [
+        ("Monday", "Monday"),
+        ("Tuesday", "Tuesday"),
+        ("Wednesday", "Wednesday"),
+        ("Thursday", "Thursday"),
+        ("Friday", "Friday"),
+        ("Saturday", "Saturday"),
+    ]
+    
+    TIME_SLOT_CHOICES = [
+        ("8am-9am", "8 a.m. - 9 a.m."),
+        ("9am-10am", "9 a.m. - 10 a.m."),
+        ("10am-11am", "10 a.m. - 11 a.m."),
+        ("11am-12pm", "11 a.m. - noon"),
+        ("12pm-1pm", "noon - 1 p.m."),
+        ("1pm-2pm", "1 p.m. - 2 p.m."),
+        ("2pm-3pm", "2 p.m. - 3 p.m."),
+        ("3pm-4pm", "3 p.m. - 4 p.m."),
+        ("4pm-5pm", "4 p.m. - 5 p.m."),
+        ("5pm-6pm", "5 p.m. - 6 p.m."),
+        ("6pm-7pm", "6 p.m. - 7 p.m."),
+        ("7pm-8pm", "7 p.m. - 8 p.m."),
+        ("8pm-9pm", "8 p.m. - 9 p.m."),
+        ("9pm-10pm", "9 p.m. - 10 p.m."),
+    ]
+    
+    section_course_faculty = models.ForeignKey(
+        SectionCourseFaculty, on_delete=models.CASCADE, related_name="schedules"
+    )
+
+    course_offering = models.ForeignKey(
+        CourseOffering,
+        on_delete=models.PROTECT,
+        related_name="schedules",
+        null=True,
+        blank=True,
+    )
+    classroom = models.ForeignKey(
+        Classroom, on_delete=models.PROTECT, related_name="schedules"
+    )
+    day_of_week = models.CharField(max_length=10, choices=DAY_CHOICES)
+    time_slot = models.CharField(max_length=20, choices=TIME_SLOT_CHOICES, default="8am-9am")
+
+    period_number = models.PositiveSmallIntegerField(null=True, blank=True)
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_schedules",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ["day_of_week", "time_slot", "classroom__block__code", "classroom__room_number"]
+        constraints = [
+            # Prevent same classroom at same time
+            models.UniqueConstraint(
+                fields=["classroom", "day_of_week", "time_slot"],
+                name="unique_room_slot",
+                violation_error_message="This classroom is already booked for this time slot.",
+            ),
+        ]
+    
+    def __str__(self) -> str:
+        return f"{self.section_course_faculty.course.code} - {self.day_of_week} {self.time_slot} - {self.classroom}"
+    
+    @property
+    def faculty(self):
+        return self.section_course_faculty.faculty
+    
+    @property
+    def section(self):
+        return self.section_course_faculty.section
+    
+    @property
+    def course(self):
+        return self.section_course_faculty.course
+    
+    @property
+    def derived_period_number(self):
+        """Derive period number from time slot for display purposes."""
+        slot_map = {
+            "8am-9am": 1, "9am-10am": 2, "10am-11am": 3, "11am-12pm": 4,
+            "12pm-1pm": 5, "1pm-2pm": 6, "2pm-3pm": 7, "3pm-4pm": 8,
+            "4pm-5pm": 9, "5pm-6pm": 10, "6pm-7pm": 11, "7pm-8pm": 12,
+            "8pm-9pm": 13, "9pm-10pm": 14,
+        }
+        return slot_map.get(self.time_slot, 0)

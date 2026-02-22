@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Smart LPU - Courses{% endblock %}
+{% block title %}CampusOne - Courses{% endblock %}
 
 {% block content %}
 <style>
@@ -193,11 +193,34 @@
   </div>
 
   <div class="data-card">
+    <form method="get" style="margin-bottom: 16px; display: flex; gap: 8px; flex-wrap: wrap; align-items: end;">
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <label style="font-size: 12px; color: #64748b;">Year</label>
+        <input name="year" value="{{ filters.year }}" class="form-control" style="padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 6px;" />
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <label style="font-size: 12px; color: #64748b;">Semester</label>
+        <input name="semester" value="{{ filters.semester }}" class="form-control" style="padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 6px;" />
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <label style="font-size: 12px; color: #64748b;">Assigned Teacher</label>
+        <select name="teacher_id" class="form-select" style="padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 6px;">
+          <option value="">---------</option>
+          {% for t in teachers %}
+            <option value="{{ t.id }}" {% if filters.teacher_id == t.id|stringformat:'s' %}selected{% endif %}>{{ t.user.username }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn-primary" style="box-shadow: none;">Filter</button>
+      <a href="{% url 'manage_courses' %}" class="btn-secondary" style="box-shadow: none;">Clear</a>
+    </form>
     <table class="data-table">
       <thead>
         <tr>
           <th>Code</th>
           <th>Name</th>
+          <th>Year</th>
+          <th>Semester</th>
           <th class="actions-cell">Actions</th>
         </tr>
       </thead>
@@ -206,12 +229,14 @@
           <tr>
             <td class="code-cell">{{ c.code }}</td>
             <td>{{ c.name }}</td>
+            <td>{{ c.year }}</td>
+            <td>{{ c.semester }}</td>
             <td class="actions-cell">
               <a href="{% url 'manage_course_delete' course_id=c.id %}" class="btn-delete">Delete</a>
             </td>
           </tr>
         {% empty %}
-          <tr><td colspan="3" class="empty-state">No courses yet.</td></tr>
+          <tr><td colspan="5" class="empty-state">No courses yet.</td></tr>
         {% endfor %}
       </tbody>
     </table>

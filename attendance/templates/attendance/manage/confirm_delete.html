@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Smart LPU - Delete{% endblock %}
+{% block title %}CampusOne - Delete{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -15,6 +15,8 @@
         <div class="smart-muted small">{{ object.email }}</div>
         {% elif type == 'Course' %}
         <div class="fw-semibold">{{ object.code }} - {{ object.name }}</div>
+        {% elif type == 'Section' %}
+        <div class="fw-semibold">{{ object.name }}</div>
         {% elif type == 'Block' %}
         <div class="fw-semibold">{{ object.code }} - {{ object.name }}</div>
         {% elif type == 'Classroom' %}
@@ -25,7 +27,11 @@
         <div class="smart-muted small">Employee ID: {{ object.employee_id|default:'-' }}</div>
         {% elif type == 'Course Offering' %}
         <div class="fw-semibold">{{ object.course.code }} - {{ object.faculty.user.username }}</div>
+        {% if object.classroom %}
         <div class="smart-muted small">{{ object.classroom.block.code }}-{{ object.classroom.room_number }} | {{ object.get_day_of_week_display }} {{ object.start_time }}-{{ object.end_time }}</div>
+        {% elif object.section %}
+        <div class="smart-muted small">Section: {{ object.section.name }}</div>
+        {% endif %}
         {% elif object %}
         <div class="fw-semibold">{{ object.student.registration_number }} - {{ object.student.full_name }}</div>
         {% if object.image %}

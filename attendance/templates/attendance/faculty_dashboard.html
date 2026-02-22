@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}CampusOne - Faculty Dashboard{% endblock %}
+
+{% block content %}
+<style>
+  .faculty-dashboard {
+    padding: 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .page-header {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .header-title h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .header-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+
+  .section-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background: #dbeafe;
+    color: #3b82f6;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .course-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .course-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+  }
+
+  .course-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .course-code {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .course-name {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+
+  .btn-mark-attendance {
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-mark-attendance:hover {
+    background: #2563eb;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-size: 14px;
+  }
+</style>
+
+<div class="faculty-dashboard">
+  <div class="page-header">
+    <div class="header-title">
+      <h1>Faculty Dashboard</h1>
+      <div class="header-subtitle">Your assigned sections and courses</div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <a href="{% url 'faculty_timetable' %}" class="action-card" style="background: #3b82f6; color: white; padding: 20px; border-radius: 12px; text-decoration: none; display: flex; align-items: center; gap: 12px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      <div>
+        <div style="font-weight: 600;">My Timetable</div>
+        <div style="font-size: 12px; opacity: 0.9;">Weekly schedule with rooms</div>
+      </div>
+    </a>
+    <a href="{% url 'faculty_today_classes' %}" class="action-card" style="background: #10b981; color: white; padding: 20px; border-radius: 12px; text-decoration: none; display: flex; align-items: center; gap: 12px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      <div>
+        <div style="font-weight: 600;">Today's Classes</div>
+        <div style="font-size: 12px; opacity: 0.9;">Quick attendance access</div>
+      </div>
+    </a>
+  </div>
+
+  {% for section_name, section_data in sections %}
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-badge">Section: {{ section_name }}</div>
+      <a href="{% url 'section_timetable' section_id=section_data.section.id %}" class="btn-view-timetable" style="padding: 6px 12px; background: #f1f5f9; color: #3b82f6; border-radius: 6px; font-size: 12px; font-weight: 500; text-decoration: none; margin-left: auto;">View Timetable</a>
+    </div>
+    <div class="course-list">
+      {% for course_data in section_data.courses %}
+      <div class="course-item">
+        <div class="course-info">
+          <span class="course-code">{{ course_data.course.code }}</span>
+          <span class="course-name">{{ course_data.course.name }}</span>
+        </div>
+        <a href="{% url 'create_session' %}" class="btn-mark-attendance">Create Session</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% empty %}
+  <div class="section-card">
+    <div class="empty-state">
+      No course assignments yet. Please contact admin.
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

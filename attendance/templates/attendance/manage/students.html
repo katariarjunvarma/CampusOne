@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Smart LPU - Students{% endblock %}
+{% block title %}CampusOne - Students{% endblock %}
 
 {% block content %}
 <style>
@@ -111,10 +111,36 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 
+  .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .email-col {
+    max-width: 180px;
+    word-break: break-word;
+  }
+
+  .actions-col {
+    min-width: 130px;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
   .data-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
+    table-layout: fixed;
   }
 
   .data-table th {
@@ -147,11 +173,14 @@
   }
 
   .actions-cell {
-    text-align: right;
+    text-align: center;
+    white-space: nowrap;
+    width: 120px;
   }
 
   .btn-edit {
-    padding: 6px 12px;
+    display: inline-block;
+    padding: 5px 10px;
     background: #dbeafe;
     color: #3b82f6;
     border: none;
@@ -161,7 +190,6 @@
     text-decoration: none;
     cursor: pointer;
     transition: all 0.2s;
-    margin-right: 8px;
   }
 
   .btn-edit:hover {
@@ -169,7 +197,8 @@
   }
 
   .btn-delete {
-    padding: 6px 12px;
+    display: inline-block;
+    padding: 5px 10px;
     background: #fee2e2;
     color: #ef4444;
     border: none;
@@ -185,11 +214,89 @@
     background: #fecaca;
   }
 
-  .empty-state {
-    text-align: center;
-    padding: 40px;
-    color: #94a3b8;
-    font-size: 14px;
+  .filter-form {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .filter-field label {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .filter-field input,
+  .filter-field select {
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #374151;
+    background: #ffffff;
+    min-width: 120px;
+    height: 36px;
+    box-sizing: border-box;
+  }
+
+  .filter-field input:focus,
+  .filter-field select:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .btn-filter {
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    height: 36px;
+    box-sizing: border-box;
+  }
+
+  .btn-filter:hover {
+    background: #2563eb;
+  }
+
+  .btn-clear {
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #64748b;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    height: 36px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .btn-clear:hover {
+    background: #f9fafb;
+    color: #374151;
   }
 </style>
 
@@ -202,6 +309,7 @@
       </div>
       <div class="header-actions">
         <a href="{% url 'manage_student_create' %}" class="btn-primary">Add Student</a>
+        <a href="{% url 'manage_section_allocate_students' %}" class="btn-secondary">Allocate Section</a>
         <a href="{% url 'manage_dashboard' %}" class="btn-secondary">Back</a>
       </div>
     </div>
@@ -215,14 +323,46 @@
   </div>
 
   <div class="data-card">
+    <form method="get" class="filter-form">
+      <div class="filter-field">
+        <label>Year</label>
+        <input name="year" value="{{ filters.year }}" placeholder="e.g., 1, 2, 3, 4" />
+      </div>
+      <div class="filter-field">
+        <label>Semester</label>
+        <input name="semester" value="{{ filters.semester }}" placeholder="e.g., 1, 2" />
+      </div>
+      <div class="filter-field">
+        <label>Department</label>
+        <input name="department" value="{{ filters.department }}" placeholder="e.g., CSE" />
+      </div>
+      <div class="filter-field">
+        <label>Enrolled Course</label>
+        <select name="course_id">
+          <option value="">All Courses</option>
+          {% for c in courses %}
+            <option value="{{ c.id }}" {% if filters.course_id == c.id|stringformat:'s' %}selected{% endif %}>{{ c.code }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-actions">
+        <button type="submit" class="btn-filter">Filter</button>
+        <a href="{% url 'manage_students' %}" class="btn-clear">Clear</a>
+      </div>
+    </form>
+    <div class="table-wrapper">
     <table class="data-table">
       <thead>
         <tr>
           <th>Registration Number</th>
           <th>Name</th>
+          <th>Department</th>
+          <th>Year</th>
+          <th>Semester</th>
+          <th>Section</th>
           <th>Email</th>
-          <th>Parent Phone</th>
-          <th class="actions-cell">Actions</th>
+          <th>Student Phone Number</th>
+          <th class="actions-col">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -230,20 +370,27 @@
         <tr>
           <td class="roll-cell">{{ s.registration_number }}</td>
           <td>{{ s.full_name }}</td>
-          <td class="muted-cell">{{ s.email }}</td>
-          <td class="muted-cell">{{ s.parent_phone }}</td>
-          <td class="actions-cell">
-            <a href="{% url 'manage_student_edit' student_id=s.id %}" class="btn-edit">Edit</a>
-            <a href="{% url 'manage_student_delete' student_id=s.id %}" class="btn-delete">Delete</a>
+          <td class="muted-cell">{{ s.department }}</td>
+          <td class="muted-cell">{{ s.year }}</td>
+          <td class="muted-cell">{{ s.semester }}</td>
+          <td class="muted-cell">{% if s.section %}{{ s.section.name }}{% else %}-{% endif %}</td>
+          <td class="muted-cell email-col">{{ s.email }}</td>
+          <td class="muted-cell">{{ s.student_phone }}</td>
+          <td class="actions-col">
+            <div class="action-buttons">
+            <a href="{% url 'manage_student_edit' student_id=s.id %}" class="btn-edit btn-sm">Edit</a>
+            <a href="{% url 'manage_student_delete' student_id=s.id %}" class="btn-delete btn-sm">Delete</a>
+            </div>
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="5" class="empty-state">No students yet.</td>
+          <td colspan="9" class="empty-state">No students yet.</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+    </div>
   </div>
 </div>
 {% endblock %}

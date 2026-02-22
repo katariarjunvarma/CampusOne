@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+{% block title %}CampusOne - Timetable & Classroom Allocation{% endblock %}
+
+{% block content %}
+<style>
+  .manage-page {
+    padding: 24px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .page-header {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .header-title h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .header-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-primary:hover {
+    background: #2563eb;
+  }
+
+  .btn-secondary {
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover {
+    background: #eff6ff;
+  }
+
+  .filter-form {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .filter-field label {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .filter-field select {
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #374151;
+    background: #ffffff;
+    min-width: 150px;
+    height: 36px;
+    box-sizing: border-box;
+  }
+
+  .filter-field select:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  .btn-filter {
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    height: 36px;
+    box-sizing: border-box;
+  }
+
+  .btn-filter:hover {
+    background: #2563eb;
+  }
+
+  .btn-clear {
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #64748b;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    height: 36px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .btn-clear:hover {
+    background: #f9fafb;
+    color: #374151;
+  }
+
+  .data-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .data-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+  }
+
+  .data-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #1e293b;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .data-table tr:hover td {
+    background: #f9fafb;
+  }
+
+  .badge-soft {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #f1f5f9;
+    color: #475569;
+  }
+
+  .muted {
+    color: #6b7280;
+  }
+
+  .btn-delete {
+    display: inline-block;
+    padding: 5px 10px;
+    background: #fee2e2;
+    color: #ef4444;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-delete:hover {
+    background: #fecaca;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-size: 14px;
+  }
+
+  .time-display {
+    font-family: monospace;
+    font-size: 13px;
+  }
+</style>
+
+<div class="manage-page">
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-title">
+        <h1>Timetable & Classroom Allocation</h1>
+        <div class="header-subtitle">Assign classroom and schedule periods for course offerings.</div>
+      </div>
+      <div class="header-actions">
+        <a href="{% url 'schedule_create' %}" class="btn-primary">Add Schedule</a>
+        <a href="{% url 'manage_system' %}" class="btn-secondary">Back</a>
+      </div>
+    </div>
+  </div>
+
+  <form method="get" class="filter-form">
+    <div class="filter-field">
+      <label>Filter by Section</label>
+      <select name="section">
+        <option value="">All Sections</option>
+        {% for s in sections %}
+          <option value="{{ s.id }}" {% if filters.section == s.id|stringformat:'s' %}selected{% endif %}>{{ s.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label>Filter by Faculty</label>
+      <select name="faculty">
+        <option value="">All Faculty</option>
+        {% for f in faculty_list %}
+          <option value="{{ f.id }}" {% if filters.faculty == f.id|stringformat:'s' %}selected{% endif %}>{{ f.user.username }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label>Filter by Day</label>
+      <select name="day">
+        <option value="">All Days</option>
+        {% for d in days %}
+          <option value="{{ d }}" {% if filters.day == d %}selected{% endif %}>{{ d }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label>Filter by Block</label>
+      <select name="block">
+        <option value="">All Blocks</option>
+        {% for b in blocks %}
+          <option value="{{ b.id }}" {% if filters.block == b.id|stringformat:'s' %}selected{% endif %}>{{ b.code }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label>Filter by Classroom</label>
+      <select name="classroom">
+        <option value="">All Classrooms</option>
+        {% for c in classrooms %}
+          <option value="{{ c.id }}" {% if filters.classroom == c.id|stringformat:'s' %}selected{% endif %}>{{ c.block.code }}-{{ c.room_number }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn-filter">Filter</button>
+    <a href="{% url 'schedule_list' %}" class="btn-clear">Clear</a>
+  </form>
+
+  <div class="data-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Course</th>
+          <th>Section</th>
+          <th>Faculty</th>
+          <th>Teacher ID</th>
+          <th>Block</th>
+          <th>Classroom</th>
+          <th>Day</th>
+          <th>Time Slot</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in schedules %}
+        <tr>
+          <td><span class="badge-soft">{{ s.section_course_faculty.course.code }}</span><br><small class="muted">{{ s.section_course_faculty.course.name }}</small></td>
+          <td class="muted">{{ s.section_course_faculty.section.name|default:"-" }}</td>
+          <td class="muted">{{ s.section_course_faculty.faculty.user.get_full_name|default:s.section_course_faculty.faculty.user.username }}</td>
+          <td><code style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:12px;">{{ s.section_course_faculty.faculty.id }}</code></td>
+          <td class="muted">{{ s.classroom.block.code }}</td>
+          <td class="muted">{{ s.classroom.room_number }}</td>
+          <td>{{ s.day_of_week }}</td>
+          <td>{{ s.get_time_slot_display }}</td>
+          <td>
+            <a href="{% url 'schedule_delete' schedule_id=s.id %}" class="btn-delete">Delete</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9" class="empty-state">No schedules found. Click "Add Schedule" to create one.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -827,7 +827,7 @@ def vendor_remind_order(request: HttpRequest) -> HttpResponse:
     # Send reminder email
     if order.ordered_by and order.ordered_by.email:
         try:
-            subject = f"Reminder: Order #{order.order_number or order.id} Ready for Pickup - Smart LPU"
+            subject = f"Reminder: Order #{order.order_number or order.id} Ready for Pickup - CampusOne"
             
             html_message = render_to_string('food/email/order_notification.html', {
                 'order': order,

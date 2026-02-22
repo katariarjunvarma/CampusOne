@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Smart LPU - {{ title }}{% endblock %}
+{% block title %}CampusOne - {{ title }}{% endblock %}
 
 {% block content %}
 <style>
@@ -185,6 +185,37 @@
     color: #94a3b8;
     margin-top: 4px;
   }
+
+  .checkbox-scroll {
+    max-height: 220px;
+    overflow: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    background: #ffffff;
+  }
+
+  .checkbox-scroll ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .checkbox-scroll li label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .checkbox-scroll input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+  }
 </style>
 
 <div class="form-page">
@@ -239,7 +270,11 @@
       {% for field in form %}
       <div class="form-group">
         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {% if field.name == 'courses' %}
+        <div class="checkbox-scroll">{{ field }}</div>
+        {% else %}
         {{ field }}
+        {% endif %}
         {% if field.help_text %}
         <div class="help-text">{{ field.help_text }}</div>
         {% endif %}
@@ -265,6 +300,50 @@
 
 {% block scripts %}
 {{ block.super }}
+<script>
+  (function () {
+    const sectionEl = document.getElementById('id_section');
+    const courseEl = document.getElementById('id_course');
+    if (!sectionEl || !courseEl) return;
+
+    const setOptions = (items) => {
+      const current = courseEl.value;
+      courseEl.innerHTML = '';
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = '---------';
+      courseEl.appendChild(placeholder);
+
+      for (const c of items) {
+        const opt = document.createElement('option');
+        opt.value = String(c.id);
+        opt.textContent = `${c.code} - ${c.name}`;
+        courseEl.appendChild(opt);
+      }
+
+      if (current) courseEl.value = current;
+    };
+
+    const load = async () => {
+      const sid = sectionEl.value;
+      if (!sid) {
+        setOptions([]);
+        return;
+      }
+      try {
+        const res = await fetch(`/manage/students/sections/${sid}/courses/`, { headers: { 'Accept': 'application/json' } });
+        if (!res.ok) throw new Error('bad response');
+        const data = await res.json();
+        setOptions(data.courses || []);
+      } catch (e) {
+        setOptions([]);
+      }
+    };
+
+    sectionEl.addEventListener('change', load);
+    load();
+  })();
+</script>
 {% if enable_camera_capture %}
 <script>
   (function () {

@@ -5,7 +5,7 @@ from .models import AttendanceRecord, AttendanceSession, Course, Enrollment, Fac
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ("registration_number", "full_name", "email", "parent_phone")
+    list_display = ("registration_number", "full_name", "email", "student_phone")
     search_fields = ("registration_number", "full_name", "email")
 
 
@@ -47,7 +47,26 @@ class FaceSampleAdmin(admin.ModelAdmin):
     search_fields = ("student__registration_number", "student__full_name")
 
 
-from .models import Block, Classroom, FacultyProfile, CourseOffering
+from .models import Block, Classroom, FacultyProfile, CourseOffering, Section, SectionCourseFaculty, Schedule
+
+
+@admin.register(Schedule)
+class ScheduleAdmin(admin.ModelAdmin):
+    list_display = ("section_course_faculty", "classroom", "day_of_week", "time_slot")
+    list_filter = ("day_of_week", "classroom__block", "section_course_faculty__course")
+    search_fields = ("section_course_faculty__course__code", "classroom__room_number", "classroom__block__code")
+    autocomplete_fields = ["section_course_faculty", "classroom"]
+
+
+@admin.register(Section)
+class SectionAdmin(admin.ModelAdmin):
+    list_display = ("name", "courses_display", "year", "semester")
+    search_fields = ("name", "courses__code", "courses__name")
+    list_filter = ("year", "semester")
+
+    @admin.display(description="Courses")
+    def courses_display(self, obj: Section) -> str:
+        return ", ".join(obj.courses.order_by("code").values_list("code", flat=True))
 
 
 @admin.register(Block)
@@ -73,8 +92,16 @@ class FacultyProfileAdmin(admin.ModelAdmin):
 
 @admin.register(CourseOffering)
 class CourseOfferingAdmin(admin.ModelAdmin):
-    list_display = ("course", "faculty", "classroom", "day_of_week", "start_time", "end_time", "is_active")
-    search_fields = ("course__code", "course__name", "faculty__user__username", "classroom__room_number")
-    list_filter = ("day_of_week", "mode", "is_active", "semester", "academic_year")
-    autocomplete_fields = ["course", "faculty", "classroom"]
+    list_display = ("course", "faculty", "section", "is_active")
+    search_fields = ("course__code", "course__name", "faculty__user__username", "section__name")
+    list_filter = ("is_active",)
+    autocomplete_fields = ["course", "faculty", "section"]
+
+
+@admin.register(SectionCourseFaculty)
+class SectionCourseFacultyAdmin(admin.ModelAdmin):
+    list_display = ("section", "course", "faculty", "created_at")
+    search_fields = ("section__name", "course__code", "course__name", "faculty__user__username")
+    list_filter = ("section", "course")
+    autocomplete_fields = ["section", "course", "faculty"]
 

@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% block title %}CampusOne - Block Utilization{% endblock %}
+
+{% block content %}
+<style>
+  .manage-page {
+    padding: 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .page-header {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .header-title h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .header-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-secondary {
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover {
+    background: #eff6ff;
+  }
+
+  .data-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .block-summary {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+  }
+
+  .block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .block-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .utilization-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .utilization-high {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+
+  .utilization-mid {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  .utilization-low {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #374151;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-label {
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .offering-list {
+    margin-top: 16px;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .data-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .data-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #1e293b;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .data-table tr:hover td {
+    background: #f9fafb;
+  }
+
+  .muted {
+    color: #6b7280;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .pill.good {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+
+  .pill.mid {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  .pill.high {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-size: 14px;
+  }
+</style>
+
+<div class="manage-page">
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-title">
+        <h1>Block Utilization</h1>
+        <div class="header-subtitle">Aggregated capacity and utilization by campus block.</div>
+      </div>
+      <div class="header-actions">
+        <a href="{% url 'campus_resources_dashboard' %}" class="btn-secondary">Back</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-card">
+    {% if block_data %}
+      {% for block in block_data %}
+        <div class="block-summary">
+          <div class="block-header">
+            <div class="block-title">{{ block.block.code }} - {{ block.block.name }}</div>
+            <div class="utilization-badge {% if block.utilization_pct >= 90 %}utilization-high{% elif block.utilization_pct >= 70 %}utilization-mid{% else %}utilization-low{% endif %}">
+              {{ block.utilization_pct }}%
+            </div>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat-item">
+              <div class="stat-label">Total Capacity</div>
+              <div class="stat-value">{{ block.total_capacity }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Students Assigned</div>
+              <div class="stat-value">{{ block.total_used }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Utilization</div>
+              <div class="stat-value">{{ block.utilization_pct }}%</div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">No blocks found.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

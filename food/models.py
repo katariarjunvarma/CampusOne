@@ -196,3 +196,19 @@ class EmergencyAlert(models.Model):
     def is_expired(self):
         from django.utils import timezone
         return self.expires_at and self.expires_at < timezone.now()
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile'
+    )
+    owner_status = models.BooleanField(default=False, help_text="Designates this user as a stall owner")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "User Profile"
+        verbose_name_plural = "User Profiles"
+
+    def __str__(self):
+        return f"{self.user.username} - Owner: {self.owner_status}"

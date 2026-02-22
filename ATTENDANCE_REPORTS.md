@@ -1,6 +1,6 @@
 # Attendance Reports Management Commands
 
-This document describes the Django management commands for sending attendance reports in Smart LPU.
+This document describes the Django management commands for sending attendance reports in CampusOne.
 
 ## Available Commands
 
@@ -47,16 +47,16 @@ python manage.py send_custom_report --email admin@example.com --days 7 --format 
 **Examples:**
 ```bash
 # Send last 7 days report for all courses
-python manage.py send_custom_report --email admin@smartlpu.edu
+python manage.py send_custom_report --email admin@campusone.edu
 
 # Send last 30 days report for specific course
-python manage.py send_custom_report --email admin@smartlpu.edu --course CS101 --days 30
+python manage.py send_custom_report --email admin@campusone.edu --course CS101 --days 30
 
 # Send CSV format report
-python manage.py send_custom_report --email admin@smartlpu.edu --format csv
+python manage.py send_custom_report --email admin@campusone.edu --format csv
 
 # Send report for specific course and time period
-python manage.py send_custom_report --email hod@smartlpu.edu --course CS101 --days 14 --format html
+python manage.py send_custom_report --email hod@campusone.edu --course CS101 --days 14 --format html
 ```
 
 ## Automated Scheduling
@@ -66,19 +66,19 @@ You can set up cron jobs to automate report sending:
 ### Daily Low Attendance Warnings
 ```bash
 # Run every day at 6 PM
-0 18 * * * /path/to/venv/bin/python /path/to/smartLPU/manage.py send_attendance_reports --type warnings
+0 18 * * * /path/to/venv/bin/python /path/to/project/manage.py send_attendance_reports --type warnings
 ```
 
 ### Monthly Attendance Summaries
 ```bash
 # Run on 1st of every month at 9 AM
-0 9 1 * * /path/to/venv/bin/python /path/to/smartLPU/manage.py send_attendance_reports --type monthly
+0 9 1 * * /path/to/venv/bin/python /path/to/project/manage.py send_attendance_reports --type monthly
 ```
 
 ### Weekly Reports for Administrators
 ```bash
 # Run every Friday at 5 PM
-0 17 * * 5 /path/to/venv/bin/python /path/to/smartLPU/manage.py send_custom_report --email admin@smartlpu.edu --days 7
+0 17 * * 5 /path/to/venv/bin/python /path/to/project/manage.py send_custom_report --email admin@campusone.edu --days 7
 ```
 
 ## Report Features
@@ -113,7 +113,7 @@ Absence emails now use your requested format:
 **Message:** `You have been marked absent for {course code} - {course name} from time {time} on {date}`
 
 ### Template Features
-- Professional HTML design with Smart LPU branding
+- Professional HTML design with CampusOne branding
 - Responsive layout for mobile devices
 - Detailed student and course information
 - Contact information and next steps

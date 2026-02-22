@@ -1,4 +1,4 @@
-ABSENCE NOTIFICATION - SMART LPU
+ABSENCE NOTIFICATION - CampusOne
 ====================================
 
 Dear Parent/Guardian,
@@ -17,12 +17,10 @@ Important Notes:
 - Regular attendance is crucial for academic success
 
 Contact Information:
--------------------
-Email: admin@lpu.edu
+--------------------
+Email: support@campusone.edu
 Phone: +91-1824-404404
 Administration Office
 
-This is an automated message from LPU Smart Attendance System.
+This is an automated message from CampusOne.
 Please do not reply to this email.
-
-© 2024 Lovely Professional University. All rights reserved.

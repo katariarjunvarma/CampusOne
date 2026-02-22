@@ -82,6 +82,7 @@ def _blink_seen(state: dict[str, object]) -> bool:
 
 @login_required
 def home(request: HttpRequest) -> HttpResponse:
+    # Check for stall owner first
     try:
         from food.models import StallOwner
 
@@ -91,7 +92,18 @@ def home(request: HttpRequest) -> HttpResponse:
             return redirect("food:vendor_dashboard")
     except Exception:
         pass
-    # Import here to avoid circular imports
+    
+    # Role-based redirects
+    if request.user.is_authenticated:
+        # Admin -> Admin Dashboard
+        if getattr(request.user, "is_superuser", False):
+            return redirect("manage_dashboard")
+        
+        # Teacher -> Teacher Dashboard (staff but not superuser)
+        if getattr(request.user, "is_staff", False) and not getattr(request.user, "is_superuser", False):
+            return redirect("faculty_dashboard")
+    
+    # Default: Show food orders for regular users
     from food.models import PreOrder
     from django.utils import timezone
 

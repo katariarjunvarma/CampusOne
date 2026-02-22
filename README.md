@@ -1,9 +1,9 @@
-# SmartLPU (Smart Campus Management System)
+# CampusOne – Campus Management System
 
 ## Quick Start (Terminal)
 
 ```bash
-cd /Users/arjunvarma/Desktop/Pep/smartLPU
+cd /path/to/project
 source venv/bin/activate
 python manage.py runserver
 ```
@@ -21,7 +21,7 @@ Open: http://127.0.0.1:8000/
 
 ---
 
-SmartLPU is a Django-based Smart Campus Management System prototype for LPU, focused on a **Smart Attendance Management System**.
+CampusOne is a Django-based campus management system prototype, focused on a **Smart Attendance Management System**.
 
 ## Features
 - Manage Data dashboard (Students, Courses, Enrollments, Face Data)

@@ -21,7 +21,7 @@ def update_order_status_actions(sender, instance, created, **kwargs):
     if instance.status == PreOrder.STATUS_READY and not instance.email_sent:
         user = instance.ordered_by
         if user and user.email:
-            subject = f"Order #{instance.order_number or instance.id} Ready for Pickup - Smart LPU"
+            subject = f"Order #{instance.order_number or instance.id} Ready for Pickup - CampusOne"
             try:
                 html_message = render_to_string('food/email/order_notification.html', {
                     'order': instance,
@@ -74,7 +74,7 @@ def update_order_status_actions(sender, instance, created, **kwargs):
                 if user.email:
                     try:
                         send_mail(
-                            subject="Smart LPU - Order Penalty Notice",
+                            subject="CampusOne - Order Penalty Notice",
                             message=f"You have missed {missed_count} orders. Action: {penalty_action}",
                             from_email=settings.DEFAULT_FROM_EMAIL,
                             recipient_list=[user.email],

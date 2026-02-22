@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Smart LPU - {{ session.course.code }} Attendance{% endblock %}
+{% block title %}CampusOne - {{ session.course.code }} Attendance{% endblock %}
 
 {% block content %}
 <style>
@@ -674,8 +674,7 @@
             {% for row in student_rows %}
             <tr data-student-id="{{ row.student.id }}">
               <td class="checkbox-cell">
-                <input type="checkbox" name="present" value="{{ row.student.id }}" {% if row.status=='present'
-                  %}checked{% endif %} onchange="updateStudentStatus(this)">
+                <input type="checkbox" name="present" value="{{ row.student.id }}" {% if row.status == 'present' %}checked{% endif %} onchange="updateStudentStatus(this)">
               </td>
               <td class="roll-cell">{{ row.student.registration_number }}</td>
               <td class="name-cell">{{ row.student.full_name }}</td>

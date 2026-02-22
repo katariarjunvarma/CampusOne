@@ -4,10 +4,12 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView
 from django.db import transaction
+from django.db.models import Sum
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.http import require_GET, require_POST
 from django.template.loader import render_to_string
 
 import cv2
@@ -35,14 +37,17 @@ from .forms import (
     AttendanceSessionCreateForm,
     BlockForm,
     CourseCreateForm,
-    CourseOfferingForm,
+    SectionCourseFacultyForm,
     EnrollmentForm,
     FaceSampleMultiForm,
     FaceSampleForm,
     FacultyProfileForm,
     ClassroomForm,
+    ScheduleForm,
     StudentForm,
     UserPermissionsForm,
+    SectionForm,
+    StudentSectionAllocationForm,
 )
 from .models import (
     AttendanceRecord,
@@ -55,7 +60,11 @@ from .models import (
     FaceSample,
     FacultyProfile,
     Notification,
+    Schedule,
     Student,
+    Section,
+    SectionCourseFaculty,
+    StudentSection,
 )
 
 from food.models import BulkOrder, BreakSlot, EmergencyAlert, FoodItem, LoyaltyPoints, PreOrder, Stall
@@ -119,19 +128,40 @@ def manage_dashboard(request: HttpRequest) -> HttpResponse:
         "faculty": FacultyProfile.objects.count(),
         "offerings": CourseOffering.objects.count(),
     }
-    return render(request, "attendance/manage/dashboard.html", {"stats": stats})
+    return render(request, "attendance/manage/admin_dashboard.html", {"stats": stats})
 
 
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
-def campus_resources_dashboard(request: HttpRequest) -> HttpResponse:
+def manage_system(request: HttpRequest) -> HttpResponse:
+    from django.utils import timezone
+    from datetime import date
+    
+    today = date.today()
+    sessions_today = AttendanceSession.objects.filter(session_date=today).count()
+    
     stats = {
+        "students": Student.objects.count(),
+        "courses": Course.objects.count(),
+        "enrollments": Enrollment.objects.count(),
+        "face_samples": FaceSample.objects.count(),
+        "notifications": Notification.objects.count(),
+        "sessions": AttendanceSession.objects.count(),
+        "sessions_today": sessions_today,
+        "records": AttendanceRecord.objects.count(),
         "blocks": Block.objects.count(),
         "classrooms": Classroom.objects.count(),
         "faculty": FacultyProfile.objects.count(),
         "offerings": CourseOffering.objects.count(),
     }
-    return render(request, "attendance/manage/campus_resources_dashboard.html", {"stats": stats})
+    return render(request, "attendance/manage/manage_system.html", {"stats": stats})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def campus_resources_dashboard(request: HttpRequest) -> HttpResponse:
+    """Redirect to manage_system since Campus Resources section is removed."""
+    return redirect("manage_system")
 
 
 @login_required
@@ -160,6 +190,73 @@ def manage_block_create(request: HttpRequest) -> HttpResponse:
             "title": "Add Block",
             "cancel_url": reverse("campus_resources_dashboard"),
         },
+    )
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_sections(request: HttpRequest) -> HttpResponse:
+    sections = Section.objects.prefetch_related("courses").order_by("name")
+    return render(request, "attendance/manage/sections.html", {"sections": sections})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_section_create(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        form = SectionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Section created.")
+            return redirect("manage_sections")
+    else:
+        form = SectionForm()
+    return render(
+        request,
+        "attendance/manage/form.html",
+        {"form": form, "title": "Add Section", "cancel_url": reverse("manage_sections")},
+    )
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_section_delete(request: HttpRequest, section_id: int) -> HttpResponse:
+    section = get_object_or_404(Section, id=section_id)
+    if request.method == "POST":
+        section.delete()
+        messages.success(request, "Section deleted.")
+        return redirect("manage_sections")
+    return render(
+        request,
+        "attendance/manage/confirm_delete.html",
+        {"object": section, "type": "Section", "cancel_url": "manage_sections"},
+    )
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_section_allocate_students(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        form = StudentSectionAllocationForm(request.POST)
+        if form.is_valid():
+            section = form.cleaned_data["section"]
+            students = form.cleaned_data["students"]
+            updated = 0
+            for s in students:
+                current_section = s.section
+                if not current_section or current_section.id != section.id:
+                    StudentSection.objects.update_or_create(
+                        student=s, defaults={"section": section}
+                    )
+                    updated += 1
+            messages.success(request, f"Allocated {updated} students to section {section.name}.")
+            return redirect("manage_students")
+    else:
+        form = StudentSectionAllocationForm()
+    return render(
+        request,
+        "attendance/manage/section_allocate.html",
+        {"form": form, "cancel_url": reverse("manage_students")},
     )
 
 
@@ -347,8 +444,8 @@ def manage_faculty_delete(request: HttpRequest, faculty_id: int) -> HttpResponse
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_course_offerings(request: HttpRequest) -> HttpResponse:
     offerings = (
-        CourseOffering.objects.select_related("course", "faculty__user", "classroom__block")
-        .order_by("day_of_week", "start_time")
+        SectionCourseFaculty.objects.select_related("course", "faculty__user", "section")
+        .order_by("section__name", "course__code")
     )
     return render(request, "attendance/manage/course_offerings.html", {"offerings": offerings})
 
@@ -357,13 +454,13 @@ def manage_course_offerings(request: HttpRequest) -> HttpResponse:
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_course_offering_create(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
-        form = CourseOfferingForm(request.POST)
+        form = SectionCourseFacultyForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Course offering created.")
             return redirect("manage_course_offerings")
     else:
-        form = CourseOfferingForm()
+        form = SectionCourseFacultyForm()
     return render(
         request,
         "attendance/manage/form.html",
@@ -378,15 +475,15 @@ def manage_course_offering_create(request: HttpRequest) -> HttpResponse:
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_course_offering_edit(request: HttpRequest, offering_id: int) -> HttpResponse:
-    offering = get_object_or_404(CourseOffering, id=offering_id)
+    offering = get_object_or_404(SectionCourseFaculty, id=offering_id)
     if request.method == "POST":
-        form = CourseOfferingForm(request.POST, instance=offering)
+        form = SectionCourseFacultyForm(request.POST, instance=offering)
         if form.is_valid():
             form.save()
             messages.success(request, "Course offering updated.")
             return redirect("manage_course_offerings")
     else:
-        form = CourseOfferingForm(instance=offering)
+        form = SectionCourseFacultyForm(instance=offering)
     return render(
         request,
         "attendance/manage/form.html",
@@ -401,7 +498,7 @@ def manage_course_offering_edit(request: HttpRequest, offering_id: int) -> HttpR
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_course_offering_delete(request: HttpRequest, offering_id: int) -> HttpResponse:
-    offering = get_object_or_404(CourseOffering, id=offering_id)
+    offering = get_object_or_404(SectionCourseFaculty, id=offering_id)
     if request.method == "POST":
         offering.delete()
         messages.success(request, "Course offering deleted.")
@@ -420,33 +517,30 @@ def manage_course_offering_delete(request: HttpRequest, offering_id: int) -> Htt
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def report_capacity_utilization(request: HttpRequest) -> HttpResponse:
-    offerings = (
-        CourseOffering.objects.filter(is_active=True)
-        .select_related("course", "faculty__user", "classroom__block")
-        .order_by("day_of_week", "start_time")
+    # Report on section+course combinations and their enrollment vs capacity
+    # Use SectionCourseFaculty as the allocation model
+    allocations = (
+        SectionCourseFaculty.objects.select_related("course", "faculty__user", "section")
+        .order_by("section__name", "course__code")
     )
     rows = []
-    for o in offerings:
-        enrolled = Enrollment.objects.filter(course=o.course).count()
-        # Logic: Use actual enrollment if available (>0), otherwise fallback to expected strength
-        used_count = enrolled if enrolled > 0 else (o.expected_strength or 0)
-        source = "Enrollment" if enrolled > 0 else "Expected"
-        
-        capacity = int(o.classroom.capacity or 0)
-        utilization = (used_count / capacity * 100.0) if capacity > 0 else 0.0
+    for a in allocations:
+        # Count students in this section
+        section_student_count = StudentSection.objects.filter(section=a.section).count()
+        # Count total enrollments for this course
+        enrolled = Enrollment.objects.filter(course=a.course).count()
+        # Use section size as a proxy for "used" seats
+        used_count = section_student_count if section_student_count > 0 else enrolled
+        source = "Section Students" if section_student_count > 0 else "Course Enrollments"
         
         rows.append(
             {
-                "offering": o,
+                "allocation": a,
                 "enrolled": enrolled,
                 "used_count": used_count,
                 "source": source,
-                "capacity": capacity,
-                "utilization": round(utilization, 1),
             }
         )
-    # Sort by utilization descending
-    rows.sort(key=lambda r: r["utilization"], reverse=True)
     return render(request, "attendance/manage/report_capacity.html", {"rows": rows})
 
 
@@ -480,8 +574,36 @@ def report_workload_distribution(request: HttpRequest) -> HttpResponse:
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_students(request: HttpRequest) -> HttpResponse:
-    students = Student.objects.order_by("registration_number")
-    return render(request, "attendance/manage/students.html", {"students": students})
+    qs = Student.objects.order_by("registration_number")
+    year = (request.GET.get("year") or "").strip()
+    semester = (request.GET.get("semester") or "").strip()
+    department = (request.GET.get("department") or "").strip()
+    course_id = (request.GET.get("course_id") or "").strip()
+
+    if year.isdigit():
+        qs = qs.filter(year=int(year))
+    if semester.isdigit():
+        qs = qs.filter(semester=int(semester))
+    if department:
+        qs = qs.filter(department__icontains=department)
+    if course_id.isdigit():
+        qs = qs.filter(enrollments__course_id=int(course_id)).distinct()
+
+    courses = Course.objects.order_by("code")
+    return render(
+        request,
+        "attendance/manage/students.html",
+        {
+            "students": qs,
+            "courses": courses,
+            "filters": {
+                "year": year,
+                "semester": semester,
+                "department": department,
+                "course_id": course_id,
+            },
+        },
+    )
 
 
 @login_required
@@ -495,7 +617,11 @@ def manage_student_create(request: HttpRequest) -> HttpResponse:
             return redirect("manage_students")
     else:
         form = StudentForm()
-    return render(request, "attendance/manage/form.html", {"form": form, "title": "Add Student"})
+    return render(
+        request,
+        "attendance/manage/form.html",
+        {"form": form, "title": "Add Student", "cancel_url": reverse("campus_resources_dashboard")},
+    )
 
 
 @login_required
@@ -510,7 +636,11 @@ def manage_student_edit(request: HttpRequest, student_id: int) -> HttpResponse:
             return redirect("manage_students")
     else:
         form = StudentForm(instance=student)
-    return render(request, "attendance/manage/form.html", {"form": form, "title": "Edit Student"})
+    return render(
+        request,
+        "attendance/manage/form.html",
+        {"form": form, "title": "Edit Student", "cancel_url": reverse("campus_resources_dashboard")},
+    )
 
 
 @login_required
@@ -527,8 +657,36 @@ def manage_student_delete(request: HttpRequest, student_id: int) -> HttpResponse
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def manage_courses(request: HttpRequest) -> HttpResponse:
-    courses = Course.objects.order_by("code")
-    return render(request, "attendance/manage/courses.html", {"courses": courses})
+    qs = Course.objects.order_by("code")
+    year = (request.GET.get("year") or "").strip()
+    semester = (request.GET.get("semester") or "").strip()
+    teacher_id = (request.GET.get("teacher_id") or "").strip()
+
+    if year.isdigit():
+        qs = qs.filter(year=int(year))
+    if semester.isdigit():
+        qs = qs.filter(semester=int(semester))
+    if teacher_id.isdigit():
+        qs = qs.filter(section_faculty_allocations__faculty_id=int(teacher_id)).distinct()
+
+    teachers = FacultyProfile.objects.select_related("user").order_by("user__username")
+    return render(
+        request,
+        "attendance/manage/courses.html",
+        {
+            "courses": qs,
+            "teachers": teachers,
+            "filters": {"year": year, "semester": semester, "teacher_id": teacher_id},
+        },
+    )
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_staff", False)))
+def section_courses_json(request: HttpRequest, section_id: int) -> JsonResponse:
+    section = get_object_or_404(Section, id=section_id)
+    courses = section.courses.order_by("code").values("id", "code", "name")
+    return JsonResponse({"courses": list(courses)})
 
 
 @login_required
@@ -569,12 +727,32 @@ def manage_enrollment_create(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = EnrollmentForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Enrollment created.")
+            student = form.cleaned_data["student"]
+            course = form.cleaned_data["course"]
+            obj, created = Enrollment.objects.get_or_create(student=student, course=course)
+            if created:
+                messages.success(request, "Enrollment created.")
+            else:
+                messages.info(request, "Student is already enrolled in this course.")
             return redirect("manage_enrollments")
     else:
         form = EnrollmentForm()
     return render(request, "attendance/manage/form.html", {"form": form, "title": "Add Enrollment"})
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def manage_enrollment_delete(request: HttpRequest, enrollment_id: int) -> HttpResponse:
+    enrollment = get_object_or_404(Enrollment.objects.select_related("student", "course"), id=enrollment_id)
+    if request.method == "POST":
+        enrollment.delete()
+        messages.success(request, "Enrollment removed.")
+        return redirect("manage_enrollments")
+    return render(
+        request,
+        "attendance/manage/confirm_delete.html",
+        {"object": enrollment, "type": "Enrollment", "cancel_url": "manage_enrollments"},
+    )
 
 
 @login_required
@@ -676,6 +854,83 @@ def manage_records(request: HttpRequest) -> HttpResponse:
         "attendance/manage/records.html",
         {"records": records, "sessions": sessions, "selected_session": selected_session},
     )
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def report_block_utilization(request: HttpRequest) -> HttpResponse:
+    # Aggregate students by block (via classrooms -> sections -> students)
+    # Simplified report showing block capacity vs students assigned to sections in that block
+    blocks = Block.objects.annotate(
+        total_capacity=Sum("classrooms__capacity")
+    ).prefetch_related("classrooms")
+    
+    block_data = []
+    for block in blocks:
+        # Get sections that have classrooms in this block (via section->classroom relation through courses)
+        # Simplified: just count students allocated to sections
+        total_capacity = block.total_capacity or 0
+        
+        # Count students whose section has courses allocated to classrooms in this block
+        # This is an approximation - count all students in sections
+        student_count = 0
+        section_ids = set()
+        
+        # Get all sections that have allocations in this block's classrooms
+        for classroom in block.classrooms.all():
+            # Count students allocated to sections associated with this classroom
+            # Since there's no direct link, we use a simplified approach
+            pass
+        
+        # Simplified: count students in all sections as a proxy
+        student_count = StudentSection.objects.count()
+        
+        utilization_pct = round((student_count / total_capacity * 100), 1) if total_capacity else 0
+        
+        block_data.append({
+            "block": block,
+            "total_capacity": total_capacity,
+            "total_used": student_count,
+            "utilization_pct": utilization_pct,
+            "offering_count": 0,  # Simplified
+            "offering_details": [],
+        })
+    
+    # Sort by utilization descending
+    block_data.sort(key=lambda x: x["utilization_pct"], reverse=True)
+    
+    return render(
+        request,
+        "attendance/manage/report_block_utilization.html",
+        {"block_data": block_data},
+    )
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def report_workload_distribution(request: HttpRequest) -> HttpResponse:
+    faculty = FacultyProfile.objects.filter(is_active=True).select_related("user").order_by("user__username")
+    rows = []
+    for f in faculty:
+        sessions_per_week = CourseOffering.objects.filter(faculty=f, is_active=True).count()
+        max_load = f.max_weekly_load
+        
+        # Calculate load percentage
+        load_pct = (sessions_per_week / max_load * 100.0) if max_load > 0 else 0.0
+        
+        is_overloaded = sessions_per_week > max_load
+        
+        rows.append({
+            "faculty": f,
+            "sessions_per_week": sessions_per_week,
+            "max_load": max_load,
+            "load_pct": round(load_pct, 1),
+            "is_overloaded": is_overloaded
+        })
+    
+    # Sort by sessions descending
+    rows.sort(key=lambda r: r["sessions_per_week"], reverse=True)
+    return render(request, "attendance/manage/report_workload.html", {"rows": rows})
 
 
 @login_required
@@ -1038,4 +1293,830 @@ def manage_emergency_alert_delete(request: HttpRequest, alert_id: int) -> HttpRe
         alert.delete()
         messages.success(request, "Alert deleted.")
         return redirect("manage_emergency_alerts")
-    return render(request, "attendance/manage/confirm_delete.html", {"object": alert, "type": "Emergency Alert"})
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_staff", False)))
+def faculty_dashboard(request: HttpRequest) -> HttpResponse:
+    """Faculty dashboard showing their assignments grouped by section."""
+    # Get faculty profile for current user
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found. Please contact admin.")
+        return redirect("home")
+    
+    # Get all offerings for this faculty
+    offerings = (
+        SectionCourseFaculty.objects.filter(faculty=faculty)
+        .select_related("course", "section")
+        .order_by("section__name", "course__code")
+    )
+    
+    # Group by section
+    sections_data = {}
+    for offering in offerings:
+        section_name = offering.section.name if offering.section else "No Section"
+        if section_name not in sections_data:
+            sections_data[section_name] = {
+                "section": offering.section,
+                "courses": []
+            }
+        sections_data[section_name]["courses"].append({
+            "course": offering.course,
+            "offering": offering
+        })
+    
+    # Sort by section name
+    sorted_sections = sorted(sections_data.items(), key=lambda x: x[0])
+    
+    return render(
+        request,
+        "attendance/faculty_dashboard.html",
+        {
+            "faculty": faculty,
+            "sections": sorted_sections
+        }
+    )
+
+
+# ==================== SCHEDULE VIEWS ====================
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def schedule_list(request: HttpRequest) -> HttpResponse:
+    """List all academic schedules with optional filters."""
+    qs = Schedule.objects.select_related(
+        "section_course_faculty__course",
+        "section_course_faculty__faculty__user",
+        "section_course_faculty__section",
+        "classroom__block"
+    ).order_by("day_of_week", "time_slot")
+    
+    # Get filter options
+    sections = Section.objects.order_by("name")
+    faculty_list = FacultyProfile.objects.filter(is_active=True).select_related("user").order_by("user__username")
+    blocks = Block.objects.order_by("code")
+    classrooms = Classroom.objects.select_related("block").order_by("block__code", "room_number")
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    
+    # Apply filters
+    section_filter = request.GET.get("section")
+    faculty_filter = request.GET.get("faculty")
+    day_filter = request.GET.get("day")
+    block_filter = request.GET.get("block")
+    classroom_filter = request.GET.get("classroom")
+    
+    if section_filter:
+        qs = qs.filter(section_course_faculty__section_id=section_filter)
+    if faculty_filter:
+        qs = qs.filter(section_course_faculty__faculty_id=faculty_filter)
+    if day_filter:
+        qs = qs.filter(day_of_week=day_filter)
+    if block_filter:
+        qs = qs.filter(classroom__block_id=block_filter)
+    if classroom_filter:
+        qs = qs.filter(classroom_id=classroom_filter)
+    
+    return render(request, "attendance/manage/schedule_list.html", {
+        "schedules": qs,
+        "sections": sections,
+        "faculty_list": faculty_list,
+        "blocks": blocks,
+        "classrooms": classrooms,
+        "days": days,
+        "filters": {
+            "section": section_filter,
+            "faculty": faculty_filter,
+            "day": day_filter,
+            "block": block_filter,
+            "classroom": classroom_filter,
+        }
+    })
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def schedule_create(request: HttpRequest) -> HttpResponse:
+    """Create a new schedule entry with clash prevention."""
+    if request.method == "POST":
+        form = ScheduleForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Schedule created successfully.")
+            return redirect("schedule_list")
+    else:
+        form = ScheduleForm()
+    
+    return render(request, "attendance/manage/form.html", {
+        "form": form,
+        "title": "Add Schedule",
+        "cancel_url": reverse("schedule_list"),
+    })
+
+
+@login_required
+@user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
+def schedule_delete(request: HttpRequest, schedule_id: int) -> HttpResponse:
+    """Delete a schedule entry."""
+    schedule = get_object_or_404(Schedule.objects.select_related(
+        "section_course_faculty__course",
+        "classroom__block"
+    ), id=schedule_id)
+    
+    if request.method == "POST":
+        schedule.delete()
+        messages.success(request, "Schedule deleted successfully.")
+        return redirect("schedule_list")
+    
+    return render(request, "attendance/manage/confirm_delete.html", {
+        "object": schedule,
+        "type": "Schedule",
+        "cancel_url": "schedule_list",
+    })
+
+
+# ==================== FACULTY TIMETABLE VIEWS ====================
+
+@login_required
+def faculty_timetable(request: HttpRequest) -> HttpResponse:
+    """Faculty views their weekly timetable with classroom allocation."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    # Get all schedules for this faculty
+    schedules = Schedule.objects.filter(
+        section_course_faculty__faculty=faculty
+    ).select_related(
+        "section_course_faculty__course",
+        "section_course_faculty__section",
+        "classroom__block"
+    ).order_by("day_of_week", "time_slot")
+    
+    # Group by day for timetable display
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    timetable = {day: [] for day in days}
+    
+    # Weekly load summary
+    weekly_load = {
+        "total_classes": schedules.count(),
+        "classes_per_day": {day: 0 for day in days},
+    }
+    
+    for s in schedules:
+        timetable[s.day_of_week].append({
+            "time_slot": s.get_time_slot_display(),
+            "course_code": s.section_course_faculty.course.code,
+            "course_name": s.section_course_faculty.course.name,
+            "section": s.section_course_faculty.section.name if s.section_course_faculty.section else "-",
+            "classroom": f"{s.classroom.block.code}-{s.classroom.room_number}",
+            "schedule_id": s.id,
+        })
+        weekly_load["classes_per_day"][s.day_of_week] += 1
+    
+    # Get faculty's courses for booking dropdown
+    faculty_courses = SectionCourseFaculty.objects.filter(
+        faculty=faculty
+    ).select_related("course", "section")
+
+    classrooms = Classroom.objects.select_related("block").order_by("block__code", "room_number")
+
+    # Ensure course offerings exist for assigned courses (so booking dropdown isn't empty)
+    for scf in faculty_courses:
+        existing_offering = CourseOffering.objects.filter(course=scf.course, section=scf.section).first()
+        if existing_offering and existing_offering.faculty_id != faculty.id:
+            continue
+        CourseOffering.objects.get_or_create(
+            course=scf.course,
+            section=scf.section,
+            defaults={"faculty": faculty, "is_active": True},
+        )
+
+    course_offerings = CourseOffering.objects.filter(
+        faculty=faculty,
+        is_active=True,
+    ).select_related("course", "section").order_by("course__code", "section__name")
+
+    booking_history = Schedule.objects.filter(
+        created_by=request.user,
+    ).select_related(
+        "course_offering__course",
+        "course_offering__section",
+        "classroom__block",
+        "section_course_faculty__course",
+        "section_course_faculty__section",
+    ).order_by("-created_at")
+    
+    return render(request, "attendance/faculty_timetable.html", {
+        "timetable": timetable,
+        "days": days,
+        "faculty": faculty,
+        "weekly_load": weekly_load,
+        "time_slots": Schedule.TIME_SLOT_CHOICES,
+        "faculty_courses": faculty_courses,
+        "classrooms": classrooms,
+        "booking_history": booking_history,
+        "course_offerings": course_offerings,
+    })
+
+
+@login_required
+def section_timetable(request: HttpRequest, section_id: int) -> HttpResponse:
+    """View timetable for a specific section (faculty access)."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    section = get_object_or_404(Section, id=section_id)
+    
+    # Check if faculty teaches this section
+    teaches_section = SectionCourseFaculty.objects.filter(
+        faculty=faculty, section=section
+    ).exists()
+    
+    if not teaches_section and not request.user.is_superuser:
+        messages.error(request, "You don't have access to this section's timetable.")
+        return redirect("faculty_dashboard")
+    
+    schedules = Schedule.objects.filter(
+        section_course_faculty__section=section
+    ).select_related(
+        "section_course_faculty__course",
+        "section_course_faculty__faculty__user",
+        "classroom__block"
+    ).order_by("day_of_week", "time_slot")
+    
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    timetable = {day: [] for day in days}
+    
+    for s in schedules:
+        timetable[s.day_of_week].append({
+            "time_slot": s.get_time_slot_display(),
+            "course_code": s.section_course_faculty.course.code,
+            "course_name": s.section_course_faculty.course.name,
+            "faculty": s.section_course_faculty.faculty.user.get_full_name() or s.section_course_faculty.faculty.user.username,
+            "classroom": f"{s.classroom.block.code}-{s.classroom.room_number}",
+        })
+    
+    return render(request, "attendance/section_timetable.html", {
+        "timetable": timetable,
+        "days": days,
+        "section": section,
+    })
+
+
+@login_required
+def faculty_today_classes(request: HttpRequest) -> HttpResponse:
+    """Quick view of today's classes for faculty with attendance links."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    from datetime import datetime
+    today = datetime.now().strftime("%A")
+    
+    # Get today's schedules
+    today_schedules = Schedule.objects.filter(
+        section_course_faculty__faculty=faculty,
+        day_of_week=today
+    ).select_related(
+        "section_course_faculty__course",
+        "section_course_faculty__section",
+        "classroom__block"
+    ).order_by("time_slot")
+    
+    classes = []
+    for s in today_schedules:
+        # Check if attendance session already exists
+        existing_session = AttendanceSession.objects.filter(
+            course_offering__course=s.section_course_faculty.course,
+            section=s.section_course_faculty.section,
+            faculty=faculty,
+            created_at__date=datetime.now().date()
+        ).first()
+        
+        classes.append({
+            "time_slot": s.get_time_slot_display(),
+            "course_code": s.section_course_faculty.course.code,
+            "course_name": s.section_course_faculty.course.name,
+            "section": s.section_course_faculty.section.name if s.section_course_faculty.section else "-",
+            "classroom": f"{s.classroom.block.code}-{s.classroom.room_number}",
+            "schedule_id": s.id,
+            "attendance_session": existing_session,
+            "can_take_attendance": existing_session is None,
+        })
+    
+    return render(request, "attendance/faculty_today_classes.html", {
+        "classes": classes,
+        "today": today,
+        "faculty": faculty,
+    })
+
+
+@login_required
+@require_GET
+def check_room_availability(request: HttpRequest) -> JsonResponse:
+    selected_day = (request.GET.get("day") or "").strip()
+    selected_slot = (request.GET.get("slot") or "").strip()
+    selected_period = (request.GET.get("period") or "").strip()
+    selected_start_time = (request.GET.get("start_time") or "").strip()
+    classroom_id = (request.GET.get("room") or "").strip()
+
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    allowed_days = set(days)
+    allowed_slots = set(dict(Schedule.TIME_SLOT_CHOICES).keys())
+
+    if not selected_day or not classroom_id or (not selected_slot and not selected_period and not selected_start_time):
+        return JsonResponse({"ok": False, "error": "Missing parameters."}, status=400)
+
+    if selected_day not in allowed_days:
+        return JsonResponse({"ok": False, "error": "Invalid day."}, status=400)
+
+    # Normalize to slot if period/start_time is provided
+    if not selected_slot:
+        if selected_period.isdigit():
+            period_map = {
+                1: "8am-9am", 2: "9am-10am", 3: "10am-11am", 4: "11am-12pm",
+                5: "12pm-1pm", 6: "1pm-2pm", 7: "2pm-3pm", 8: "3pm-4pm",
+                9: "4pm-5pm", 10: "5pm-6pm", 11: "6pm-7pm", 12: "7pm-8pm",
+                13: "8pm-9pm", 14: "9pm-10pm",
+            }
+            selected_slot = period_map.get(int(selected_period), "")
+        elif selected_start_time:
+            start_map = {
+                "08:00": "8am-9am", "09:00": "9am-10am", "10:00": "10am-11am", "11:00": "11am-12pm",
+                "12:00": "12pm-1pm", "13:00": "1pm-2pm", "14:00": "2pm-3pm", "15:00": "3pm-4pm",
+                "16:00": "4pm-5pm", "17:00": "5pm-6pm", "18:00": "6pm-7pm", "19:00": "7pm-8pm",
+                "20:00": "8pm-9pm", "21:00": "9pm-10pm",
+            }
+            selected_slot = start_map.get(selected_start_time, "")
+
+    if selected_slot not in allowed_slots:
+        return JsonResponse({"ok": False, "error": "Invalid day or time slot."}, status=400)
+
+    classroom = get_object_or_404(Classroom.objects.select_related("block"), id=classroom_id)
+
+    booked = Schedule.objects.filter(
+        classroom=classroom,
+        day_of_week=selected_day,
+        time_slot=selected_slot,
+    ).select_related(
+        "section_course_faculty__course",
+        "section_course_faculty__section",
+        "section_course_faculty__faculty__user",
+        "classroom__block",
+    ).first()
+
+    if not booked:
+        return JsonResponse({
+            "ok": True,
+            "available": True,
+            "room": {
+                "id": classroom.id,
+                "label": f"{classroom.block.code}-{classroom.room_number}",
+            },
+            "day": selected_day,
+            "slot": dict(Schedule.TIME_SLOT_CHOICES).get(selected_slot, selected_slot),
+        })
+
+    faculty_user = booked.section_course_faculty.faculty.user
+    faculty_name = faculty_user.get_full_name() or faculty_user.username
+
+    return JsonResponse({
+        "ok": True,
+        "available": False,
+        "day": selected_day,
+        "slot": booked.get_time_slot_display(),
+        "booked": {
+            "schedule_id": booked.id,
+            "course_code": booked.section_course_faculty.course.code,
+            "course_name": booked.section_course_faculty.course.name,
+            "section": booked.section_course_faculty.section.name if booked.section_course_faculty.section else "-",
+            "faculty": faculty_name,
+            "room": f"{classroom.block.code}-{classroom.room_number}",
+        },
+    })
+
+
+def _slot_to_times(slot: str):
+    from datetime import time
+
+    slot_map = {
+        "8am-9am": (1, time(8, 0), time(9, 0)),
+        "9am-10am": (2, time(9, 0), time(10, 0)),
+        "10am-11am": (3, time(10, 0), time(11, 0)),
+        "11am-12pm": (4, time(11, 0), time(12, 0)),
+        "12pm-1pm": (5, time(12, 0), time(13, 0)),
+        "1pm-2pm": (6, time(13, 0), time(14, 0)),
+        "2pm-3pm": (7, time(14, 0), time(15, 0)),
+        "3pm-4pm": (8, time(15, 0), time(16, 0)),
+        "4pm-5pm": (9, time(16, 0), time(17, 0)),
+        "5pm-6pm": (10, time(17, 0), time(18, 0)),
+        "6pm-7pm": (11, time(18, 0), time(19, 0)),
+        "7pm-8pm": (12, time(19, 0), time(20, 0)),
+        "8pm-9pm": (13, time(20, 0), time(21, 0)),
+        "9pm-10pm": (14, time(21, 0), time(22, 0)),
+    }
+    return slot_map.get(slot)
+
+
+@login_required
+@require_POST
+def book_room(request: HttpRequest) -> HttpResponse:
+    """Teacher books a classroom slot; persists Schedule with clash prevention."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+
+    day = (request.POST.get("day") or "").strip()
+    slot = (request.POST.get("slot") or "").strip()
+    room_id = (request.POST.get("room") or "").strip()
+    offering_id = (request.POST.get("course_offering") or "").strip()
+
+    if not all([day, slot, room_id, offering_id]):
+        messages.error(request, "All fields are required.")
+        return redirect("faculty_timetable")
+
+    allowed_days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+    if day not in allowed_days:
+        messages.error(request, "Invalid day.")
+        return redirect("faculty_timetable")
+
+    allowed_slots = set(dict(Schedule.TIME_SLOT_CHOICES).keys())
+    if slot not in allowed_slots:
+        messages.error(request, "Invalid time slot.")
+        return redirect("faculty_timetable")
+
+    # Teacher restriction
+    try:
+        offering = CourseOffering.objects.select_related("course", "section").get(id=offering_id, faculty=faculty)
+    except CourseOffering.DoesNotExist:
+        messages.error(request, "Invalid course offering.")
+        return redirect("faculty_timetable")
+
+    classroom = get_object_or_404(Classroom.objects.select_related("block"), id=room_id)
+
+    # Keep existing timetable linkage
+    try:
+        scf = SectionCourseFaculty.objects.get(course=offering.course, section=offering.section, faculty=faculty)
+    except SectionCourseFaculty.DoesNotExist:
+        messages.error(request, "Course assignment missing. Contact admin to assign your course-section.")
+        return redirect("faculty_timetable")
+
+    # Clash prevention
+    if Schedule.objects.filter(day_of_week=day, time_slot=slot, classroom=classroom).exists():
+        messages.error(request, "Room already booked")
+        return redirect("faculty_timetable")
+
+    if Schedule.objects.filter(day_of_week=day, time_slot=slot, section_course_faculty__faculty=faculty).exists():
+        messages.error(request, "You already have class at this time")
+        return redirect("faculty_timetable")
+
+    if offering.section and Schedule.objects.filter(day_of_week=day, time_slot=slot, section_course_faculty__section=offering.section).exists():
+        messages.error(request, "This section already has a class at this time")
+        return redirect("faculty_timetable")
+
+    slot_info = _slot_to_times(slot)
+    period_number = slot_info[0] if slot_info else None
+    start_time = slot_info[1] if slot_info else None
+    end_time = slot_info[2] if slot_info else None
+
+    Schedule.objects.create(
+        section_course_faculty=scf,
+        course_offering=offering,
+        classroom=classroom,
+        day_of_week=day,
+        time_slot=slot,
+        period_number=period_number,
+        start_time=start_time,
+        end_time=end_time,
+        created_by=request.user,
+    )
+
+    messages.success(request, "Slot booked successfully.")
+    return redirect("faculty_timetable")
+
+
+@login_required
+@require_POST
+def book_room_ajax(request: HttpRequest) -> JsonResponse:
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        return JsonResponse({"ok": False, "error": "No faculty profile found."}, status=400)
+
+    day_of_week = (request.POST.get("day") or "").strip()
+    time_slot = (request.POST.get("slot") or "").strip()
+    classroom_id = (request.POST.get("room") or "").strip()
+    scf_id = (request.POST.get("section_course_faculty") or "").strip()
+
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    allowed_days = set(days)
+    allowed_slots = set(dict(Schedule.TIME_SLOT_CHOICES).keys())
+
+    if not all([day_of_week, time_slot, classroom_id, scf_id]):
+        return JsonResponse({"ok": False, "error": "All fields are required."}, status=400)
+
+    if day_of_week not in allowed_days or time_slot not in allowed_slots:
+        return JsonResponse({"ok": False, "error": "Invalid day or time slot."}, status=400)
+
+    try:
+        scf = SectionCourseFaculty.objects.select_related("course", "section").get(id=scf_id, faculty=faculty)
+    except SectionCourseFaculty.DoesNotExist:
+        return JsonResponse({"ok": False, "error": "Invalid course assignment."}, status=403)
+
+    classroom = get_object_or_404(Classroom, id=classroom_id)
+
+    if Schedule.objects.filter(day_of_week=day_of_week, time_slot=time_slot, classroom=classroom).exists():
+        return JsonResponse({"ok": False, "error": "Room already booked"}, status=409)
+
+    if Schedule.objects.filter(day_of_week=day_of_week, time_slot=time_slot, section_course_faculty__faculty=faculty).exists():
+        return JsonResponse({"ok": False, "error": "You already have class at this time"}, status=409)
+
+    if scf.section and Schedule.objects.filter(day_of_week=day_of_week, time_slot=time_slot, section_course_faculty__section=scf.section).exists():
+        return JsonResponse({"ok": False, "error": "This section already has a class at this time"}, status=409)
+
+    schedule = Schedule.objects.create(
+        section_course_faculty=scf,
+        classroom=classroom,
+        day_of_week=day_of_week,
+        time_slot=time_slot,
+    )
+
+    return JsonResponse({
+        "ok": True,
+        "created": True,
+        "schedule_id": schedule.id,
+    })
+
+
+@login_required
+def mark_attendance_quick(request: HttpRequest, schedule_id: int) -> HttpResponse:
+    """Quick attendance marking from schedule - auto-creates session."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    from datetime import datetime
+    
+    schedule = get_object_or_404(
+        Schedule.objects.select_related(
+            "section_course_faculty__course",
+            "section_course_faculty__section"
+        ),
+        id=schedule_id,
+        section_course_faculty__faculty=faculty
+    )
+    
+    scf = schedule.section_course_faculty
+    
+    # Check if session already exists for today
+    existing = AttendanceSession.objects.filter(
+        course_offering__course=scf.course,
+        section=scf.section,
+        faculty=faculty,
+        created_at__date=datetime.now().date()
+    ).first()
+    
+    if existing:
+        return redirect("mark_attendance", session_id=existing.id)
+    
+    # Find or create course offering
+    offering, _ = CourseOffering.objects.get_or_create(
+        course=scf.course,
+        faculty=faculty,
+        section=scf.section,
+        defaults={"is_active": True}
+    )
+    
+    # Create new attendance session
+    session = AttendanceSession.objects.create(
+        course_offering=offering,
+        section=scf.section,
+        faculty=faculty,
+        scheduled_date=datetime.now().date()
+    )
+    
+    messages.success(request, f"Attendance session created for {scf.course.code} - {schedule.get_time_slot_display()}")
+    return redirect("mark_attendance", session_id=session.id)
+
+
+@login_required
+def faculty_book_room(request: HttpRequest) -> HttpResponse:
+    """Faculty books a classroom for their course."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    if request.method == "POST":
+        classroom_id = request.POST.get("classroom")
+        day_of_week = request.POST.get("day_of_week")
+        time_slot = request.POST.get("time_slot")
+        section_course_faculty_id = request.POST.get("section_course_faculty")
+        
+        if not all([classroom_id, day_of_week, time_slot, section_course_faculty_id]):
+            messages.error(request, "All fields are required.")
+            return redirect("faculty_timetable")
+        
+        # Verify the faculty owns this section_course_faculty
+        try:
+            scf = SectionCourseFaculty.objects.get(
+                id=section_course_faculty_id,
+                faculty=faculty
+            )
+        except SectionCourseFaculty.DoesNotExist:
+            messages.error(request, "Invalid course assignment.")
+            return redirect("faculty_timetable")
+        
+        # Check for room clash
+        existing = Schedule.objects.filter(
+            classroom_id=classroom_id,
+            day_of_week=day_of_week,
+            time_slot=time_slot
+        ).first()
+        
+        if existing:
+            messages.error(request, "This room is already booked for this time slot.")
+            return redirect("faculty_timetable")
+        
+        # Check for faculty clash
+        faculty_clash = Schedule.objects.filter(
+            section_course_faculty__faculty=faculty,
+            day_of_week=day_of_week,
+            time_slot=time_slot
+        ).first()
+        
+        if faculty_clash:
+            messages.error(request, "You already have a class at this time.")
+            return redirect("faculty_timetable")
+        
+        # Create the schedule
+        Schedule.objects.create(
+            section_course_faculty=scf,
+            classroom_id=classroom_id,
+            day_of_week=day_of_week,
+            time_slot=time_slot
+        )
+        
+        messages.success(request, f"Room booked successfully for {scf.course.code} on {day_of_week} at {dict(Schedule.TIME_SLOT_CHOICES).get(time_slot, time_slot)}")
+        return redirect("faculty_timetable")
+    
+    # GET request - show booking form
+    day = request.GET.get("day")
+    slot = request.GET.get("slot")
+    classroom_id = request.GET.get("classroom")
+    
+    # Get faculty's courses
+    faculty_courses = SectionCourseFaculty.objects.filter(
+        faculty=faculty
+    ).select_related("course", "section")
+    
+    # Get available classrooms for the selected time
+    available_classrooms = None
+    if day and slot:
+        busy_rooms = Schedule.objects.filter(
+            day_of_week=day,
+            time_slot=slot
+        ).values_list("classroom_id", flat=True)
+        
+        available_classrooms = Classroom.objects.exclude(
+            id__in=busy_rooms
+        ).select_related("block").order_by("block__code", "room_number")
+    
+    return render(request, "attendance/faculty_book_room.html", {
+        "faculty_courses": faculty_courses,
+        "available_classrooms": available_classrooms,
+        "day": day,
+        "slot": slot,
+        "classroom_id": classroom_id,
+        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        "time_slots": Schedule.TIME_SLOT_CHOICES,
+    })
+    
+    if existing:
+        return redirect("mark_attendance", session_id=existing.id)
+    
+    # Find or create course offering
+    offering, _ = CourseOffering.objects.get_or_create(
+        course=scf.course,
+        faculty=faculty,
+        section=scf.section,
+        defaults={"is_active": True}
+    )
+    
+    # Create new attendance session
+    session = AttendanceSession.objects.create(
+        course_offering=offering,
+        section=scf.section,
+        faculty=faculty,
+        scheduled_date=datetime.now().date()
+    )
+    
+    messages.success(request, f"Attendance session created for {scf.course.code} - {schedule.get_time_slot_display()}")
+    return redirect("mark_attendance", session_id=session.id)
+
+
+@login_required
+def faculty_book_room(request: HttpRequest) -> HttpResponse:
+    """Faculty books a classroom for their course."""
+    try:
+        faculty = FacultyProfile.objects.get(user=request.user)
+    except FacultyProfile.DoesNotExist:
+        messages.error(request, "No faculty profile found.")
+        return redirect("home")
+    
+    if request.method == "POST":
+        classroom_id = request.POST.get("classroom")
+        day_of_week = request.POST.get("day_of_week")
+        time_slot = request.POST.get("time_slot")
+        section_course_faculty_id = request.POST.get("section_course_faculty")
+        
+        if not all([classroom_id, day_of_week, time_slot, section_course_faculty_id]):
+            messages.error(request, "All fields are required.")
+            return redirect("faculty_timetable")
+        
+        # Verify the faculty owns this section_course_faculty
+        try:
+            scf = SectionCourseFaculty.objects.get(
+                id=section_course_faculty_id,
+                faculty=faculty
+            )
+        except SectionCourseFaculty.DoesNotExist:
+            messages.error(request, "Invalid course assignment.")
+            return redirect("faculty_timetable")
+        
+        # Check for room clash
+        existing = Schedule.objects.filter(
+            classroom_id=classroom_id,
+            day_of_week=day_of_week,
+            time_slot=time_slot
+        ).first()
+        
+        if existing:
+            messages.error(request, "This room is already booked for this time slot.")
+            return redirect("faculty_timetable")
+        
+        # Check for faculty clash
+        faculty_clash = Schedule.objects.filter(
+            section_course_faculty__faculty=faculty,
+            day_of_week=day_of_week,
+            time_slot=time_slot
+        ).first()
+        
+        if faculty_clash:
+            messages.error(request, "You already have a class at this time.")
+            return redirect("faculty_timetable")
+        
+        # Create the schedule
+        Schedule.objects.create(
+            section_course_faculty=scf,
+            classroom_id=classroom_id,
+            day_of_week=day_of_week,
+            time_slot=time_slot
+        )
+        
+        messages.success(request, f"Room booked successfully for {scf.course.code} on {day_of_week} at {dict(Schedule.TIME_SLOT_CHOICES).get(time_slot, time_slot)}")
+        return redirect("faculty_timetable")
+    
+    # GET request - show booking form
+    day = request.GET.get("day")
+    slot = request.GET.get("slot")
+    classroom_id = request.GET.get("classroom")
+    
+    # Get faculty's courses
+    faculty_courses = SectionCourseFaculty.objects.filter(
+        faculty=faculty
+    ).select_related("course", "section")
+    
+    # Get available classrooms for the selected time
+    available_classrooms = None
+    if day and slot:
+        busy_rooms = Schedule.objects.filter(
+            day_of_week=day,
+            time_slot=slot
+        ).values_list("classroom_id", flat=True)
+        
+        available_classrooms = Classroom.objects.exclude(
+            id__in=busy_rooms
+        ).select_related("block").order_by("block__code", "room_number")
+    
+    return render(request, "attendance/faculty_book_room.html", {
+        "faculty_courses": faculty_courses,
+        "available_classrooms": available_classrooms,
+        "day": day,
+        "slot": slot,
+        "classroom_id": classroom_id,
+        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        "time_slots": Schedule.TIME_SLOT_CHOICES,
+    })

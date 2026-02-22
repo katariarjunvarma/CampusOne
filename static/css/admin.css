@@ -1,6 +1,6 @@
 :root {
-  --lpu-red: #d61f26;
-  --lpu-red-dark: #b0121a;
+  --campusone-red: #d61f26;
+  --campusone-red-dark: #b0121a;
   --ink: #0b1220;
   --muted: rgba(11, 18, 32, 0.68);
   --glass: rgba(255, 255, 255, 0.66);
@@ -50,7 +50,7 @@ body::after {
 }
 
 #header {
-  background: linear-gradient(90deg, var(--lpu-red), var(--lpu-red-dark)) !important;
+  background: linear-gradient(90deg, var(--campusone-red), var(--campusone-red-dark)) !important;
 }
 
 #header a:link,
@@ -128,18 +128,18 @@ tr:hover td {
 /* Links + buttons */
 a:link,
 a:visited {
-  color: var(--lpu-red-dark);
+  color: var(--campusone-red-dark);
 }
 
 a:hover {
-  color: var(--lpu-red);
+  color: var(--campusone-red);
 }
 
 .button,
 input[type=submit],
 input[type=button],
 .submit-row input[type=submit] {
-  background: linear-gradient(90deg, var(--lpu-red), var(--lpu-red-dark)) !important;
+  background: linear-gradient(90deg, var(--campusone-red), var(--campusone-red-dark)) !important;
   border: 0 !important;
   border-radius: 12px !important;
   box-shadow: none !important;
@@ -185,4 +185,30 @@ input:focus, select:focus, textarea:focus {
 
 .actionlist li {
   border-bottom: 1px solid var(--stroke) !important;
+}
+
+/* Table layout fixes */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.email-col {
+  max-width: 180px;
+  word-break: break-word;
+}
+
+.actions-col {
+  min-width: 130px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
 }

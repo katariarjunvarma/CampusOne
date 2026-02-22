@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n static %}
-{% block title %}Smart LPU - Admin Login{% endblock %}
+{% block title %}CampusOne - Admin Login{% endblock %}
 
 {% block shell_class %}d-block{% endblock %}
 {% block sidebar %}{% endblock %}
@@ -11,9 +11,9 @@
       <div class="glass-strong p-4 p-md-5 mb-4">
         <div class="d-flex align-items-center justify-content-between gap-3">
           <div class="d-flex align-items-center gap-3">
-            <img src="{% static 'img/lpu-logo.png' %}" alt="LPU" style="width:54px;height:54px" />
+            <img src="{% static 'img/lpu-logo.png' %}" alt="CampusOne" style="width:54px;height:54px" />
             <div>
-              <h1 class="h3 mb-1">Smart LPU</h1>
+              <h1 class="h3 mb-1">CampusOne</h1>
               <div class="smart-muted">Admin sign in (Django Admin).</div>
             </div>
           </div>
@@ -24,7 +24,7 @@
       <div class="glass-strong p-4">
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div class="fw-semibold">Admin Login</div>
-          <span class="badge badge-soft">LPU</span>
+          <span class="badge badge-soft">CampusOne</span>
         </div>
 
         {% if form.errors and not form.non_field_errors %}

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block title %}CampusOne - Today's Classes{% endblock %}
+
+{% block content %}
+<style>
+  .today-page {
+    padding: 24px 32px;
+  }
+  .today-header {
+    margin-bottom: 24px;
+  }
+  .today-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  .today-header p {
+    color: #64748b;
+    margin: 4px 0 0 0;
+  }
+  .classes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .class-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .class-info {
+    flex: 1;
+  }
+  .class-time {
+    font-size: 14px;
+    font-weight: 600;
+    color: #3b82f6;
+    margin-bottom: 4px;
+  }
+  .class-course {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 16px;
+  }
+  .class-meta {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  .class-room {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #f1f5f9;
+    color: #3b82f6;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .btn-attendance {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-attendance:hover {
+    background: #2563eb;
+  }
+  .btn-taken {
+    padding: 10px 20px;
+    background: #dcfce7;
+    color: #16a34a;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: default;
+  }
+  .no-classes {
+    text-align: center;
+    padding: 48px;
+    color: #64748b;
+    background: #f8fafc;
+    border-radius: 12px;
+  }
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  .nav-link:hover {
+    background: #2563eb;
+  }
+</style>
+
+<div class="today-page">
+  <a href="{% url 'faculty_dashboard' %}" class="nav-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Back to Dashboard
+  </a>
+
+  <div class="today-header">
+    <h1>Today's Classes - {{ today }}</h1>
+    <p>Scheduled classes with quick attendance access</p>
+  </div>
+
+  {% if classes %}
+  <div class="classes-list">
+    {% for class in classes %}
+    <div class="class-card">
+      <div class="class-info">
+        <div class="class-time">{{ class.time_slot }}</div>
+        <div class="class-course">{{ class.course_code }} - {{ class.course_name }}</div>
+        <div class="class-meta">
+          Section: {{ class.section }} | Room: <span class="class-room">{{ class.classroom }}</span>
+        </div>
+      </div>
+      {% if class.can_take_attendance %}
+      <a href="{% url 'mark_attendance_quick' schedule_id=class.schedule_id %}" class="btn-attendance">Take Attendance</a>
+      {% else %}
+      <span class="btn-taken">Attendance Taken</span>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="no-classes">
+    <p>No classes scheduled for today.</p>
+    <p>Enjoy your free time!</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
