@@ -1,0 +1,4 @@
+Operations to perform:
+  Apply all migrations: admin, attendance, auth, contenttypes, food, sessions
+Running migrations:
+  No migrations to apply.
