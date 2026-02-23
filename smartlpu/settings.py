@@ -15,6 +15,7 @@ import ssl
 import certifi
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,12 +28,16 @@ load_dotenv()
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+@7t79ho(s0v$ah_-1g-_lw-lu-h@k$(*s+6%kxh90opo7m&v#'
+SECRET_KEY = os.getenv(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-+@7t79ho(s0v$ah_-1g-_lw-lu-h@k$(*s+6%kxh90opo7m&v#",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "1") in {"1", "true", "True"}
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+_allowed_hosts_env = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").strip()
+ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_env.split(",") if h.strip()]
 
 # CSRF trusted origins
 # For local development / IDE previews, set `CSRF_TRUSTED_ORIGINS` in your .env
@@ -65,6 +70,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -97,16 +103,26 @@ WSGI_APPLICATION = 'smartlpu.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        'OPTIONS': {
-            # Increase busy timeout to reduce 'database is locked' under concurrent writes.
-            'timeout': int(os.getenv('SQLITE_TIMEOUT', '30')),
-        },
+_database_url = os.getenv("DATABASE_URL", "").strip()
+if _database_url:
+    DATABASES = {
+        "default": dj_database_url.parse(
+            _database_url,
+            conn_max_age=int(os.getenv("DB_CONN_MAX_AGE", "60")),
+            ssl_require=os.getenv("DB_SSL_REQUIRE", "1") in {"1", "true", "True"},
+        )
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+            'OPTIONS': {
+                # Increase busy timeout to reduce 'database is locked' under concurrent writes.
+                'timeout': int(os.getenv('SQLITE_TIMEOUT', '30')),
+            },
+        }
+    }
 
 
 # Password validation
@@ -145,8 +161,18 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_URL = 'media/'
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_URL = '/accounts/login/'
