@@ -50,16 +50,297 @@
             </div>
           </form>
 
+          {% if show_demo_credentials %}
+            <div class="d-flex justify-content-center mt-3">
+              <button class="btn btn-outline-smart btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#demoCredentialsModal">Demo Credentials</button>
+            </div>
+          {% endif %}
+
           <div class="d-flex justify-content-center mt-3">
             <a class="btn btn-outline-smart btn-sm" href="/admin/login/">Admin Login</a>
           </div>
-          
-          <div class="text-center mt-4">
-            <small class="text-muted" style="font-size: 12px; opacity: 0.7;">
-              Created by <strong>Arjun Varma</strong>
-            </small>
-          </div>
+      </div>
+
+      <div class="glass-strong p-3 mt-3 text-center">
+        <small class="text-muted" style="font-size: 11px; opacity: 0.8;">
+          <div>Copyright (c) 2026 <strong>K. Arjun Varma</strong>. All rights reserved.</div>
+          <div class="mt-1">Email: <a href="mailto:arjunvarma5110@gmail.com">arjunvarma5110@gmail.com</a> | Contact: 9849112235</div>
+          <div class="mt-1">Student of Lovely Professional University</div>
+        </small>
       </div>
     </div>
   </div>
+
+  {% if show_demo_credentials %}
+    <div class="modal fade" id="demoCredentialsModal" tabindex="-1" aria-labelledby="demoCredentialsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content glass-strong" style="border: none;">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-semibold" id="demoCredentialsModalLabel"><i class="bi bi-info-circle me-2"></i>Demo Logins & Resources</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="text-muted mb-4">Explore CampusOne modules using demo accounts and watch feature walkthroughs.</div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="glass-strong p-3 h-100">
+                  <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="badge bg-primary">Admin</span>
+                    <span class="badge bg-light text-dark ms-auto small"><i class="bi bi-shield-check"></i> Full Access</span>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                    <div class="small"><span class="text-muted">User:</span> <strong id="demo-admin-username">{{ demo_credentials.admin.username }}</strong></div>
+                    <button class="btn btn-outline-smart btn-xs" style="padding: 2px 8px; font-size: 11px;" type="button" data-copy-target="demo-admin-username">Copy</button>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between gap-2">
+                    <div class="small"><span class="text-muted">Pass:</span> <span id="demo-admin-password">{{ demo_credentials.admin.password }}</span></div>
+                    <button class="btn btn-outline-smart btn-xs" style="padding: 2px 8px; font-size: 11px;" type="button" data-copy-target="demo-admin-password">Copy</button>
+                  </div>
+                  <button class="btn btn-smart btn-sm w-100 mt-3 text-white" type="button" data-fill-login data-username="{{ demo_credentials.admin.username }}" data-password="{{ demo_credentials.admin.password }}">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Auto-fill & Login
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="glass-strong p-3 h-100">
+                  <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="badge bg-success">Faculty</span>
+                    <span class="badge bg-light text-dark ms-auto small"><i class="bi bi-person-workspace"></i> Attendance</span>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                    <div class="small"><span class="text-muted">User:</span> <strong id="demo-faculty-username">{{ demo_credentials.faculty.username }}</strong></div>
+                    <button class="btn btn-outline-smart btn-xs" style="padding: 2px 8px; font-size: 11px;" type="button" data-copy-target="demo-faculty-username">Copy</button>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between gap-2">
+                    <div class="small"><span class="text-muted">Pass:</span> <span id="demo-faculty-password">{{ demo_credentials.faculty.password }}</span></div>
+                    <button class="btn btn-outline-smart btn-xs" style="padding: 2px 8px; font-size: 11px;" type="button" data-copy-target="demo-faculty-password">Copy</button>
+                  </div>
+                  <button class="btn btn-success btn-sm w-100 mt-3 text-white" type="button" data-fill-login data-username="{{ demo_credentials.faculty.username }}" data-password="{{ demo_credentials.faculty.password }}">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Auto-fill & Login
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="glass-strong p-3 h-100">
+                  <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="badge bg-warning text-dark">Stall Owner</span>
+                    <span class="badge bg-light text-dark ms-auto small"><i class="bi bi-shop"></i> Vendor</span>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                    <div class="small"><span class="text-muted">User:</span> <strong id="demo-stall-owner-username">{{ demo_credentials.stall_owner.username }}</strong></div>
+                    <button class="btn btn-outline-smart btn-xs" style="padding: 2px 8px; font-size: 11px;" type="button" data-copy-target="demo-stall-owner-username">Copy</button>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between gap-2">
+                    <div class="small"><span class="text-muted">Pass:</span> <span id="demo-stall-owner-password">{{ demo_credentials.stall_owner.password }}</span></div>
+                    <button class="btn btn-outline-smart btn-xs" style="padding: 2px 8px; font-size: 11px;" type="button" data-copy-target="demo-stall-owner-password">Copy</button>
+                  </div>
+                  <button class="btn btn-warning btn-sm w-100 mt-3 text-dark" type="button" data-fill-login data-username="{{ demo_credentials.stall_owner.username }}" data-password="{{ demo_credentials.stall_owner.password }}">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Auto-fill & Login
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <h6 class="fw-semibold mb-3"><i class="bi bi-stars me-2"></i>Feature Highlights</h6>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="d-flex align-items-start gap-3 p-3 glass-strong rounded">
+                    <div class="badge bg-primary p-2"><i class="bi bi-camera-video fs-5"></i></div>
+                    <div>
+                      <div class="fw-medium">Face Recognition Attendance</div>
+                      <div class="small text-muted">AI-powered attendance with real-time face detection</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="d-flex align-items-start gap-3 p-3 glass-strong rounded">
+                    <div class="badge bg-success p-2"><i class="bi bi-cart3 fs-5"></i></div>
+                    <div>
+                      <div class="fw-medium">Food Pre-Ordering</div>
+                      <div class="small text-muted">Skip queues with advance meal booking & vendor dashboard</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="d-flex align-items-start gap-3 p-3 glass-strong rounded">
+                    <div class="badge bg-info p-2"><i class="bi bi-graph-up-arrow fs-5"></i></div>
+                    <div>
+                      <div class="fw-medium">Resource Analytics</div>
+                      <div class="small text-muted">Campus resource estimation & optimization insights</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="d-flex align-items-start gap-3 p-3 glass-strong rounded">
+                    <div class="badge bg-warning p-2"><i class="bi bi-calendar-check fs-5"></i></div>
+                    <div>
+                      <div class="fw-medium">Make-Up Classes</div>
+                      <div class="small text-muted">Schedule remedial classes & track attendance</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 p-3 glass-strong rounded">
+              <h6 class="fw-semibold mb-3"><i class="bi bi-lightning-charge me-2"></i>Quick Start (3 Steps)</h6>
+              <div class="d-flex flex-column gap-2">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="badge bg-primary rounded-pill" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">1</div>
+                  <div class="small">Pick a demo account above and click <strong>"Auto-fill & Login"</strong></div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="badge bg-success rounded-pill" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">2</div>
+                  <div class="small">Explore the dashboard — each role sees different features</div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="badge bg-info rounded-pill" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">3</div>
+                  <div class="small">Watch video walkthroughs below for detailed feature demos</div>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="mb-3">
+              <h6 class="fw-semibold mb-3"><i class="bi bi-camera-video me-2"></i>Video Walkthroughs</h6>
+              <div class="row g-2">
+                <div class="col-12">
+                  <a href="https://drive.google.com/file/d/1ruRNOUdZbyejFUpOfZoD715rrBy63HXx/view?usp=sharing" target="_blank" rel="noopener" class="d-flex align-items-center gap-3 p-3 glass-strong text-decoration-none text-reset rounded hover-effect">
+                    <div class="badge bg-primary">1</div>
+                    <div>
+                      <div class="fw-medium">Smart Attendance Management System</div>
+                      <div class="small text-muted">Face recognition & attendance tracking</div>
+                    </div>
+                    <i class="bi bi-box-arrow-up-right ms-auto text-muted"></i>
+                  </a>
+                </div>
+                <div class="col-12">
+                  <a href="https://drive.google.com/file/d/1bBfH2QdjS7snAhwZIsopdWzicfudlB9m/view?usp=sharing" target="_blank" rel="noopener" class="d-flex align-items-center gap-3 p-3 glass-strong text-decoration-none text-reset rounded hover-effect">
+                    <div class="badge bg-success">2</div>
+                    <div>
+                      <div class="fw-medium">Smart Food Stall Pre-Ordering System</div>
+                      <div class="small text-muted">Order management & vendor dashboard</div>
+                    </div>
+                    <i class="bi bi-box-arrow-up-right ms-auto text-muted"></i>
+                  </a>
+                </div>
+                <div class="col-12">
+                  <a href="https://drive.google.com/file/d/1t5pv_0VPhlMSDRbqt63cr9XmyLJxEtM-/view?usp=sharing" target="_blank" rel="noopener" class="d-flex align-items-center gap-3 p-3 glass-strong text-decoration-none text-reset rounded hover-effect">
+                    <div class="badge bg-info text-dark">3</div>
+                    <div>
+                      <div class="fw-medium">Campus Resource & Parameter Estimation</div>
+                      <div class="small text-muted">Resource optimization & analytics</div>
+                    </div>
+                    <i class="bi bi-box-arrow-up-right ms-auto text-muted"></i>
+                  </a>
+                </div>
+                <div class="col-12">
+                  <a href="https://drive.google.com/file/d/1KykmE1TEyM-om1LOx_3ub1pIdhZqt7PI/view?usp=sharing" target="_blank" rel="noopener" class="d-flex align-items-center gap-3 p-3 glass-strong text-decoration-none text-reset rounded hover-effect">
+                    <div class="badge bg-warning text-dark">4</div>
+                    <div>
+                      <div class="fw-medium">Make-Up Class & Remedial Module</div>
+                      <div class="small text-muted">Scheduling & remedial management</div>
+                    </div>
+                    <i class="bi bi-box-arrow-up-right ms-auto text-muted"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <h6 class="fw-semibold mb-3"><i class="bi bi-medium me-2"></i>Documentation</h6>
+              <a href="https://medium.com/@arjunvarma5110/building-campusone-an-ai-powered-campus-management-system-with-django-and-opencv-3f52ead5851e" target="_blank" rel="noopener" class="d-flex align-items-center gap-3 p-3 glass-strong text-decoration-none text-reset rounded hover-effect">
+                <div class="badge bg-dark"><i class="bi bi-medium"></i></div>
+                <div>
+                  <div class="fw-medium">CampusOne Blog Post</div>
+                  <div class="small text-muted">Building an AI-powered campus management system</div>
+                </div>
+                <i class="bi bi-box-arrow-up-right ms-auto text-muted"></i>
+              </a>
+            </div>
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-smart text-white" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <style>
+      .hover-effect { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+      .hover-effect:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+      .btn-xs { padding: 2px 8px; font-size: 11px; }
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  {% if show_demo_credentials %}
+    <script>
+      (function () {
+        function copyText(text) {
+          if (!text) return;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text);
+            return;
+          }
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'absolute';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (_e) {}
+          document.body.removeChild(ta);
+        }
+
+        document.addEventListener('click', function (e) {
+          const btn = e.target && e.target.closest ? e.target.closest('[data-copy-target]') : null;
+          if (!btn) return;
+          const id = btn.getAttribute('data-copy-target');
+          const el = id ? document.getElementById(id) : null;
+          const text = el ? (el.textContent || '').trim() : '';
+          copyText(text);
+        });
+
+        // Auto-fill login functionality
+        document.addEventListener('click', function (e) {
+          const btn = e.target && e.target.closest ? e.target.closest('[data-fill-login]') : null;
+          if (!btn) return;
+          const username = btn.getAttribute('data-username');
+          const password = btn.getAttribute('data-password');
+          
+          // Find the form inputs
+          const usernameInput = document.querySelector('input[name="username"]');
+          const passwordInput = document.querySelector('input[name="password"]');
+          const form = usernameInput ? usernameInput.closest('form') : null;
+          
+          if (usernameInput && passwordInput && form) {
+            usernameInput.value = username;
+            passwordInput.value = password;
+            
+            // Close the modal first
+            const modal = document.getElementById('demoCredentialsModal');
+            if (modal && window.bootstrap && window.bootstrap.Modal) {
+              const modalInstance = window.bootstrap.Modal.getInstance(modal);
+              if (modalInstance) {
+                modalInstance.hide();
+              }
+            }
+            
+            // Submit the form after a short delay
+            setTimeout(function() {
+              form.submit();
+            }, 300);
+          }
+        });
+      })();
+    </script>
+  {% endif %}
 {% endblock %}

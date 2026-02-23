@@ -179,6 +179,22 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
+ENABLE_DEMO_CREDENTIALS = os.getenv("ENABLE_DEMO_CREDENTIALS", "0") in {"1", "true", "True"}
+DEMO_CREDENTIALS = {
+    "admin": {
+        "username": os.getenv("DEMO_ADMIN_USERNAME", ""),
+        "password": os.getenv("DEMO_ADMIN_PASSWORD", ""),
+    },
+    "faculty": {
+        "username": os.getenv("DEMO_FACULTY_USERNAME", ""),
+        "password": os.getenv("DEMO_FACULTY_PASSWORD", ""),
+    },
+    "stall_owner": {
+        "username": os.getenv("DEMO_STALL_OWNER_USERNAME", ""),
+        "password": os.getenv("DEMO_STALL_OWNER_PASSWORD", ""),
+    },
+}
+
 _smtp_user = os.getenv("EMAIL_HOST_USER", "")
 _smtp_password = os.getenv("EMAIL_HOST_PASSWORD", "")
 
