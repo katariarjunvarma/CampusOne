@@ -1,6 +1,21 @@
 from django.contrib import admin
 
-from .models import AttendanceRecord, AttendanceSession, Course, Enrollment, FaceSample, Notification, Student
+from .models import (
+    AttendanceRecord,
+    AttendanceSession,
+    Block,
+    Classroom,
+    Course,
+    CourseOffering,
+    Enrollment,
+    FaceSample,
+    FacultyProfile,
+    Notification,
+    Schedule,
+    Section,
+    SectionCourseFaculty,
+    Student,
+)
 
 
 @admin.register(Student)
@@ -45,9 +60,6 @@ class NotificationAdmin(admin.ModelAdmin):
 class FaceSampleAdmin(admin.ModelAdmin):
     list_display = ("student", "created_at")
     search_fields = ("student__registration_number", "student__full_name")
-
-
-from .models import Block, Classroom, FacultyProfile, CourseOffering, Section, SectionCourseFaculty, Schedule
 
 
 @admin.register(Schedule)

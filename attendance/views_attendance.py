@@ -13,7 +13,6 @@ from django.template.loader import render_to_string
 import cv2
 import numpy as np
 from PIL import Image
-from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.conf import settings
 import base64

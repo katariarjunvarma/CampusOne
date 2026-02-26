@@ -1,8 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.views import LoginView
 from django.db import transaction
 from django.db.models import Sum
 from django.http import HttpRequest, HttpResponse, JsonResponse
@@ -11,17 +9,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
 from django.template.loader import render_to_string
-
-import cv2
-import numpy as np
-from PIL import Image
-from django.http import JsonResponse
-from django.core.mail import send_mail
-from django.conf import settings
-import base64
-import time
-from collections import deque
-from datetime import timedelta
 
 from .face_recognition import (
     build_embedding_gallery,
@@ -164,7 +151,6 @@ def manage_system(request: HttpRequest) -> HttpResponse:
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def campus_resources_dashboard(request: HttpRequest) -> HttpResponse:
-    """Redirect to manage_system since Campus Resources section is removed."""
     return redirect("manage_system")
 
 
@@ -521,19 +507,14 @@ def manage_course_offering_delete(request: HttpRequest, offering_id: int) -> Htt
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def report_capacity_utilization(request: HttpRequest) -> HttpResponse:
-    # Report on section+course combinations and their enrollment vs capacity
-    # Use SectionCourseFaculty as the allocation model
     allocations = (
         SectionCourseFaculty.objects.select_related("course", "faculty__user", "section")
         .order_by("section__name", "course__code")
     )
     rows = []
     for a in allocations:
-        # Count students in this section
         section_student_count = StudentSection.objects.filter(section=a.section).count()
-        # Count total enrollments for this course
         enrolled = Enrollment.objects.filter(course=a.course).count()
-        # Use section size as a proxy for "used" seats
         used_count = section_student_count if section_student_count > 0 else enrolled
         source = "Section Students" if section_student_count > 0 else "Course Enrollments"
         
@@ -863,32 +844,14 @@ def manage_records(request: HttpRequest) -> HttpResponse:
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def report_block_utilization(request: HttpRequest) -> HttpResponse:
-    # Aggregate students by block (via classrooms -> sections -> students)
-    # Simplified report showing block capacity vs students assigned to sections in that block
     blocks = Block.objects.annotate(
         total_capacity=Sum("classrooms__capacity")
     ).prefetch_related("classrooms")
     
     block_data = []
     for block in blocks:
-        # Get sections that have classrooms in this block (via section->classroom relation through courses)
-        # Simplified: just count students allocated to sections
         total_capacity = block.total_capacity or 0
-        
-        # Count students whose section has courses allocated to classrooms in this block
-        # This is an approximation - count all students in sections
-        student_count = 0
-        section_ids = set()
-        
-        # Get all sections that have allocations in this block's classrooms
-        for classroom in block.classrooms.all():
-            # Count students allocated to sections associated with this classroom
-            # Since there's no direct link, we use a simplified approach
-            pass
-        
-        # Simplified: count students in all sections as a proxy
         student_count = StudentSection.objects.count()
-        
         utilization_pct = round((student_count / total_capacity * 100), 1) if total_capacity else 0
         
         block_data.append({
@@ -896,11 +859,10 @@ def report_block_utilization(request: HttpRequest) -> HttpResponse:
             "total_capacity": total_capacity,
             "total_used": student_count,
             "utilization_pct": utilization_pct,
-            "offering_count": 0,  # Simplified
+            "offering_count": 0,
             "offering_details": [],
         })
     
-    # Sort by utilization descending
     block_data.sort(key=lambda x: x["utilization_pct"], reverse=True)
     
     return render(
@@ -949,33 +911,24 @@ def super_admin_view_attendance(request: HttpRequest) -> HttpResponse:
     selected_course = None
 
     if query:
-        # Search for student by registration number or name
         student = Student.objects.filter(registration_number__iexact=query).first()
         if not student:
-            # Try partial name match
             possible_students = Student.objects.filter(full_name__icontains=query)
             if possible_students.count() == 1:
                 student = possible_students.first()
             elif possible_students.count() > 1:
                 messages.warning(request, f"Multiple students found matching '{query}'. Please use the exact Registration Number.")
-            else:
-                pass # Just show not found message in template
 
     if student:
-        # Get all regular attendance records
         all_records = AttendanceRecord.objects.select_related("session", "session__course").filter(student=student)
-        
-        # Get makeup class attendance records and convert to similar format
         makeup_records = MakeUpAttendanceRecord.objects.filter(
             student=student,
             makeup_class__status=MakeUpClass.STATUS_COMPLETED
         ).select_related("makeup_class", "makeup_class__course", "makeup_class__faculty")
         
-        # Overall Stats (including makeup classes)
         total_regular_sessions = all_records.count()
         total_makeup_sessions = makeup_records.count()
         total_sessions = total_regular_sessions + total_makeup_sessions
-        
         present_regular = all_records.filter(status=AttendanceRecord.STATUS_PRESENT).count()
         present_makeup = makeup_records.filter(status=AttendanceRecord.STATUS_PRESENT).count()
         present = present_regular + present_makeup
@@ -995,22 +948,16 @@ def super_admin_view_attendance(request: HttpRequest) -> HttpResponse:
         }
 
         if course_id:
-            # Course Detail View - combine regular and makeup records
             regular_records = all_records.filter(session__course_id=course_id).order_by("-session__session_date", "-session__created_at")
             makeup_course_records = makeup_records.filter(makeup_class__course_id=course_id).order_by("-makeup_class__session_date")
-            
-            # Convert makeup records to display format
             records = list(regular_records)
             for mr in makeup_course_records:
-                # Create a synthetic record-like object for template
                 mr.session_date = mr.makeup_class.session_date
                 mr.course_name = mr.makeup_class.course.name
                 mr.course_code = mr.makeup_class.course.code
                 mr.is_makeup = True
                 mr.faculty_name = mr.makeup_class.faculty.user.get_full_name() or mr.makeup_class.faculty.user.username
                 records.append(mr)
-            
-            # Sort by date
             records.sort(key=lambda x: x.session_date if hasattr(x, 'session_date') else x.session.session_date, reverse=True)
             
             if regular_records.exists():
@@ -1020,9 +967,7 @@ def super_admin_view_attendance(request: HttpRequest) -> HttpResponse:
             else:
                 selected_course = Course.objects.filter(id=course_id).first()
         else:
-            # Course Summary View - include makeup classes
             courses = {}
-            # Process regular records
             for record in all_records:
                 c = record.session.course
                 if c.id not in courses:
@@ -1038,8 +983,6 @@ def super_admin_view_attendance(request: HttpRequest) -> HttpResponse:
                     courses[c.id]["present"] += 1
                 else:
                     courses[c.id]["absent"] += 1
-            
-            # Process makeup records
             for mr in makeup_records:
                 c = mr.makeup_class.course
                 if c.id not in courses:
@@ -1352,22 +1295,18 @@ def manage_emergency_alert_delete(request: HttpRequest, alert_id: int) -> HttpRe
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_staff", False)))
 def faculty_dashboard(request: HttpRequest) -> HttpResponse:
-    """Faculty dashboard showing their assignments grouped by section."""
-    # Get faculty profile for current user
     try:
         faculty = FacultyProfile.objects.get(user=request.user)
     except FacultyProfile.DoesNotExist:
         messages.error(request, "No faculty profile found. Please contact admin.")
         return redirect("home")
     
-    # Get all offerings for this faculty
     offerings = (
         SectionCourseFaculty.objects.filter(faculty=faculty)
         .select_related("course", "section")
         .order_by("section__name", "course__code")
     )
     
-    # Group by section
     sections_data = {}
     for offering in offerings:
         section_name = offering.section.name if offering.section else "No Section"
@@ -1381,7 +1320,6 @@ def faculty_dashboard(request: HttpRequest) -> HttpResponse:
             "offering": offering
         })
     
-    # Sort by section name
     sorted_sections = sorted(sections_data.items(), key=lambda x: x[0])
     
     return render(
@@ -1399,7 +1337,6 @@ def faculty_dashboard(request: HttpRequest) -> HttpResponse:
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def schedule_list(request: HttpRequest) -> HttpResponse:
-    """List all academic schedules with optional filters."""
     qs = Schedule.objects.select_related(
         "section_course_faculty__course",
         "section_course_faculty__faculty__user",
@@ -1407,14 +1344,12 @@ def schedule_list(request: HttpRequest) -> HttpResponse:
         "classroom__block"
     ).order_by("day_of_week", "time_slot")
     
-    # Get filter options
     sections = Section.objects.order_by("name")
     faculty_list = FacultyProfile.objects.filter(is_active=True).select_related("user").order_by("user__username")
     blocks = Block.objects.order_by("code")
     classrooms = Classroom.objects.select_related("block").order_by("block__code", "room_number")
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
     
-    # Apply filters
     section_filter = request.GET.get("section")
     faculty_filter = request.GET.get("faculty")
     day_filter = request.GET.get("day")
@@ -1452,7 +1387,6 @@ def schedule_list(request: HttpRequest) -> HttpResponse:
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def schedule_create(request: HttpRequest) -> HttpResponse:
-    """Create a new schedule entry with clash prevention."""
     if request.method == "POST":
         form = ScheduleForm(request.POST)
         if form.is_valid():
@@ -1472,7 +1406,6 @@ def schedule_create(request: HttpRequest) -> HttpResponse:
 @login_required
 @user_passes_test(lambda u: bool(getattr(u, "is_superuser", False)))
 def schedule_delete(request: HttpRequest, schedule_id: int) -> HttpResponse:
-    """Delete a schedule entry."""
     schedule = get_object_or_404(Schedule.objects.select_related(
         "section_course_faculty__course",
         "classroom__block"
@@ -1494,14 +1427,12 @@ def schedule_delete(request: HttpRequest, schedule_id: int) -> HttpResponse:
 
 @login_required
 def faculty_timetable(request: HttpRequest) -> HttpResponse:
-    """Faculty views their weekly timetable with classroom allocation."""
     try:
         faculty = FacultyProfile.objects.get(user=request.user)
     except FacultyProfile.DoesNotExist:
         messages.error(request, "No faculty profile found.")
         return redirect("home")
     
-    # Get all schedules for this faculty
     schedules = Schedule.objects.filter(
         section_course_faculty__faculty=faculty
     ).select_related(
@@ -1510,11 +1441,9 @@ def faculty_timetable(request: HttpRequest) -> HttpResponse:
         "classroom__block"
     ).order_by("day_of_week", "time_slot")
     
-    # Group by day for timetable display
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
     timetable = {day: [] for day in days}
     
-    # Weekly load summary
     weekly_load = {
         "total_classes": schedules.count(),
         "classes_per_day": {day: 0 for day in days},
@@ -1531,14 +1460,12 @@ def faculty_timetable(request: HttpRequest) -> HttpResponse:
         })
         weekly_load["classes_per_day"][s.day_of_week] += 1
     
-    # Get faculty's courses for booking dropdown
     faculty_courses = SectionCourseFaculty.objects.filter(
         faculty=faculty
     ).select_related("course", "section")
 
     classrooms = Classroom.objects.select_related("block").order_by("block__code", "room_number")
 
-    # Ensure course offerings exist for assigned courses (so booking dropdown isn't empty)
     for scf in faculty_courses:
         existing_offering = CourseOffering.objects.filter(course=scf.course, section=scf.section).first()
         if existing_offering and existing_offering.faculty_id != faculty.id:
@@ -1579,7 +1506,6 @@ def faculty_timetable(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def section_timetable(request: HttpRequest, section_id: int) -> HttpResponse:
-    """View timetable for a specific section (faculty access)."""
     try:
         faculty = FacultyProfile.objects.get(user=request.user)
     except FacultyProfile.DoesNotExist:
@@ -1588,7 +1514,6 @@ def section_timetable(request: HttpRequest, section_id: int) -> HttpResponse:
     
     section = get_object_or_404(Section, id=section_id)
     
-    # Check if faculty teaches this section
     teaches_section = SectionCourseFaculty.objects.filter(
         faculty=faculty, section=section
     ).exists()
@@ -1626,7 +1551,6 @@ def section_timetable(request: HttpRequest, section_id: int) -> HttpResponse:
 
 @login_required
 def faculty_today_classes(request: HttpRequest) -> HttpResponse:
-    """Quick view of today's classes for faculty with attendance links."""
     try:
         faculty = FacultyProfile.objects.get(user=request.user)
     except FacultyProfile.DoesNotExist:
@@ -1636,7 +1560,6 @@ def faculty_today_classes(request: HttpRequest) -> HttpResponse:
     from datetime import datetime
     today = datetime.now().strftime("%A")
     
-    # Get today's schedules
     today_schedules = Schedule.objects.filter(
         section_course_faculty__faculty=faculty,
         day_of_week=today
@@ -1648,7 +1571,6 @@ def faculty_today_classes(request: HttpRequest) -> HttpResponse:
     
     classes = []
     for s in today_schedules:
-        # Check if attendance session already exists
         existing_session = AttendanceSession.objects.filter(
             course_offering__course=s.section_course_faculty.course,
             section=s.section_course_faculty.section,
@@ -2823,7 +2745,6 @@ def makeup_class_attendance_records(request: HttpRequest, makeup_class_id: int) 
 
 @login_required
 def makeup_class_export_report(request: HttpRequest, makeup_class_id: int) -> HttpResponse:
-    """Export attendance report as CSV."""
     import csv
     
     try:
@@ -2867,7 +2788,6 @@ def makeup_class_export_report(request: HttpRequest, makeup_class_id: int) -> Ht
 
 @login_required
 def makeup_class_send_reminder(request: HttpRequest, makeup_class_id: int) -> HttpResponse:
-    """Send reminder notification to students about make-up class."""
     try:
         faculty = FacultyProfile.objects.get(user=request.user)
     except FacultyProfile.DoesNotExist:
@@ -2882,10 +2802,7 @@ def makeup_class_send_reminder(request: HttpRequest, makeup_class_id: int) -> Ht
     )
     
     if request.method == "POST":
-        # Get students in section
         students = Student.objects.filter(section_mapping__section=makeup_class.section)
-        
-        # Create notifications
         notification_count = 0
         for student in students:
             Notification.objects.create(

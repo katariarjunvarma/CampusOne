@@ -21,15 +21,10 @@ User = get_user_model()
 
 
 def setup_groups():
-    """
-    Create Teacher and StallOwner groups with required permissions.
-    Call this on startup or when needed.
-    """
-    # Teacher Group
+    """Create Teacher and StallOwner groups with required permissions."""
     teacher_group, _ = Group.objects.get_or_create(name="Teacher")
     teacher_perms = Permission.objects.filter(
         Q(codename__in=[
-            # Attendance permissions
             'view_student',
             'view_course',
             'view_section',
@@ -45,11 +40,9 @@ def setup_groups():
     )
     teacher_group.permissions.set(teacher_perms)
 
-    # StallOwner Group
     stallowner_group, _ = Group.objects.get_or_create(name="StallOwner")
     stallowner_perms = Permission.objects.filter(
         Q(codename__in=[
-            # Food module permissions
             'view_stall',
             'add_fooditem',
             'change_fooditem',
@@ -108,43 +101,26 @@ class UserAdmin(DjangoUserAdmin):
 
     list_display = tuple(getattr(DjangoUserAdmin, "list_display", ())) + ("get_role", "is_stall_owner", "get_owner_status")
 
-    # Hide manual permission selection, show only groups
     filter_horizontal = ()
 
     def save_model(self, request, obj, form, change):
-        """
-        Auto-assign groups based on user role:
-        - Superuser: No group needed (all permissions)
-        - Staff + Owner Status: StallOwner group
-        - Staff only (no owner_status): Teacher group
-        """
-        # First save the user
+        """Auto-assign groups based on user role."""
         super().save_model(request, obj, form, change)
 
-        # Ensure profile exists
         UserProfile.objects.get_or_create(user=obj)
 
-        # Setup groups if they don't exist
         teacher_group, stallowner_group = setup_groups()
 
-        # Clear existing groups (to prevent duplicate/conflicting assignments)
         obj.groups.clear()
-
-        # Clear user-specific permissions (they should come from groups)
         obj.user_permissions.clear()
 
-        # Assign group based on role
         if obj.is_superuser:
-            # Superusers don't need any groups - they have all permissions
             pass
         elif obj.profile.owner_status:
-            # Stall Owner role
             obj.groups.add(stallowner_group)
         elif obj.is_staff:
-            # Teacher role (staff but not owner)
             obj.groups.add(teacher_group)
 
-        # Save again to persist group changes
         obj.save()
 
 
@@ -193,11 +169,6 @@ class PreOrderAdmin(admin.ModelAdmin):
 
     @admin.action(description="Clear ALL orders (Warning: Clears everything)")
     def clear_all_history(self, request, queryset):
-        # We use the queryset if selected, or all if we want a global button (but actions are usually selection-based).
-        # To make it global-like, we can ignore queryset, but that's confusing.
-        # Let's just make it delete the SELECTED ones, but rename it "Delete Selected History".
-        # Actually, the user asked for a "clear food history button".
-        # Best way is to delete ALL.
         count, _ = PreOrder.objects.all().delete()
         self.message_user(request, f"Cleared ALL {count} food orders history.")
 

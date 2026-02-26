@@ -14,7 +14,7 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
-from datetime import date as _date
+from datetime import date
 
 from .forms import CancelOrderForm, PreOrderForm
 from .models import BreakSlot, BulkOrder, FoodItem, LoyaltyPoints, PreOrder, Stall, StallOwner
@@ -367,7 +367,7 @@ def submit_bulk_order(request: HttpRequest) -> HttpResponse:
         people_count = 0
 
     try:
-        delivery_date = _date.fromisoformat(str(payload.get("delivery_date")))
+        delivery_date = date.fromisoformat(str(payload.get("delivery_date")))
     except Exception:
         delivery_date = None
 
@@ -424,20 +424,18 @@ def my_orders(request: HttpRequest) -> HttpResponse:
     day_str = (request.GET.get("date") or "").strip()
     if day_str:
         try:
-            day = _date.fromisoformat(day_str)
+            day = date.fromisoformat(day_str)
         except Exception:
             day = timezone.localdate()
     else:
         day = timezone.localdate()
 
-    # Get all orders for the day
     orders = (
         PreOrder.objects.select_related("food_item", "slot")
         .filter(order_date=day, ordered_by=request.user)
         .order_by("order_number", "created_at")
     )
     
-    # Group by order_number
     grouped_orders = {}
     for order in orders:
         onum = order.order_number
@@ -471,7 +469,7 @@ def food_dashboard(request: HttpRequest) -> HttpResponse:
     day_str = (request.GET.get("date") or "").strip()
     if day_str:
         try:
-            day = _date.fromisoformat(day_str)
+            day = date.fromisoformat(day_str)
         except Exception:
             day = timezone.localdate()
     else:
@@ -679,7 +677,6 @@ def food_admin_clear_history(request: HttpRequest) -> HttpResponse:
         return redirect("home")
     
     if request.method == "POST":
-        # Clear all PreOrder objects
         count, _ = PreOrder.objects.all().delete()
         messages.success(request, f"Successfully cleared all {count} food order history.")
     
@@ -789,9 +786,6 @@ def vendor_update_order(request: HttpRequest) -> HttpResponse:
 
     order.status = new_status
     order.save(update_fields=["status"])
-
-    # Email is handled by post_save signal in signals.py
-
     return JsonResponse({"ok": True, "status": new_status, "new_status": new_status})
 
 
@@ -854,13 +848,11 @@ def vendor_remind_order(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def vendor_menu(request: HttpRequest) -> HttpResponse:
-    """Separate page showing only the stall's menu items."""
     stall_owner = _get_stall_owner(request)
     if not stall_owner or not stall_owner.is_active:
         messages.error(request, "Stall owner access required.")
         return redirect("home")
 
-    # Show all items for this stall (both active and inactive) so vendor can toggle
     menu_items = FoodItem.objects.filter(stall=stall_owner.stall).order_by("name")
 
     return render(
@@ -875,7 +867,6 @@ def vendor_menu(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def vendor_toggle_item(request: HttpRequest) -> HttpResponse:
-    """Toggle food item availability (active/inactive)."""
     stall_owner = _get_stall_owner(request)
     if not stall_owner or not stall_owner.is_active:
         return JsonResponse({"ok": False, "error": "access_denied"}, status=403)
@@ -900,7 +891,6 @@ def vendor_toggle_item(request: HttpRequest) -> HttpResponse:
     except FoodItem.DoesNotExist:
         return JsonResponse({"ok": False, "error": "not_found"}, status=404)
 
-    # Toggle is_active
     item.is_active = not item.is_active
     item.save(update_fields=["is_active"])
 
@@ -912,13 +902,11 @@ def vendor_toggle_item(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def vendor_updates(request: HttpRequest) -> HttpResponse:
-    """API Endpoint for Vendor Dashboard Realtime Updates"""
     stall_owner = _get_stall_owner(request)
     if not stall_owner or not stall_owner.is_active:
         return JsonResponse({"ok": False})
 
     today = timezone.localdate()
-    # Optimize query by selecting specific fields if possible, but for now full objects are fine
     all_orders = (
         PreOrder.objects.select_related("food_item", "slot", "ordered_by")
         .filter(
@@ -955,24 +943,21 @@ def vendor_updates(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def my_orders_updates(request: HttpRequest) -> HttpResponse:
-    """API Endpoint for My Orders Realtime Updates"""
     day_str = (request.GET.get("date") or "").strip()
     if day_str:
         try:
-            day = _date.fromisoformat(day_str)
+            day = date.fromisoformat(day_str)
         except Exception:
             day = timezone.localdate()
     else:
         day = timezone.localdate()
 
-    # Get all orders for the day
     orders = (
         PreOrder.objects.select_related("food_item", "slot")
         .filter(order_date=day, ordered_by=request.user)
         .order_by("order_number", "created_at")
     )
     
-    # Group by order_number
     grouped_orders = {}
     for order in orders:
         onum = order.order_number
@@ -1024,47 +1009,16 @@ def vendor_update_bulk_status(request: HttpRequest) -> HttpResponse:
     order_id = request.POST.get("order_id")
     status = request.POST.get("status")
     
-    # Check for 'action' from Mark Completed form which uses name='action' value='complete'
-    # But template uses status='completed' in a separate form.
-    # The template I wrote uses name="status" for approve/reject/complete forms.
-    # Except one form uses name='action' value='complete'. Let's handle both.
-    
     action = request.POST.get("action")
     if action == "complete":
         status = "completed"
         
-    # Map 'completed' to specific status if needed. 
-    # BulkOrder model has STATUS_APPROVED, STATUS_REJECTED, STATUS_CANCELLED.
-    # It seems I didn't add a STATUS_COMPLETED to the model in models.py earlier.
-    # Let me check models.py content again or I can assume I need to add it or use an existing one.
-    # From previous view_file of models.py:
-    # STATUS_SUBMITTED = "submitted"
-    # STATUS_APPROVED = "approved"
-    # STATUS_REJECTED = "rejected"
-    # STATUS_CANCELLED = "cancelled"
-    # There is NO "completed" status in BulkOrder model yet.
-    # I should likely add it or map it to something else, or maybe just APPROVED is the final state?
-    # User asked for "Completed button". So I should add STATUS_COMPLETED to Model.
-    
-    # For now, let's assume I will update the model in next step.
-    
     if not order_id or not status:
          messages.error(request, "Invalid request.")
          return redirect("food:vendor_bulk_orders")
          
     try:
         order = BulkOrder.objects.get(id=order_id, stall_name=stall_owner.stall.name)
-        
-        # Validate transitions
-        # submitted -> approved / rejected
-        # approved -> completed (new status)
-        
-        # Since I can't restart model editing right in the middle of this generic comment,
-        # I will assume "completed" is a valid string to save for now, 
-        # but I must update choices in models.py to strictly follow Django patterns.
-        # However, CharField choices are validation level, saving a string usually works if max_length allows.
-        # BulkOrder status max_length=16. "completed" is 9 chars. Safe.
-        
         order.status = status
         order.save()
         messages.success(request, f"Bulk Order #{order.id} marked as {status}.")
