@@ -97,6 +97,10 @@ TEMPLATES = [
     },
 ]
 
+FIXTURE_DIRS = [
+    BASE_DIR / "fixtures",
+]
+
 WSGI_APPLICATION = 'smartlpu.wsgi.application'
 
 
